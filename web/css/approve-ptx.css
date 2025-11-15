@@ -1,0 +1,41 @@
+.phieu-thue-xe-form label {
+    color:blue;
+ }
+ 
+     /* CSS để tạo radio buttons hình vuông */
+     .form-check-input.square-radio {
+         -webkit-appearance: none; /* Tắt kiểu mặc định */
+         -moz-appearance: none;
+         appearance: none;
+         width: 20px; /* Kích thước tùy chỉnh */
+         height: 20px;
+         border: 2px solid #007bff; /* Màu viền */
+         border-radius: 0; /* Hình vuông */
+         outline: none; /* Xóa outline */
+         cursor: pointer; /* Thay đổi con trỏ */
+         position: relative; /* Để điều chỉnh vị trí */
+     }
+ 
+     /* Hiệu ứng khi chọn radio button */
+     .form-check-input.square-radio:checked {
+         background-color: #007bff; /* Màu nền khi được chọn */
+     }
+ 
+     .form-check-input.square-radio:checked::after {
+         content: '';
+         position: absolute;
+         top: 50%;
+         left: 50%;
+         width: 10px; /* Kích thước dấu chọn */
+         height: 10px;
+         background-color: white; /* Màu dấu chọn */
+         border-radius: 0; /* Hình vuông */
+         transform: translate(-50%, -50%); /* Căn giữa */
+     }
+     .square-radio {
+        width: 20px; /* Độ rộng của radio button */
+        height: 20px; /* Độ cao của radio button */
+        margin-right: 10px; /* Khoảng cách giữa radio button và label */
+        cursor: pointer; /* Hiển thị con trỏ chuột khi di chuột qua */
+    }
+    

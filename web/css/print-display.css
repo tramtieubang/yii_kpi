@@ -1,0 +1,41 @@
+#print{
+	width:100%;
+	margin:0 auto;
+}
+.wrap{
+	width:270px;
+	height:80px;
+	margin:0 auto;
+}
+.wrap2{
+	padding-top:5px;
+}
+.div-left{
+	width: 130px;
+	float:left;
+}
+.div-right{
+	width: 130px;
+	
+	float:left;
+	padding-left:10px;
+
+}
+.img{
+	width:45px;
+}
+.title{
+	font-weight: bold;
+	font-size:9px;
+	text-align: center;
+}
+.title-2{
+	font-weight: normal;
+	font-size:9px;
+	text-align: center;
+	font-style: italic;
+}
+
+.clearfix{
+	clear:both;
+}

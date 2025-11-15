@@ -1,0 +1,49 @@
+*{
+	margin: 0px;
+	padding: 0px;
+}
+body{
+	font-family: "Times New Roman", Times, serif;
+	/*font-size: 100%;*/
+}
+table,tr,td{
+	margin:0;
+	padding:0;
+}
+.wrap{
+	width:270px;
+	height:80px;
+	margin-left: 5px;
+	margin-top:5px;
+	padding: 0px;
+}
+.wrap2{
+	padding-top:5px;
+}
+.div-left{
+	width: 130px;
+	float:left;
+}
+.div-right{
+	width: 130px;
+	float:left;
+	padding-left:10px;
+}
+.img{
+	width:45px;
+}
+.title{
+	font-weight: bold;
+	font-size:9px;
+	text-align: center;
+}
+.title-2{
+	font-weight: normal;
+	font-size:9px;
+	text-align: center;
+	font-style: italic;
+}
+
+.clearfix{
+	clear:both;
+}
