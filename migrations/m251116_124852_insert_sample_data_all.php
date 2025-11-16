@@ -3,10 +3,10 @@
 use yii\db\Migration;
 
 /**
- * Class m251116_135500_insert_sample_kpi_users
+ * m251116_124852_insert_sample_data_all
  * Chèn dữ liệu mẫu test cho toàn bộ hệ thống KPI với user admin + nhân viên
+ * Chèn dữ liệu mẫu test cho toàn bộ hệ thống KPI, bao gồm user, departments, employees, KPI, work, evaluation, report và summary
  */
-
 class m251116_124852_insert_sample_data_all extends Migration
 {
     public function safeUp()
@@ -179,10 +179,26 @@ class m251116_124852_insert_sample_data_all extends Migration
                 'reported_at'=>$now,
             ]);
         }
+
+        // -------------------------------
+        // 9. Bảng kpi_summary
+        // -------------------------------
+        for($i=1; $i<=10; $i++){
+            $this->insert('{{%kpi_summary}}', [
+                'employee_id' => $i,
+                'total_registered' => rand(1,10),
+                'total_assigned' => rand(1,10),
+                'total_completed' => rand(0,10),
+                'average_score' => rand(70,100),
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+        }
     }
 
     public function safeDown()
     {
+        $this->truncateTable('{{%kpi_summary}}');
         $this->truncateTable('{{%kpi_work_report}}');
         $this->truncateTable('{{%kpi_kpi_evaluation}}');
         $this->truncateTable('{{%kpi_work_assignment}}');
