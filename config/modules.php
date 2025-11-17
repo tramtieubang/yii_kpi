@@ -2,6 +2,26 @@
 
 return [
 
+    'departments' => [ 
+        'class' => 'app\modules\departments\Module', 
+    ],
+
+    'employees' => [ 
+        'class' => 'app\modules\employees\Module', 
+    ],  
+    
+    'kpi' => [ 
+        'class' => 'app\modules\kpi\Module', 
+    ],
+
+    'work-registered' => [ 
+        'class' => 'app\modules\work_registered\Module', 
+    ],
+
+    'kpi-evaluation' => [ 
+        'class' => 'app\modules\kpi_evaluation\Module', 
+    ],
+
     'home' => [ 
         'class' => 'app\modules\home\Module', 
     ],

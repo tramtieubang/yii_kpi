@@ -1,7 +1,10 @@
 <?php
 
-namespace app\models;
+namespace app\modules\kpi\models;
 
+use app\models\KpiKpi;
+use app\models\KpiKpiEvaluation;
+use app\models\KpiWorkRegistered;
 use Yii;
 
 /**
@@ -17,7 +20,7 @@ use Yii;
  * @property KpiKpiEvaluation[] $kpiKpiEvaluations
  * @property KpiWorkRegistered[] $kpiWorkRegistereds
  */
-class KpiKpi extends \yii\db\ActiveRecord
+class KpiKpiForm extends KpiKpi
 {
 
 
@@ -49,13 +52,13 @@ class KpiKpi extends \yii\db\ActiveRecord
      */
     public function attributeLabels()
     {
-        return [
-            'id' => 'ID',
-            'code' => 'Code',
-            'name' => 'Name',
-            'description' => 'Description',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+         return [
+            'id' => 'Mã',
+            'code' => 'Mã code',
+            'name' => 'Tên',
+            'description' => 'Mô tả',
+            'created_at' => 'Ngày tạo',
+            'updated_at' => 'Ngày cập nhật',
         ];
     }
 

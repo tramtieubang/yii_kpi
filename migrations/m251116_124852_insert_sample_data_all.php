@@ -13,199 +13,172 @@ class m251116_124852_insert_sample_data_all extends Migration
     {
         $now = date('Y-m-d H:i:s');
 
-        // -------------------------------
-        // 1. Bảng user
-        // -------------------------------
-        $users = [
-            ['admin','admin@example.com',1],
-            ['user2','user2@example.com',0],
-            ['user3','user3@example.com',0],
-            ['user4','user4@example.com',0],
-            ['user5','user5@example.com',0],
-            ['user6','user6@example.com',0],
-            ['user7','user7@example.com',0],
-            ['user8','user8@example.com',0],
-            ['user9','user9@example.com',0],
-            ['user10','user10@example.com',0],
+        /* ======================================================
+         * 1. POSITIONS (10 record)
+         * ====================================================== */
+        $positions = [
+            ['Giám đốc'], ['Phó Giám đốc'], ['Trưởng phòng'], ['Phó phòng'],
+            ['Chuyên viên'], ['Nhân viên Kinh doanh'], ['Nhân viên IT'],
+            ['Nhân viên HR'], ['Nhân viên Marketing'], ['Nhân viên Kế toán']
         ];
 
-        foreach ($users as $i => $u) {
-            $this->insert('{{%user}}', [
-                'username' => $u[0],
-                'auth_key' => Yii::$app->security->generateRandomString(),
-                'password_hash' => Yii::$app->security->generatePasswordHash('123456'),
-                'confirmation_token' => 'token'.$i,
-                'status' => 10,
-                'superadmin' => $u[2],
-                'created_at' => $now,
-                'updated_at' => $now,
-                'registration_ip' => '127.0.0.'.($i+1),
-                'bind_to_ip' => null,
-                'email' => $u[1],
-                'email_confirmed' => 1,
-            ]);
-        }
-
-        // -------------------------------
-        // 2. Bảng departments
-        // -------------------------------
-        $departments = [
-            ['DPT001','Phòng Hành chính'],
-            ['DPT002','Phòng Kinh doanh'],
-            ['DPT003','Phòng IT'],
-            ['DPT004','Phòng Nhân sự'],
-            ['DPT005','Phòng Marketing'],
-            ['DPT006','Phòng Tài chính'],
-            ['DPT007','Phòng Sản xuất'],
-            ['DPT008','Phòng Nghiên cứu'],
-            ['DPT009','Phòng CSKH'],
-            ['DPT010','Phòng Logistic'],
-        ];
-
-        foreach ($departments as $d) {
-            $this->insert('{{%departments}}', [
-                'code' => $d[0],
-                'name' => $d[1],
-                'description' => $d[1],
+        foreach ($positions as $p) {
+            $this->insert('positions', [
+                'name' => $p[0],
+                'description' => null,
                 'created_at' => $now,
                 'updated_at' => $now,
             ]);
         }
 
-        // -------------------------------
-        // 3. Bảng employees
-        // -------------------------------
-        $employees = [
-            ['Nguyễn Văn A',1,'0901000001','Trưởng phòng','2020-01-01'],
-            ['Trần Thị B',2,'0901000002','Nhân viên kinh doanh','2021-03-15'],
-            ['Lê Văn C',3,'0901000003','Chuyên viên IT','2019-05-20'],
-            ['Phạm Thị D',4,'0901000004','Nhân viên HR','2020-07-10'],
-            ['Vũ Văn E',5,'0901000005','Nhân viên Marketing','2022-02-01'],
-            ['Đinh Thị F',6,'0901000006','Kế toán','2021-09-15'],
-            ['Ngô Văn G',7,'0901000007','Nhân viên sản xuất','2018-12-01'],
-            ['Bùi Thị H',8,'0901000008','Chuyên viên R&D','2022-06-10'],
-            ['Lý Văn I',9,'0901000009','Nhân viên CSKH','2020-11-05'],
-            ['Trương Thị J',10,'0901000010','Nhân viên Logistic','2021-08-20'],
+        /* ======================================================
+         * 2. BUSINESS FIELDS (10 record)
+         * ====================================================== */
+        $fields = [
+            'Công nghệ thông tin', 'Marketing', 'Bán hàng',
+            'Logistics', 'Sản xuất', 'Tài chính', 'Nhân sự',
+            'Dịch vụ khách hàng', 'R&D', 'Hành chính'
         ];
-
-        foreach ($employees as $i => $e) {
-            $this->insert('{{%employees}}', [
-                'user_id' => $i+1,
-                'department_id' => $e[1],
-                'name' => $e[0],
-                'email' => strtolower(str_replace(' ','',$e[0])).'@example.com',
-                'phone' => $e[2],
-                'position' => $e[3],
-                'hire_date' => $e[4],
+        foreach ($fields as $f) {
+            $this->insert('business_fields', [
+                'name' => $f,
+                'description' => null,
                 'created_at' => $now,
                 'updated_at' => $now,
             ]);
         }
 
-        // -------------------------------
-        // 4. Bảng kpi_kpi
-        // -------------------------------
+        /* ======================================================
+         * 3. DEPARTMENTS (10 record)
+         * ====================================================== */
+        for ($i = 1; $i <= 10; $i++) {
+            $this->insert('departments', [
+                'code' => 'DP' . str_pad($i, 3, '0', STR_PAD_LEFT),
+                'name' => 'Phòng ban ' . $i,
+                'description' => null,
+                'created_at' => $now,
+                'updated_at' => $now
+            ]);
+        }
+
+        /* ======================================================
+         * 4. EMPLOYEES (10 record)
+         * user_id: bạn cần phải có sẵn user từ 1..10 trong bảng user
+         * ====================================================== */
+        for ($i = 1; $i <= 10; $i++) {
+            $this->insert('employees', [
+                'user_id' => $i,
+                'department_id' => rand(1, 10),
+                'position_id' => rand(1, 10),
+                'business_field_id' => rand(1, 10),
+                'name' => "Nhân viên $i",
+                'email' => "employee$i@example.com",
+                'phone' => "09010000" . str_pad($i, 2, '0', STR_PAD_LEFT),
+                'hire_date' => "2020-01-" . str_pad($i, 2, '0', STR_PAD_LEFT),
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+        }
+
+        /* ======================================================
+         * 5. KPI List (kpi_kpi) 10 record
+         * ====================================================== */
         $kpis = [
-            'KPI Doanh số',
-            'KPI CSKH',
-            'KPI IT',
-            'KPI Marketing',
-            'KPI HR',
-            'KPI Sản xuất',
-            'KPI R&D',
-            'KPI Logistic',
-            'KPI Tài chính',
-            'KPI Hành chính',
+            'Doanh số', 'CSKH', 'IT Support', 'Marketing',
+            'HR tuyển dụng', 'Sản xuất', 'R&D nghiên cứu',
+            'Logistics giao hàng', 'Tài chính', 'Hành chính'
         ];
 
-        foreach ($kpis as $k) {
-            $this->insert('{{%kpi_kpi}}', [
-                'name' => $k,
-                'description' => $k,
+        foreach ($kpis as $index => $kpi) {
+            $this->insert('kpi_kpi', [
+                'code' => 'KPI' . str_pad($index + 1, 3, '0', STR_PAD_LEFT),
+                'name' => $kpi,
+                'description' => null,
+                'created_at' => $now,
+                'updated_at' => $now
+            ]);
+        }
+
+        /* ======================================================
+         * 6. KPI_WORK_REGISTERED (10 record)
+         * ====================================================== */
+        for ($i = 1; $i <= 10; $i++) {
+            $this->insert('kpi_work_registered', [
+                'employee_id' => rand(1, 10),
+                'kpi_id' => rand(1, 10),
+                'title' => "Công việc đăng ký $i",
+                'description' => "Mô tả công việc $i",
+                'status' => rand(0, 2),
+                'date_start' => "2025-01-" . str_pad($i, 2, '0', STR_PAD_LEFT),
+                'date_end' => "2025-01-" . str_pad(($i + 5), 2, '0', STR_PAD_LEFT),
                 'created_at' => $now,
                 'updated_at' => $now,
             ]);
         }
 
-        // -------------------------------
-        // 5. Bảng kpi_work_registered
-        // -------------------------------
-        for($i=1;$i<=10;$i++){
-            $this->insert('{{%kpi_work_registered}}', [
-                'employee_id'=>$i,
-                'kpi_id'=>$i,
-                'title'=>'Công việc mẫu '.$i,
-                'description'=>'Mô tả công việc mẫu '.$i,
-                'status'=>rand(0,2),
-                'date_start'=>date('Y-m-d',strtotime("-10 days +$i day")),
-                'date_end'=>date('Y-m-d',strtotime("+20 days +$i day")),
-                'created_at'=>$now,
-                'updated_at'=>$now,
+        /* ======================================================
+         * 7. KPI_WORK_ASSIGNMENT (10 record)
+         * ====================================================== */
+        for ($i = 1; $i <= 10; $i++) {
+            $this->insert('kpi_work_assignment', [
+                'work_registered_id' => $i,
+                'employee_id' => rand(1, 10),
+                'assigned_at' => $now,
+                'status' => rand(0, 2),
             ]);
         }
 
-        // -------------------------------
-        // 6. Bảng kpi_work_assignment
-        // -------------------------------
-        for($i=1;$i<=10;$i++){
-            $this->insert('{{%kpi_work_assignment}}', [
-                'work_registered_id'=>$i,
-                'employee_id'=>$i,
-                'assigned_at'=>$now,
-                'status'=>rand(0,2),
+        /* ======================================================
+         * 8. KPI_EVALUATION (10 record)
+         * ====================================================== */
+        for ($i = 1; $i <= 10; $i++) {
+            $this->insert('kpi_kpi_evaluation', [
+                'kpi_id' => rand(1, 10),
+                'employee_id' => rand(1, 10),
+                'score' => rand(50, 100) / 10,
+                'comment' => "Nhận xét $i",
+                'evaluated_at' => $now,
             ]);
         }
 
-        // -------------------------------
-        // 7. Bảng kpi_kpi_evaluation
-        // -------------------------------
-        for($i=1;$i<=10;$i++){
-            $this->insert('{{%kpi_kpi_evaluation}}', [
-                'kpi_id'=>$i,
-                'employee_id'=>$i,
-                'score'=>rand(70,100),
-                'comment'=>'Đánh giá mẫu '.$i,
-                'evaluated_at'=>$now,
+        /* ======================================================
+         * 9. KPI_WORK_REPORT (10 record)
+         * ====================================================== */
+        for ($i = 1; $i <= 10; $i++) {
+            $this->insert('kpi_work_report', [
+                'work_assignment_id' => $i,
+                'content' => "Nội dung báo cáo $i",
+                'reported_at' => $now,
             ]);
         }
 
-        // -------------------------------
-        // 8. Bảng kpi_work_report
-        // -------------------------------
-        for($i=1;$i<=10;$i++){
-            $this->insert('{{%kpi_work_report}}', [
-                'work_assignment_id'=>$i,
-                'content'=>'Báo cáo công việc mẫu '.$i,
-                'reported_at'=>$now,
-            ]);
-        }
-
-        // -------------------------------
-        // 9. Bảng kpi_summary
-        // -------------------------------
-        for($i=1; $i<=10; $i++){
-            $this->insert('{{%kpi_summary}}', [
+        /* ======================================================
+         * 10. KPI_SUMMARY (10 record)
+         * ====================================================== */
+        for ($i = 1; $i <= 10; $i++) {
+            $this->insert('kpi_summary', [
                 'employee_id' => $i,
-                'total_registered' => rand(1,10),
-                'total_assigned' => rand(1,10),
-                'total_completed' => rand(0,10),
-                'average_score' => rand(70,100),
+                'total_registered' => rand(3, 10),
+                'total_assigned' => rand(3, 10),
+                'total_completed' => rand(1, 10),
+                'average_score' => rand(60, 100) / 10,
                 'created_at' => $now,
-                'updated_at' => $now,
+                'updated_at' => $now
             ]);
         }
     }
 
     public function safeDown()
     {
-        $this->truncateTable('{{%kpi_summary}}');
-        $this->truncateTable('{{%kpi_work_report}}');
-        $this->truncateTable('{{%kpi_kpi_evaluation}}');
-        $this->truncateTable('{{%kpi_work_assignment}}');
-        $this->truncateTable('{{%kpi_work_registered}}');
-        $this->truncateTable('{{%kpi_kpi}}');
-        $this->truncateTable('{{%employees}}');
-        $this->truncateTable('{{%departments}}');
-        $this->delete('{{%user}}', ['username'=>['admin','user2','user3','user4','user5','user6','user7','user8','user9','user10']]);
+        $this->delete('kpi_summary');
+        $this->delete('kpi_work_report');
+        $this->delete('kpi_kpi_evaluation');
+        $this->delete('kpi_work_assignment');
+        $this->delete('kpi_work_registered');
+        $this->delete('kpi_kpi');
+        $this->delete('employees');
+        $this->delete('departments');
+        $this->delete('business_fields');
+        $this->delete('positions');
     }
 }

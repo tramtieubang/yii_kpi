@@ -15,51 +15,21 @@ class m251116_123016_create_kpi_tables extends Migration
     public function safeUp()
     {
         $nowExpression = new \yii\db\Expression('CURRENT_TIMESTAMP');
-
+       
         // -------------------------------
-        // 1. Bảng departments
-        // -------------------------------
-        $this->createTable('{{%departments}}', [
-            'id' => $this->primaryKey()->comment('ID phòng ban'),
-            'code' => $this->string(50)->notNull()->unique()->comment('Mã phòng ban'),
-            'name' => $this->string(255)->notNull()->comment('Tên phòng ban'),
-            'description' => $this->text()->comment('Mô tả phòng ban'),
-            'created_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP')->comment('Thời gian tạo'),
-            'updated_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')->comment('Thời gian cập nhật'),
-        ], 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT="Bảng phòng ban"');
-
-        // -------------------------------
-        // 2. Bảng employees
-        // -------------------------------
-        $this->createTable('{{%employees}}', [
-            'id' => $this->primaryKey()->comment('ID nhân viên'),
-            'user_id' => $this->integer()->notNull()->comment('ID user trong module quản lý người dùng Yii2'),
-            'department_id' => $this->integer()->notNull()->comment('ID phòng ban của nhân viên'),
-            'name' => $this->string(255)->notNull()->comment('Họ tên nhân viên'),
-            'email' => $this->string(255)->notNull()->unique()->comment('Email nhân viên'),
-            'phone' => $this->string(50)->comment('Số điện thoại'),
-            'position' => $this->string(255)->comment('Chức vụ'),
-            'hire_date' => $this->date()->comment('Ngày tuyển dụng'),
-            'created_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP')->comment('Thời gian tạo'),
-            'updated_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')->comment('Thời gian cập nhật'),
-        ], 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT="Bảng nhân viên"');
-
-        $this->addForeignKey('fk_employees_user', '{{%employees}}', 'user_id', '{{%user}}', 'id', 'CASCADE', 'CASCADE');
-        $this->addForeignKey('fk_employees_department', '{{%employees}}', 'department_id', '{{%departments}}', 'id', 'CASCADE', 'CASCADE');
-
-        // -------------------------------
-        // 3. Bảng kpi_kpi
+        // 1. Bảng kpi_kpi
         // -------------------------------
         $this->createTable('{{%kpi_kpi}}', [
             'id' => $this->primaryKey()->comment('ID KPI'),
-            'name' => $this->string(255)->notNull()->comment('Tên KPI'),
+            'code' => $this->string(50)->notNull()->unique()->comment('Mã KPI'),
+            'name' => $this->string(255)->notNull()->comment('Tên KPI'),            
             'description' => $this->text()->comment('Mô tả KPI'),
             'created_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP')->comment('Thời gian tạo'),
             'updated_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')->comment('Thời gian cập nhật'),
         ], 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT="Bảng KPI"');
 
         // -------------------------------
-        // 4. Bảng kpi_work_registered
+        // 2. Bảng kpi_work_registered
         // -------------------------------
         $this->createTable('{{%kpi_work_registered}}', [
             'id' => $this->primaryKey()->comment('ID đăng ký công việc'),
@@ -79,7 +49,7 @@ class m251116_123016_create_kpi_tables extends Migration
         $this->createIndex('idx_work_registered_emp_kpi_status_start', '{{%kpi_work_registered}}', ['employee_id','kpi_id','status','date_start']);
 
         // -------------------------------
-        // 5. Bảng kpi_work_assignment
+        // 3. Bảng kpi_work_assignment
         // -------------------------------
         $this->createTable('{{%kpi_work_assignment}}', [
             'id' => $this->primaryKey()->comment('ID phân công công việc'),
@@ -94,7 +64,7 @@ class m251116_123016_create_kpi_tables extends Migration
         $this->createIndex('idx_work_assignment_emp_status', '{{%kpi_work_assignment}}', ['employee_id','status']);
 
         // -------------------------------
-        // 6. Bảng kpi_kpi_evaluation
+        // 4. Bảng kpi_kpi_evaluation
         // -------------------------------
         $this->createTable('{{%kpi_kpi_evaluation}}', [
             'id' => $this->primaryKey()->comment('ID đánh giá KPI'),
@@ -110,7 +80,7 @@ class m251116_123016_create_kpi_tables extends Migration
         $this->createIndex('idx_evaluation_emp_kpi', '{{%kpi_kpi_evaluation}}', ['employee_id','kpi_id']);
 
         // -------------------------------
-        // 7. Bảng kpi_work_report
+        // 5. Bảng kpi_work_report
         // -------------------------------
         $this->createTable('{{%kpi_work_report}}', [
             'id' => $this->primaryKey()->comment('ID báo cáo công việc'),
@@ -122,7 +92,7 @@ class m251116_123016_create_kpi_tables extends Migration
         $this->addForeignKey('fk_work_report_assignment', '{{%kpi_work_report}}', 'work_assignment_id', '{{%kpi_work_assignment}}', 'id', 'CASCADE', 'CASCADE');
 
         // -------------------------------
-        // 8. Bảng kpi_summary
+        // 6. Bảng kpi_summary
         // -------------------------------
         $this->createTable('{{%kpi_summary}}', [
             'id' => $this->primaryKey(),

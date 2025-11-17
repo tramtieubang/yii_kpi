@@ -31,6 +31,14 @@ use yii\helpers\Html;
 				
 				<!-- <li class="side-item side-item-category">CHỨC NĂNG</li> -->
 				<?= $this->render('menus/system') ?>
+
+				<?= $this->render('menus/quanlydanhmuc/master_data') ?>
+
+				<?= $this->render('menus/quanlycongviec/work_flows') ?>
+
+				<?= $this->render('menus/danhgiakpi/kpi_evaluation') ?>
+
+				<?= $this->render('menus/baocaothongke/reports') ?>
 				
 			</ul>
 			<div class="slide-right" id="slide-right">
