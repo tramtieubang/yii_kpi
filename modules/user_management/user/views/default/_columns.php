@@ -120,7 +120,7 @@ return [
     ],
 
     // Cột hành động tùy chọn: Phân quyền + Đổi mật khẩu
-    [
+    [        
         'header' => 'Tùy chọn',
         'format' => 'raw',
         'value' => function (UserForm $model) {
@@ -130,7 +130,7 @@ return [
                 <button class="btn btn-dark btn-sm dropdown-toggle"
                         type="button"
                         data-bs-toggle="dropdown"
-                        data-bs-display="static">
+                        data-bs-display="dynamic">
                     <i class="fe fe-settings me-1"></i> Tùy chọn
                 </button>
 

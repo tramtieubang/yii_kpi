@@ -43,6 +43,11 @@ Yii::$app->params['showView'] = false;
         <?=GridView::widget([
             'id'=>'crud-datatable',
             'dataProvider' => $dataProvider,
+            'formatter' => [
+                'class' => 'yii\i18n\Formatter',
+                'nullDisplay' => '', // không hiển thị gì khi null
+            ],
+
             //'filterModel' => $searchModel,
             'pjax'=>true,
             'columns' => require(__DIR__.'/_columns.php'),

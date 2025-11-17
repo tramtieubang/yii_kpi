@@ -83,6 +83,7 @@ Yii::$app->params['showView'] = false;
             'striped' => false,
             'condensed' => true,
             'responsive' => false,
+            'containerOptions' => ['style'=>'overflow-x:auto; white-space: nowrap;'], // ✅ thêm dòng này
             'panelHeadingTemplate'=>'<div style="width:100%;"><div class="float-start mt-2 text-primary">{title}</div> <div class="float-end">{toolbar}</div></div>',
             'panelFooterTemplate'=>'<div style="width:100%;"><div class="float-start">{summary}</div><div class="float-end">{pager}</div></div>',
             'summary'=>'Tổng: {totalCount} dòng dữ liệu',
@@ -103,11 +104,18 @@ Yii::$app->params['showView'] = false;
 <?php Pjax::end(); ?>
 
 <script>
-$(document).on('hidden.bs.modal', '.modal', function() {
+/* $(document).on('hidden.bs.modal', '.modal', function() {
     if ($('.modal.show').length > 0) {
         $('body').addClass('modal-open');
     }
-});
+}); */
+    document.addEventListener('hidden.bs.modal', function (event) {
+        const modals = document.querySelectorAll('.modal.show');
+        if (modals.length > 0) {
+            document.body.classList.add('modal-open');
+        }
+    });     
+
 </script>
 
 <?php Modal::begin([
@@ -115,7 +123,7 @@ $(document).on('hidden.bs.modal', '.modal', function() {
         'id'=>'ajaxCrudModal',
         'tabindex' => false // important for Select2 to work properly
    ],
-   'dialogOptions'=>['class'=>'modal-lg'],
+   'dialogOptions'=>['class'=>'modal-xl'],
    'closeButton'=>['label'=>'<span aria-hidden=\'true\'>×</span>'],
    'id'=>'ajaxCrudModal',
     'footer'=>'',// always need it for jquery plugin

@@ -67,7 +67,7 @@ class DefaultController extends Controller
         if($request->isAjax){
             Yii::$app->response->format = Response::FORMAT_JSON;
             return [
-                    'title'=> "EmployeesForm",
+                    'title'=> "Xem",
                     'content'=>$this->renderAjax('view', [
                         'model' => $this->findModel($id),
                     ]),

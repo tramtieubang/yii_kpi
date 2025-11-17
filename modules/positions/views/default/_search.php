@@ -3,11 +3,11 @@ use yii\bootstrap5\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model app\modules\employees\models\EmployeesForm */
+/* @var $model app\modules\positions\models\PositionsForm */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="employees-form-search">
+<div class="positions-form-search">
 
     <?php $form = ActiveForm::begin([
         	'id'=>'myFilterForm',
@@ -17,21 +17,9 @@ use yii\widgets\ActiveForm;
             ]
       	]); ?>
 	<div class="row">
-<div class="col-md-4">    <?= $form->field($model, 'user_id')->textInput() ?>
+<div class="col-md-4">    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-</div><div class="col-md-4">    <?= $form->field($model, 'department_id')->textInput() ?>
-
-</div><div class="col-md-4">    <?= $form->field($model, 'position_id')->textInput() ?>
-
-</div><div class="col-md-4">    <?= $form->field($model, 'business_field_id')->textInput() ?>
-
-</div><div class="col-md-4">    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-
-</div><div class="col-md-4">    <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
-
-</div><div class="col-md-4">    <?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
-
-</div><div class="col-md-4">    <?= $form->field($model, 'hire_date')->textInput() ?>
+</div><div class="col-md-4">    <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
 </div><div class="col-md-4">    <?= $form->field($model, 'created_at')->textInput() ?>
 

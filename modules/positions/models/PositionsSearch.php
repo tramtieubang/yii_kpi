@@ -1,16 +1,16 @@
 <?php
 
-namespace app\modules\employees\models;
+namespace app\modules\positions\models;
 
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\modules\employees\models\EmployeesForm;
+use app\modules\positions\models\PositionsForm;
 
 /**
- * EmployeesSearch represents the model behind the search form about `app\modules\employees\models\EmployeesForm`.
+ * PositionsSearch represents the model behind the search form about `app\modules\positions\models\PositionsForm`.
  */
-class EmployeesSearch extends EmployeesForm
+class PositionsSearch extends PositionsForm
 {
     /**
      * @inheritdoc
@@ -18,8 +18,8 @@ class EmployeesSearch extends EmployeesForm
     public function rules()
     {
         return [
-            [['id', 'user_id', 'department_id', 'position_id', 'business_field_id'], 'integer'],
-            [['name', 'email', 'phone', 'hire_date', 'created_at', 'updated_at'], 'safe'],
+            [['id'], 'integer'],
+            [['name', 'description', 'created_at', 'updated_at'], 'safe'],
         ];
     }
 
@@ -41,7 +41,7 @@ class EmployeesSearch extends EmployeesForm
      */
     public function search($params, $cusomSearch=NULL)
     {
-        $query = EmployeesForm::find();
+        $query = PositionsForm::find();
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -56,24 +56,17 @@ class EmployeesSearch extends EmployeesForm
         }
 		if($cusomSearch != NULL){
 			$query->andFilterWhere ( [ 'OR' ,['like', 'name', $cusomSearch],
-            ['like', 'email', $cusomSearch],
-            ['like', 'phone', $cusomSearch]] );
+            ['like', 'description', $cusomSearch]] );
  
 		} else {
         	$query->andFilterWhere([
             'id' => $this->id,
-            'user_id' => $this->user_id,
-            'department_id' => $this->department_id,
-            'position_id' => $this->position_id,
-            'business_field_id' => $this->business_field_id,
-            'hire_date' => $this->hire_date,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'email', $this->email])
-            ->andFilterWhere(['like', 'phone', $this->phone]);
+            ->andFilterWhere(['like', 'description', $this->description]);
 		}
         return $dataProvider;
     }

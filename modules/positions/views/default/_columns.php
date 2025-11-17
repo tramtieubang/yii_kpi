@@ -20,7 +20,12 @@ return [
         'width' => '20px',
         'urlCreator' => function($action, $model, $key, $index) {
         	return Url::to([$action,'id'=>$key]);
-        },        
+        },
+        'visibleButtons' => [
+            'view' => function ($model, $key, $index) {
+                return Yii::$app->params['showView'];
+            },
+        ],
         'viewOptions'=>['role'=>'modal-remote','title'=>'View','title'=>'Xem',
                'class'=>'btn ripple btn-primary btn-sm',
               'data-bs-placement'=>'top',
@@ -56,49 +61,8 @@ return [
     ],
     [
         'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'phone',
+        'attribute'=>'description',
     ],
-    [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'email',
-    ], 
-    [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'department_id',
-        'vAlign'=>'top',
-        'value' => function ($model) {
-            return $model->department ? $model->department->name : null;
-        },
-    ],
-    [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'position_id',
-        'vAlign'=>'top',
-        'value' => function ($model) {
-            return $model->position ? $model->position->name : null;
-        },
-    ],
-    [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'business_field_id',
-        'vAlign'=>'top',
-        'value' => function ($model) {
-            return $model->businessField ? $model->businessField->name : null;
-        },
-    ],
-    [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'user_id',
-        'vAlign'=>'top',
-        'value' => function ($model) {
-            return $model->user ? $model->user->username : null;
-        },
-    ],   
-   
-    // [
-        // 'class'=>'\kartik\grid\DataColumn',
-        // 'attribute'=>'hire_date',
-    // ],
     // [
         // 'class'=>'\kartik\grid\DataColumn',
         // 'attribute'=>'created_at',

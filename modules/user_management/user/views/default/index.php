@@ -54,7 +54,7 @@ Yii::$app->params['showView'] = false;
             'columns' => require(__DIR__.'/_columns.php'),
             'toolbar'=> [
                 ['content'=>
-                    '
+                    '                  
                     <div class="dropdown">
 						<button aria-expanded="false" aria-haspopup="true" class="btn dropdown-toggle" data-bs-toggle="dropdown" type="button"><i class="fa fa-navicon"></i></button>
 						<div class="dropdown-menu tx-13" style="">

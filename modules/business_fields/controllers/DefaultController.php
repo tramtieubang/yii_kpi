@@ -1,10 +1,10 @@
 <?php
 
-namespace app\modules\departments\controllers;
+namespace app\modules\business_fields\controllers;
 
 use Yii;
-use app\modules\departments\models\DepartmentsForm;
-use app\modules\departments\models\DepartmentsSearch;
+use app\modules\business_fields\models\BusinessFieldsForm;
+use app\modules\business_fields\models\BusinessFieldsSearch;
 use app\modules\employees\models\EmployeesForm;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -14,7 +14,7 @@ use yii\helpers\Html;
 use yii\filters\AccessControl;
 
 /**
- * DefaultController implements the CRUD actions for DepartmentsForm model.
+ * DefaultController implements the CRUD actions for BusinessFieldsForm model.
  */
 class DefaultController extends Controller
 {
@@ -36,16 +36,16 @@ class DefaultController extends Controller
 	}
 
     /**
-     * Lists all DepartmentsForm models.
+     * Lists all BusinessFieldsForm models.
      * @return mixed
      */
     public function actionIndex()
     {    
-        $searchModel = new DepartmentsSearch();
+        $searchModel = new BusinessFieldsSearch();
   		if(isset($_POST['search']) && $_POST['search'] != null){
             $dataProvider = $searchModel->search(Yii::$app->request->post(), $_POST['search']);
         } else if ($searchModel->load(Yii::$app->request->post())) {
-            $searchModel = new DepartmentsSearch(); // "reset"
+            $searchModel = new BusinessFieldsSearch(); // "reset"
             $dataProvider = $searchModel->search(Yii::$app->request->post());
         } else {
             $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -58,7 +58,7 @@ class DefaultController extends Controller
 
 
     /**
-     * Displays a single DepartmentsForm model.
+     * Displays a single BusinessFieldsForm model.
      * @param integer $id
      * @return mixed
      */
@@ -68,7 +68,7 @@ class DefaultController extends Controller
         if($request->isAjax){
             Yii::$app->response->format = Response::FORMAT_JSON;
             return [
-                    'title'=> "DepartmentsForm",
+                    'title'=> "BusinessFieldsForm",
                     'content'=>$this->renderAjax('view', [
                         'model' => $this->findModel($id),
                     ]),
@@ -83,7 +83,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * Creates a new DepartmentsForm model.
+     * Creates a new BusinessFieldsForm model.
      * For ajax request will return json object
      * and for non-ajax request if creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
@@ -91,7 +91,7 @@ class DefaultController extends Controller
     public function actionCreate()
     {
         $request = Yii::$app->request;
-        $model = new DepartmentsForm();  
+        $model = new BusinessFieldsForm();  
 
         if($request->isAjax){
             /*
@@ -116,7 +116,7 @@ class DefaultController extends Controller
             if($model->load($request->post()) && $model->save()){
 
                  // ⚡ Reset form (model mới)
-                $model = new DepartmentsForm();
+                $model = new BusinessFieldsForm();
 
                 return [
                     'forceReload'=>'#crud-datatable-pjax',
@@ -159,8 +159,9 @@ class DefaultController extends Controller
                        
     }
 
+
     /**
-     * Updates an existing DepartmentsForm model.
+     * Updates an existing BusinessFieldsForm model.
      * For ajax request will return json object
      * and for non-ajax request if update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
@@ -246,29 +247,28 @@ class DefaultController extends Controller
     }
 
     /**
-     * Delete an existing DepartmentsForm model.
+     * Delete an existing BusinessFieldsForm model.
      * For ajax request will return json object
      * and for non-ajax request if deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
      */
-
     public function actionDelete($id)
     {
         $request = Yii::$app->request;
         $model = $this->findModel($id);
 
         $item = EmployeesForm::find()
-            ->select('department_id')
-            ->where(['department_id' => $id])
+            ->select('business_field_id')
+            ->where(['business_field_id' => $id])
             ->exists(); // dùng exists() nhanh hơn, trả true/false
 
-        // Nếu có nhân viên thuộc phòng ban → không cho xóa
+        // Nếu có nhân viên thuộc Lĩnh vực kinh doanh → không cho xóa
         if ($item) {
             Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             return [
                 'forceClose' => true,
-                'tcontent' => 'Phòng ban đã có nhân viên, bạn không thể xóa!'
+                'tcontent' => 'Lĩnh vực kinh doanh đã có nhân viên, bạn không thể xóa!'
             ];
         }
 
@@ -289,7 +289,7 @@ class DefaultController extends Controller
     }
 
      /**
-     * Delete multiple existing DepartmentsForm model.
+     * Delete multiple existing BusinessFieldsForm model.
      * For ajax request will return json object
      * and for non-ajax request if deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
@@ -306,9 +306,9 @@ class DefaultController extends Controller
         foreach ($pks as $pk) {
             $model = $this->findModel($pk);
 
-            // Kiểm tra phòng ban có nhân viên hay không
+            // Kiểm tra Vị trí kinh doanh có nhân viên hay không
             $hasEmployee = EmployeesForm::find()
-                ->where(['department_id' => $pk])
+                ->where(['business_field_id' => $pk])
                 ->exists();   // Tốt hơn all()
 
             if ($hasEmployee) {
@@ -337,7 +337,7 @@ class DefaultController extends Controller
             'title'   => 'Thông báo',
             'content' => 
                 '<div class="alert alert-danger">
-                    Không thể xóa các phòng ban: <b>' . implode(', ', $failedList) . '</b><br>
+                    Không thể xóa các lĩnh vực kinh doanh: <b>' . implode(', ', $failedList) . '</b><br>
                     Do đã có nhân viên.
                 </div>
                 <script>
@@ -351,15 +351,15 @@ class DefaultController extends Controller
     }
 
     /**
-     * Finds the DepartmentsForm model based on its primary key value.
+     * Finds the BusinessFieldsForm model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return DepartmentsForm the loaded model
+     * @return BusinessFieldsForm the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = DepartmentsForm::findOne($id)) !== null) {
+        if (($model = BusinessFieldsForm::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

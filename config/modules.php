@@ -22,6 +22,14 @@ return [
         'class' => 'app\modules\kpi_evaluation\Module', 
     ],
 
+    'business-fields' => [ 
+        'class' => 'app\modules\business_fields\Module', 
+    ],
+
+    'positions' => [ 
+        'class' => 'app\modules\positions\Module', 
+    ],
+
     'home' => [ 
         'class' => 'app\modules\home\Module', 
     ],

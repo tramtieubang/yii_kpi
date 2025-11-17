@@ -8,7 +8,7 @@ use cangak\ajaxcrud\BulkButtonWidget;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\modules\departments\models\DepartmentsSearch */
+/* @var $searchModel app\modules\business_fields\models\BusinessFieldsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Quản lý danh sách';
@@ -38,7 +38,7 @@ Yii::$app->params['showView'] = false;
     'formSelector' => '.myFilterForm'
 ]); ?>
 
-<div class="departments-form-index">
+<div class="business-fields-form-index">
     <div id="ajaxCrudDatatable">
         <?=GridView::widget([
             'id'=>'crud-datatable',

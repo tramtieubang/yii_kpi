@@ -153,6 +153,8 @@ body {
 
     <!-- DANH MUC -->
     <?php if (
+        PermissionHelper::check('positions/default/index') ||
+        PermissionHelper::check('business-fields/default/index') ||
         PermissionHelper::check('deparments/default/index') ||
 	    PermissionHelper::check('employees/default/index') ||
 	    PermissionHelper::check('kpi/default/index') 
@@ -161,14 +163,20 @@ body {
         <div class="home-panel">
             <h5><i class="fas fa-chalkboard-teacher text-warning"></i> Danh mục </h5>
             <div class="home-menu-grid">
+                <?php if (PermissionHelper::check('positions/default/index')): ?>
+                    <?= Html::a('<i class="fe fe-users text-warning"></i><div class="home-menu-label">Chức vụ</div>', ['/positions/default', 'menu' => 'dm1'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'dm1']) ?>
+                <?php endif; ?>
+                <?php if (PermissionHelper::check('business-fields/default/index')): ?>
+                    <?= Html::a('<i class="fe fe-briefcase text-warning"></i><div class="home-menu-label">Lĩnh vực kinh doanh</div>', ['/business-fields/default', 'menu' => 'dm2'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'dm2']) ?>
+                <?php endif; ?>
                 <?php if (PermissionHelper::check('departments/default/index')): ?>
-                    <?= Html::a('<i class="fas fa-building text-warning"></i><div class="home-menu-label">Phòng ban</div>', ['/departments/default', 'menu' => 'dm1'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'dm1']) ?>
+                    <?= Html::a('<i class="fas fa-building text-warning"></i><div class="home-menu-label">Phòng ban</div>', ['/departments/default', 'menu' => 'dm3'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'dm3']) ?>
                 <?php endif; ?>
                 <?php if (PermissionHelper::check('employees/default/index')): ?>
-                    <?= Html::a('<i class="fe fe-users text-warning"></i><div class="home-menu-label">Nhân viên</div>', ['/employees/default', 'menu' => 'dm2'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'dm2']) ?>
+                    <?= Html::a('<i class="fe fe-users text-warning"></i><div class="home-menu-label">Nhân viên</div>', ['/employees/default', 'menu' => 'dm4'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'dm4']) ?>
                 <?php endif; ?>
                 <?php if (PermissionHelper::check('kpi/default/index')): ?>
-                    <?= Html::a('<i class="fe fe-bar-chart-2 text-warning"></i><div class="home-menu-label">Danh mục KPI</div>', ['/kpi/default', 'menu' => 'dm3'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'dm3']) ?>
+                    <?= Html::a('<i class="fe fe-bar-chart-2 text-warning"></i><div class="home-menu-label">Danh mục KPI</div>', ['/kpi/default', 'menu' => 'dm5'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'dm5']) ?>
                 <?php endif; ?>
                              
             </div>
@@ -186,16 +194,16 @@ body {
             <h5><i class="fe fe-briefcase text-info"></i> Quản lý công việc </h5>
             <div class="home-menu-grid">
                 <?php if (PermissionHelper::check('deparments/default/index')): ?>
-                    <?= Html::a('<i class="fe fe-edit text-info"></i><div class="home-menu-label">Đăng ký công việc</div>', ['deparments/default', 'menu' => 'cv1'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'cv1']) ?>
+                    <?= Html::a('<i class="fe fe-edit text-info"></i><div class="home-menu-label">Đăng ký công việc</div>', ['deparments/default', 'menu' => 'cv3'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'cv3']) ?>
                 <?php endif; ?>
                 <?php if (PermissionHelper::check('employees/default/index')): ?>
-                    <?= Html::a('<i class="fe fe-check-square text-info"></i><div class="home-menu-label">Phê duyệt đăng ký</div>', ['/employees/default', 'menu' => 'cv2'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'cv2']) ?>
+                    <?= Html::a('<i class="fe fe-check-square text-info"></i><div class="home-menu-label">Phê duyệt đăng ký</div>', ['/employees/default', 'menu' => 'cv4'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'cv4']) ?>
                 <?php endif; ?>
                 <?php if (PermissionHelper::check('kpi/default/index')): ?>
-                    <?= Html::a('<i class="fe fe-share-2 text-info"></i><div class="home-menu-label">Phân công công việc</div>', ['/kpi/default', 'menu' => 'cv3'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'cv3']) ?>
+                    <?= Html::a('<i class="fe fe-share-2 text-info"></i><div class="home-menu-label">Phân công công việc</div>', ['/kpi/default', 'menu' => 'cv5'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'cv5']) ?>
                 <?php endif; ?>
                 <?php if (PermissionHelper::check('kpi/default/index')): ?>
-                    <?= Html::a('<i class="fe fe-file-text text-info"></i><div class="home-menu-label">Báo cáo công việc</div>', ['/kpi/default', 'menu' => 'cv4'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'cv4']) ?>
+                    <?= Html::a('<i class="fe fe-file-text text-info"></i><div class="home-menu-label">Báo cáo công việc</div>', ['/kpi/default', 'menu' => 'cv6'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'cv6']) ?>
                 <?php endif; ?>
                              
             </div>
