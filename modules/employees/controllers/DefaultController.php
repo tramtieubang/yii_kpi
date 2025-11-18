@@ -392,6 +392,18 @@ class DefaultController extends Controller
        
         $model->delete();
 
+        // Nếu nhân viên liên kết user thì xóa luôn
+        if ($model->user_id) {
+            $user = UserForm::findOne($model->user_id);
+            if ($user) {
+                try {
+                    $user->delete();
+                } catch (\Exception $e) {
+                    Yii::error("Không thể xóa user liên kết với nhân viên #$id: " . $e->getMessage());
+                }
+            }
+        }
+
         if($request->isAjax){
             /*
             *   Process for ajax request
@@ -475,7 +487,22 @@ class DefaultController extends Controller
 
             // Xóa nếu không có ràng buộc
             try {
+                
+                $userId = $model->user_id;  // Lưu lại user_id trước khi xóa nhân viên
                 $model->delete();
+
+                // Nếu có user liên kết, xóa luôn
+                if ($userId) {
+                    $user = UserForm::findOne($userId);
+                    if ($user) {
+                        try {
+                            $user->delete();
+                        } catch (\Exception $e) {
+                            Yii::error("Không thể xóa user liên kết với nhân viên #$pk: " . $e->getMessage());
+                        }
+                    }
+                }
+                
             } catch (\Exception $e) {
                 $delOk = false;
                 $fList[] = $model->id;
