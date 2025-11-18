@@ -29,7 +29,7 @@ return [
             'class'=>'btn ripple btn-info btn-sm',
             'data-bs-placement'=>'top',
             'data-bs-toggle'=>'tooltip-info'],
-        'deleteOptions'=>['role'=>'modal-remote','title'=>'Xóa', 
+        'deleteOptions'=>['role'=>'modal-remote-2','title'=>'Xóa', 
                       'data-confirm'=>false, 'data-method'=>false,// for overide yii data api
                       'data-request-method'=>'post',
                       'data-toggle'=>'tooltip',

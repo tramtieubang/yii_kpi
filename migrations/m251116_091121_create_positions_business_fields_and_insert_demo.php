@@ -41,7 +41,7 @@ class m251116_091121_create_positions_business_fields_and_insert_demo extends Mi
         // 4️⃣ Bảng employees
         $this->createTable('{{%employees}}', [
             'id' => $this->primaryKey()->comment('ID nhân viên'),
-            'user_id' => $this->integer()->notNull()->comment('ID user trong bảng user'),
+            'user_id' => $this->integer()->null()->comment('ID user trong bảng user'),
             'department_id' => $this->integer()->notNull()->comment('ID phòng ban'),
             'position_id' => $this->integer()->null()->comment('ID chức vụ'), // SET NULL → phải null
             'business_field_id' => $this->integer()->null()->comment('ID lĩnh vực kinh doanh'), // SET NULL → phải null

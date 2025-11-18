@@ -45,6 +45,7 @@ class EmployeesForm extends Employees
     public $username;
     public $password;
     public $confirm_password;
+    public $status = 1; // default là Hoạt động
 
     /**
      * {@inheritdoc}
@@ -61,13 +62,36 @@ class EmployeesForm extends Employees
     {
         return [
             [['username', 'password', 'confirm_password'], 'string', 'max' => 255],
-            [['password', 'confirm_password'], 'required', 'on' => 'create'],
-            ['confirm_password', 'compare', 'compareAttribute' => 'password', 'message' => "Mật khẩu xác nhận không khớp"],
-        
+
+            // Password chỉ required khi tạo user mới
+            [['password', 'confirm_password'], 'required',
+                'when' => function ($model) {
+                    // Chỉ bắt nhập password khi tạo user mới (user_id chưa có) và có username
+                    return !empty($model->username) && empty($model->user_id);
+                },
+                'whenClient' => "function (attribute, value) {
+                    return $('#employeesform-username').val().length > 0 && !$('#employeesform-user_id').val();
+                }",
+                'message' => 'Bạn phải nhập mật khẩu khi tạo tài khoản mới.'
+            ],
+
+            // So khớp confirm_password với password, nhưng chỉ validate khi password có giá trị
+            ['confirm_password', 'compare', 'compareAttribute' => 'password',
+                'message' => "Mật khẩu xác nhận không khớp",
+                'when' => function($model) {
+                    return !empty($model->password);
+                },
+                'whenClient' => "function (attribute, value) {
+                    return $('#employeesform-password').val().length > 0;
+                }",
+            ],
+
+            [['status'], 'integer'], // validate kiểu int
+
             [['position_id', 'business_field_id', 'phone', 'hire_date'], 'default', 'value' => null],
-            [['user_id', 'department_id', 'name', 'email'], 'required'],
+            [['department_id', 'name', 'email'], 'required'],
             [['user_id', 'department_id', 'position_id', 'business_field_id'], 'integer'],
-            [['hire_date', 'created_at', 'updated_at'], 'safe'],
+            [['created_at', 'updated_at'], 'safe'],
             [['name', 'email'], 'string', 'max' => 255],
             [['phone'], 'string', 'max' => 50],
             [['email'], 'unique'],

@@ -44,6 +44,10 @@ Yii::$app->params['showView'] = false;
             'id'=>'crud-datatable',
             'dataProvider' => $dataProvider,
             //'filterModel' => $searchModel,
+            'formatter' => [
+                'class' => 'yii\i18n\Formatter',
+                'nullDisplay' => '', // không hiển thị gì khi null
+            ],
             'pjax'=>true,
             'columns' => require(__DIR__.'/_columns.php'),
             'toolbar'=> [
@@ -70,7 +74,7 @@ Yii::$app->params['showView'] = false;
                             'data-request-method'=>'post',
                             'data-confirm-title'=>'Xác nhận xóa?',
                             'data-confirm-message'=>'Bạn có chắc muốn xóa?',
-                            'data-modal-size' => 'large',
+                            'data-modal-size' => 'small',
                         ])
                     .
                     '
@@ -83,7 +87,7 @@ Yii::$app->params['showView'] = false;
             'striped' => false,
             'condensed' => true,
             'responsive' => false,
-            'containerOptions' => ['style'=>'overflow-x:auto; white-space: nowrap;'], // ✅ thêm dòng này
+            'containerOptions' => ['style'=>'overflow-x:auto; white-space: nowrap;'], // ✅ thêm dòng này co scroll
             'panelHeadingTemplate'=>'<div style="width:100%;"><div class="float-start mt-2 text-primary">{title}</div> <div class="float-end">{toolbar}</div></div>',
             'panelFooterTemplate'=>'<div style="width:100%;"><div class="float-start">{summary}</div><div class="float-end">{pager}</div></div>',
             'summary'=>'Tổng: {totalCount} dòng dữ liệu',

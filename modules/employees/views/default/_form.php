@@ -25,9 +25,9 @@ use yii\widgets\ActiveForm;
         <!-- ===== Khung 1: Thông tin nhân viên ===== -->
         <div class="col-md-6 d-flex">
             <div class="card flex-fill shadow-sm border-0 d-flex flex-column">
-                <div class="card-header">Thông tin nhân viên</div>
+                <div class="card-header-info">Thông tin nhân viên</div>
                 <div class="card-body flex-fill d-flex flex-column">
-                    <div class="row g-3">
+                    <div class="row g-3 card-body-row-top">
                         <div class="col-md-6">
 							<?= $form->field($model, 'name', [
 									'template' => "{label}<span class='text-danger'> *</span>\n" .
@@ -105,6 +105,7 @@ use yii\widgets\ActiveForm;
 									'data' => $data,
 									'options' => [
 										'placeholder' => 'Chọn phòng ban...',
+										'value' => $model->department_id, // giữ giá trị cũ
 									],
 									'pluginOptions' => [
 										'escapeMarkup' => new JsExpression('function(markup) { return markup; }'),
@@ -148,6 +149,7 @@ use yii\widgets\ActiveForm;
 									'data' => $data,
 									'options' => [
 										'placeholder' => 'Chọn chức vụ...',
+										'value' => $model->position_id, // giữ giá trị cũ
 									],
 									'pluginOptions' => [
 										'escapeMarkup' => new JsExpression('function(markup) { return markup; }'),
@@ -193,6 +195,7 @@ use yii\widgets\ActiveForm;
 									'data' => $data,
 									'options' => [
 										'placeholder' => 'Chọn lĩnh vực kinh doanh...',
+										'value' => $model->business_field_id, // giữ giá trị cũ
 									],
 									'pluginOptions' => [
 										'escapeMarkup' => new JsExpression('function(markup) { return markup; }'),
@@ -218,9 +221,9 @@ use yii\widgets\ActiveForm;
         <!-- ===== Khung 2: Tài khoản người dùng ===== -->
         <div class="col-md-6 d-flex">
             <div class="card flex-fill shadow-sm border-0 d-flex flex-column">
-                <div class="card-header">Tài khoản người dùng</div>
+                <div class="card-header-account">Tài khoản người dùng</div>
                 <div class="card-body flex-fill d-flex flex-column">
-                    <div class="row g-3">
+                    <div class="row card-body-row-top">
                         <div class="col-12">
                             <?= $form->field($model, 'username', [
                                     'template' => "{label}\n<div class='input-group'><span class='input-group-text'>👤</span>{input}</div>\n{error}"
@@ -239,6 +242,26 @@ use yii\widgets\ActiveForm;
                                 ])->passwordInput(['maxlength' => true, 'placeholder' => 'Xác nhận mật khẩu'])
                                 ->label(null, ['class' => 'fw-bold']) ?>
                         </div>
+						
+						<div class="col-12">
+							<?= $form->field($model, 'status', [
+									'template' => "{label}\n<div class='input-group'>
+										<input type='range' class='form-range' min='-1' max='1' step='1' value='{$model->status}' id='statusRange'>
+										{input}
+									</div>\n{error}"
+								])->label('Trạng thái', ['class' => 'fw-bold']) ?>
+							<div class="form-text" id="statusText">
+								<?php 
+									switch ($model->status) {
+										case 1: echo 'Hoạt động'; break;
+										case 0: echo 'Không hoạt động'; break;
+										case -1: echo 'Ngừng hoạt động'; break;
+										default: echo '';
+									}
+								?>
+							</div>
+						</div>
+
                     </div>
 
                     <?php if (!Yii::$app->request->isAjax): ?>
@@ -247,7 +270,7 @@ use yii\widgets\ActiveForm;
                                 'class' => $model->isNewRecord ? 'btn btn-success fw-bold' : 'btn btn-primary fw-bold'
                             ]) ?>
                         </div>
-                    <?php endif; ?>
+                    <?php endif; ?> 
                 </div>
             </div>
         </div>
@@ -256,26 +279,49 @@ use yii\widgets\ActiveForm;
 </div>
 
 <style>
+
+.modal-footer {
+    margin-top: 0rem !important;
+}
+
 /* ===== Card Header kiểu MISA chuyên nghiệp, nhỏ gọn ===== */
-.employees-form-form .card-header {
-    background: linear-gradient(90deg, #c4c9cbff, #e8ebebff); /* gradient chuyên nghiệp */
-    font-size: 0.9rem;          /* chữ nhỏ gọn */
-    font-weight: 600;            /* in đậm vừa đủ */
-    padding: 0rem 0.75rem;    /* padding trên/dưới nhỏ nhất */
-	margin: 0;
-    line-height: 1;            /* khoảng cách dòng vừa đủ */
+.employees-form-form .card-header-info {
+    background: linear-gradient(90deg, #a9acacff, #c9dbb6ff);
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.1;
     border-radius: 0.5rem 0.5rem 0 0;
     color: #3d3a3aff;
+    margin: 0;
+    padding: 0.75rem 0.8rem; /* nhỏ nhất có thể nhưng vẫn đẹp */
+   /*  border: 1px solid #ddd;   /* nên có màu để tránh viền quá đậm */ 
+}
+
+.employees-form-form .card-header-account {
+    background: linear-gradient(90deg, #a9acacff, #b4d7d7ff);
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.1;
+    border-radius: 0.5rem 0.5rem 0 0;
+    color: #3d3a3aff;
+    margin: 0;
+    padding: 0.75rem 0.8rem; /* nhỏ nhất có thể nhưng vẫn đẹp */
+   /*  border: 1px solid #ddd;   /* nên có màu để tránh viền quá đậm */ 
 }
 
 /* ===== Card Body gọn ===== */
 .employees-form-form .card-body {
-    padding: 0.4rem 0.75rem;     /* giảm padding */
+    padding: 0rem 0.75rem;     /* giảm padding */
+}
+
+/* First Row trong card */
+.employees-form-form .card-body .card-body-row-top {
+	padding-top: 1rem;
 }
 
 /* Row trong card */
 .employees-form-form .card-body .row {
-    margin-bottom: 0.4rem;      /* khoảng cách giữa các row */
+    margin-bottom: 0.5rem;      /* khoảng cách giữa các row */
 }
 
 /* Input Group Text (icon) */
@@ -296,3 +342,43 @@ use yii\widgets\ActiveForm;
 }
 
 </style>
+
+<?php
+/* $script = <<< JS
+    if (!window.statusRangeInitialized) {
+    const statusRange = document.getElementById('statusRange');
+    const statusText = document.getElementById('statusText');
+
+    statusRange.addEventListener('input', function() {
+        let value = parseInt(this.value);
+        let text = '';
+        switch(value) {
+            case 1: text = 'Hoạt động'; break;
+            case 0: text = 'Không hoạt động'; break;
+            case -1: text = 'Ngừng hoạt động'; break;
+        }
+        statusText.innerText = text;
+        document.getElementById('employeesform-status').value = value;
+    });
+
+    window.statusRangeInitialized = true;
+}
+
+JS;
+$this->registerJs($script); */
+?>
+
+<script>
+	// cach 2 chua test
+ 	$(document).off('input', '#statusRange').on('input', '#statusRange', function() {
+		let value = parseInt(this.value);
+		let text = '';
+		switch(value){
+			case 1: text = 'Hoạt động'; break;
+			case 0: text = 'Không hoạt động'; break;
+			case -1: text = 'Ngừng hoạt động'; break;
+		}
+		$('#statusText').text(text);
+		$('#employeesform-status').val(value);
+	}); 
+</script>

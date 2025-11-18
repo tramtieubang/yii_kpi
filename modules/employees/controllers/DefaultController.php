@@ -2,9 +2,11 @@
 
 namespace app\modules\employees\controllers;
 
+use app\common\helpers\DateHelper;
 use Yii;
 use app\modules\employees\models\EmployeesForm;
 use app\modules\employees\models\EmployeesSearch;
+use app\modules\user_management\user\models\UserForm;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -97,6 +99,8 @@ class DefaultController extends Controller
             *   Process for ajax request
             */
             Yii::$app->response->format = Response::FORMAT_JSON;
+
+            // --- Hiển thị form lần đầu ---
             if($request->isGet){
                 return [
                     'title'=> "Thêm mới",
@@ -107,41 +111,105 @@ class DefaultController extends Controller
                                 Html::button('Lưu lại',['class'=>'btn btn-primary','type'=>"submit"])
         
                 ];         
-            }else if($model->load($request->post()) && $model->save()){
-                return [
-                    'forceReload'=>'#crud-datatable-pjax',
-                    'title'=> "Thêm mới",
-                    'content'=>'<span class="text-success">Thêm mới thành công</span>',
-                    'tcontent'=>'Thêm mới thành công!',
-                    'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]).
-                            Html::a('Tiếp tục thêm',['create'],['class'=>'btn btn-primary','role'=>'modal-remote'])
-        
-                ];         
-            }else{           
-                return [
-                    'title'=> "Thêm mới",
-                    'content'=>$this->renderAjax('create', [
-                        'model' => $model,
-                    ]),
-                    'tcontent'=>Html::errorSummary($model),
-                    'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]).
-                                Html::button('Lưu lại',['class'=>'btn btn-primary','type'=>"submit"])
-        
-                ];         
             }
-        }else{
-            /*
-            *   Process for non-ajax request
-            */
-            if ($model->load($request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
-            } else {
-                return $this->render('create', [
+            
+            if($model->load($request->post())) {
+                
+                // --- Lưu thành công ---
+                if($model->save()) {
+
+                    // --- Nếu có username (muốn tạo hoặc gán user) ---
+                    if (!empty($model->username)) {
+
+                        // Tìm user theo username
+                        $existingUser = UserForm::find()->where(['username' => $model->username])->one();
+
+                        if ($existingUser) {
+
+                            // --- TH1: Username tồn tại nhưng không nhập password ---
+                            if (empty($model->password)) {
+                                return [
+                                    'title' => 'Lỗi',
+                                    'tcontent' => 'Tài khoản đã tồn tại, vui lòng nhập mật khẩu để liên kết hoặc đổi username!',
+                                ];
+                            }
+
+                            // --- TH2: Username tồn tại -> kiểm tra mật khẩu có đúng không ---
+                            if (!$existingUser->validatePassword($model->password)) {
+                                return [
+                                    'title' => 'Lỗi',
+                                    'tcontent' => 'Mật khẩu không đúng với tài khoản đã tồn tại!',
+                                ];
+                            }
+
+                            // --- Mật khẩu đúng -> Gán user_id cho employees ---
+                            $model->user_id = $existingUser->id;
+                            $model->save(false);
+
+                        } else {
+
+                            // --- TH3: Username chưa tồn tại -> tạo user mới ---
+                            if (empty($model->password)) {
+                                return [
+                                    'title' => 'Lỗi',
+                                    'tcontent' => 'Bạn phải nhập mật khẩu để tạo tài khoản mới!',
+                                ];
+                            }
+
+                            $user = new UserForm();
+                            $user->username = $model->username;
+                            $user->email = $model->email ?? $model->username . '@example.com';
+                            $user->status = $model->status;
+                            $user->setPassword($model->password);
+                            $user->generateAuthKey();
+                            $user->save(false);
+
+                            // Gán user_id mới tạo
+                            $model->user_id = $user->id;
+                            $model->save(false);
+                        }
+                    }
+
+                    // --- Reset form ---
+                    $model = new EmployeesForm();
+                    return [
+                        'forceReload' => '#crud-datatable-pjax',
+                        'title' => "Thêm mới",
+                        'content' => $this->renderAjax('create', ['model' => $model]),
+                        'tcontent' => 'Thêm mới thành công!',
+                        'footer' =>
+                            Html::button('Đóng lại', ['class' => 'btn btn-default pull-left', 'data-bs-dismiss' => "modal"]) .
+                            Html::button('Lưu lại', ['class' => 'btn btn-primary', 'type' => "submit"])
+                    ];
+                }
+            }  
+
+            // --- Lỗi validate ---
+            $model->hire_date = DateHelper::formatDateMySQLToVN($model->hire_date);
+            return [
+                'title'=> "Thêm mới",
+                'content'=>$this->renderAjax('create', [
                     'model' => $model,
-                ]);
-            }
+                ]),
+                'tcontent'=>Html::errorSummary($model),
+                'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]).
+                            Html::button('Lưu lại',['class'=>'btn btn-primary','type'=>"submit"])
+    
+            ]; 
         }
-       
+           
+        /*
+        *   Process for non-ajax request
+        */
+        // --- Trường hợp không dùng ajax ---
+        if ($model->load($request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else {
+            return $this->render('create', [
+                'model' => $model,
+            ]);
+        }
+        
     }
 
     /**
@@ -154,60 +222,123 @@ class DefaultController extends Controller
     public function actionUpdate($id)
     {
         $request = Yii::$app->request;
-        $model = $this->findModel($id);       
+        $model = $this->findModel($id);
 
-        if($request->isAjax){
-            /*
-            *   Process for ajax request
-            */
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            if($request->isGet){
+        // --- Load dữ liệu user liên kết (nếu có) ---
+        if ($model->user) {
+            $model->username = $model->user->username;
+            $model->status = $model->user->status;
+        }
+
+        if ($request->isAjax) {
+            Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+            // Lần đầu hiển thị form
+            if ($request->isGet) {
                 return [
                     'title'=> "Cập nhật",
-                    'content'=>$this->renderAjax('update', [
-                        'model' => $model,
-                    ]),
-                    'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]).
-                                Html::button('Lưu lại',['class'=>'btn btn-primary','type'=>"submit"])
-                ];         
-            }else if($model->load($request->post()) && $model->save()){
-            	if(Yii::$app->params['showView']){
+                    'content'=>$this->renderAjax('update', ['model' => $model]),
+                    'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]) .
+                            Html::button('Lưu lại',['class'=>'btn btn-primary','type'=>"submit"])
+                ];
+            }
+
+            // Xử lý POST
+            if ($model->load($request->post())) {
+
+                // --- Xử lý user ---
+                $username = trim($model->username);
+                $password = $model->password;
+
+                if (!empty($username)) {
+                    $existingUser = UserForm::find()->where(['username' => $username])->one();
+
+                    if ($existingUser) {
+                        // Nếu có user rồi
+                        if (!empty($password)) {
+                            // Update password nếu nhập mới
+                            $existingUser->setPassword($password);
+                        }
+                        $existingUser->status = $model->status;
+                        $existingUser->save(false);
+                        $model->user_id = $existingUser->id;
+                    } else {
+                        // Tạo user mới
+                        $user = new UserForm();
+                        $user->username = $username;
+                        $user->status = $model->status;
+                        $user->email = $model->email ?? $username . '@example.com';
+                        if (!empty($password)) {
+                            $user->setPassword($password);
+                        }
+                        $user->generateAuthKey();
+                        $user->save(false);
+                        $model->user_id = $user->id;
+                    }
+                } else {
+                    $model->user_id = null; // Nếu không nhập username
+                }
+
+                if ($model->save()) {
                     return [
                         'forceReload'=>'#crud-datatable-pjax',
                         'title'=> "Cập nhật",
-                        'content'=>$this->renderAjax('view', [
-                            'model' => $model,
-                        ]),
+                        'content'=>$this->renderAjax('update', ['model' => $model]),
                         'tcontent'=>'Cập nhật thành công!',
-                        'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]).
-                                Html::a('Sửa',['update','id'=>$id],['class'=>'btn btn-primary','role'=>'modal-remote'])
-                    ];    
-                }else{
-                	return ['forceClose'=>true,'forceReload'=>'#crud-datatable-pjax','tcontent'=>'Cập nhật thành công!',];
-                }
-            }else{
-                 return [
-                    'title'=> "Cập nhật",
-                    'content'=>$this->renderAjax('update', [
-                        'model' => $model,
-                    ]),
-                    'tcontent'=>Html::errorSummary($model),
-                    'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]).
+                        'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]) .
                                 Html::button('Lưu lại',['class'=>'btn btn-primary','type'=>"submit"])
-                ];        
-            }
-        }else{
-            /*
-            *   Process for non-ajax request
-            */
-            if ($model->load($request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
-            } else {
-                return $this->render('update', [
-                    'model' => $model,
-                ]);
+                    ];
+                } else {
+                    return [
+                        'title'=> "Cập nhật",
+                        'content'=>$this->renderAjax('update', ['model' => $model]),
+                        'tcontent'=>Html::errorSummary($model),
+                        'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]) .
+                                Html::button('Lưu lại',['class'=>'btn btn-primary','type'=>"submit"])
+                    ];
+                }
             }
         }
+
+        // Non-Ajax
+        if ($model->load($request->post())) {
+
+            // Xử lý user tương tự như trên (non-Ajax)
+            $username = trim($model->username);
+            $password = $model->password;
+
+            if (!empty($username)) {
+                $existingUser = UserForm::find()->where(['username' => $username])->one();
+
+                if ($existingUser) {
+                    if (!empty($password)) {
+                        $existingUser->setPassword($password);
+                    }
+                    $existingUser->status = $model->status;
+                    $existingUser->save(false);
+                    $model->user_id = $existingUser->id;
+                } else {
+                    $user = new UserForm();
+                    $user->username = $username;
+                    $user->status = $model->status;
+                    $user->email = $model->email ?? $username . '@example.com';
+                    if (!empty($password)) {
+                        $user->setPassword($password);
+                    }
+                    $user->generateAuthKey();
+                    $user->save(false);
+                    $model->user_id = $user->id;
+                }
+            } else {
+                $model->user_id = null;
+            }
+
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+        }
+
+        return $this->render('update', ['model' => $model]);
     }
 
     /**
@@ -222,6 +353,43 @@ class DefaultController extends Controller
         $request = Yii::$app->request;
         $model = $this->findModel($id);
 
+        // Kiem tra da phat sinh nghiep vu cac table 
+        // kpi_work_registered, kpi_work_assignment, kpi_kpi_evaluation, kpi_summary
+        // Kiểm tra ràng buộc
+        $exists = (new \yii\db\Query())
+            ->from('kpi_work_registered')
+            ->where(['employee_id' => $id])
+            ->exists()
+            || (new \yii\db\Query())
+            ->from('kpi_work_assignment')
+            ->where(['employee_id' => $id])
+            ->exists()
+            || (new \yii\db\Query())
+            ->from('kpi_kpi_evaluation')
+            ->where(['employee_id' => $id])
+            ->exists()
+            || (new \yii\db\Query())
+            ->from('kpi_summary')
+            ->where(['employee_id' => $id])
+            ->exists();
+
+        if ($exists) {
+            if ($request->isAjax) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return [
+                    'forceClose' => true,
+                    'forceReload' => false,
+                    'tcontent' => 'Nhân viên này đã phát sinh nghiệp vụ KPI, không thể xóa!'
+                ];
+            } else {
+                 return [
+                    'forceClose' => true,
+                    'forceReload' => false,
+                    'tcontent' => 'Nhân viên này đã phát sinh nghiệp vụ KPI, không thể xóa!'
+                ];
+            }
+        }
+       
         $model->delete();
 
         if($request->isAjax){
@@ -247,37 +415,89 @@ class DefaultController extends Controller
      * @param integer $id
      * @return mixed
      */
+
     public function actionBulkdelete()
-    {        
+    {
         $request = Yii::$app->request;
-        $pks = explode(',', $request->post( 'pks' )); // Array or selected records primary keys
-        $delOk = true;
-        $fList = array();
-        foreach ( $pks as $pk ) {
-            $model = $this->findModel($pk);
-            try{
-            	$model->delete();
-            }catch(\Exception $e) {
-            	$delOk = false;
-            	$fList[] = $model->id;
+        
+        // Lấy danh sách PK, nếu null trả về mảng rỗng
+        $pksPost = $request->post('pks');
+        $pks = $pksPost !== null ? explode(',', $pksPost) : [];
+        //dd($pks);
+
+        if(empty($pks)) {
+            $message = 'Vui lòng chọn bản ghi để xóa!';
+            if ($request->isAjax) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return [
+                    'forceClose' => true,
+                    'forceReload' => false,
+                    'tcontent' => $message,
+                ];
+            } else {
+                 return [
+                    'forceClose' => true,
+                    'forceReload' => false,
+                    'tcontent' => $message,
+                ];
             }
         }
 
-        if($request->isAjax){
-            /*
-            *   Process for ajax request
-            */
+        $delOk = true;
+        $fList = [];
+
+        // Bảng cần kiểm tra KPI
+        $tables = [
+            'kpi_work_registered' => 'employee_id',
+            'kpi_work_assignment' => 'employee_id',
+            'kpi_kpi_evaluation' => 'employee_id',
+            'kpi_summary' => 'employee_id',
+        ];
+
+        foreach ($pks as $pk) {
+            $model = $this->findModel($pk);
+
+            // Kiểm tra ràng buộc trong các bảng KPI
+            $exists = false;
+            foreach ($tables as $table => $column) {
+                $exists = (new \yii\db\Query())
+                    ->from($table)
+                    ->where([$column => $pk])
+                    ->exists();
+                if ($exists) break;
+            }
+
+            if ($exists) {
+                $delOk = false;
+                $fList[] = $model->id;
+                continue;
+            }
+
+            // Xóa nếu không có ràng buộc
+            try {
+                $model->delete();
+            } catch (\Exception $e) {
+                $delOk = false;
+                $fList[] = $model->id;
+            }
+        }
+
+        // Trả kết quả
+        $message = $delOk
+            ? 'Xóa thành công!'
+            : 'Không thể xóa (đã phát sinh KPI hoặc lỗi): ' . implode(', ', $fList);
+
+        if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            return ['forceClose'=>true,'forceReload'=>'#crud-datatable-pjax',
-            			'tcontent'=>$delOk==true?'Xóa thành công!':('Không thể xóa:'.implode('</br>', $fList)),
+            return [
+                'forceClose' => true,
+                'forceReload' => '#crud-datatable-pjax',
+                'tcontent' => $message,
             ];
-        }else{
-            /*
-            *   Process for non-ajax request
-            */
+        } else {
+            Yii::$app->session->setFlash($delOk ? 'success' : 'error', $message);
             return $this->redirect(['index']);
         }
-       
     }
 
     /**
