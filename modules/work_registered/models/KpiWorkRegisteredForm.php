@@ -66,7 +66,7 @@ class KpiWorkRegisteredForm extends KpiWorkRegistered
             'employee_id' => 'Nhân viên',
             'kpi_id' => 'KPI',
             'title' => 'Tiêu đề',
-            'description' => 'Mô tả',
+            'description' => 'Mô tả công việc',
             'status' => 'Trạng thái',
             'date_start' => 'Ngày bắt đầu',
             'date_end' => 'Ngày kết thúc',

@@ -36,32 +36,40 @@ class DateHelper
     }
 
    public static function formatVN($datetime, $format = 'd/m/Y H:i:s', $timezone = 'Asia/Ho_Chi_Minh')
-    {
-        $datetimeVN = null;
+{
+    $datetimeVN = null;
 
-        try {
-            if (empty($datetime)) {
-                // Nếu không truyền vào datetime thì lấy thời gian hiện tại
-                $dt = new \DateTime('now', new \DateTimeZone($timezone));
-            } else {
-                // Nếu chuỗi là kiểu chuẩn SQL thì parse theo Y-m-d H:i:s
-                $dt = \DateTime::createFromFormat('Y-m-d H:i:s', $datetime, new \DateTimeZone($timezone));
+    try {
+        $dt = false;
 
-                // Nếu không phải kiểu chuẩn SQL thì thử parse theo format VN
-                if ($dt === false) {
-                    $dt = \DateTime::createFromFormat('d/m/Y H:i:s', $datetime, new \DateTimeZone($timezone));
-                }
+        // Nếu không truyền datetime thì lấy thời gian hiện tại
+        if (empty($datetime)) {
+            $dt = new \DateTime('now', new \DateTimeZone($timezone));
+        } else {
+            // Thử parse kiểu SQL: Y-m-d H:i:s
+            $dt = \DateTime::createFromFormat('Y-m-d H:i:s', $datetime, new \DateTimeZone($timezone));
+
+            // Nếu không thành công, thử parse kiểu VN: d/m/Y H:i:s
+            if ($dt === false) {
+                $dt = \DateTime::createFromFormat('d/m/Y H:i:s', $datetime, new \DateTimeZone($timezone));
             }
 
-            if ($dt !== false) {
-                $datetimeVN = $dt->format($format); // Xuất ra theo format yêu cầu (mặc định d/m/Y H:i:s)
+            // Nếu vẫn không thành công, thử parse tự động (ISO 8601 hoặc các format khác)
+            if ($dt === false) {
+                $dt = new \DateTime($datetime);
+                $dt->setTimezone(new \DateTimeZone($timezone)); // chuyển về timezone VN
             }
-        } catch (\Exception $e) {
-            $datetimeVN = null;
         }
 
-        return $datetimeVN;
+        if ($dt !== false) {
+            $datetimeVN = $dt->format($format);
+        }
+    } catch (\Exception $e) {
+        $datetimeVN = null;
     }
+
+    return $datetimeVN;
+}
 
 
     /**

@@ -2,6 +2,7 @@
 
 namespace app\modules\work_registered\controllers;
 
+use app\common\helpers\DateHelper;
 use app\modules\employees\models\EmployeesForm;
 use Yii;
 use app\modules\work_registered\models\KpiWorkRegisteredForm;
@@ -67,8 +68,13 @@ class RegisterController extends Controller
         $model = new KpiWorkRegisteredForm();
 
         // Gán ngày giờ mặc định từ FullCalendar
-        $model->date_start = $start_str;
-        $model->date_end = $end_str;
+        $model->date_start = DateHelper::formatVN($start_str);
+        /* if (!$model->date_start) {
+            // Chuyển ISO 8601 sang datetime
+            $dt = new \DateTime($start_str);
+            $model->date_start = $dt->format('d/m/Y H:i:s');
+        } */
+        $model->date_end = DateHelper::formatVN($end_str);
 
         // Nếu request AJAX
         if ($request->isAjax) {
