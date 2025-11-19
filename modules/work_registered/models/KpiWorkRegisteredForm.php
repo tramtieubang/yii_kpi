@@ -61,17 +61,17 @@ class KpiWorkRegisteredForm extends KpiWorkRegistered
      */
     public function attributeLabels()
     {
-        return [
+       return [
             'id' => 'ID',
-            'employee_id' => 'Employee ID',
-            'kpi_id' => 'Kpi ID',
-            'title' => 'Title',
-            'description' => 'Description',
-            'status' => 'Status',
-            'date_start' => 'Date Start',
-            'date_end' => 'Date End',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'employee_id' => 'Nhân viên',
+            'kpi_id' => 'KPI',
+            'title' => 'Tiêu đề',
+            'description' => 'Mô tả',
+            'status' => 'Trạng thái',
+            'date_start' => 'Ngày bắt đầu',
+            'date_end' => 'Ngày kết thúc',
+            'created_at' => 'Ngày tạo',
+            'updated_at' => 'Ngày cập nhật',
         ];
     }
 

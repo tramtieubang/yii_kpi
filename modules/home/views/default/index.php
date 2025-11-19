@@ -193,8 +193,8 @@ body {
         <div class="home-panel">
             <h5><i class="fe fe-briefcase text-info"></i> Quản lý công việc </h5>
             <div class="home-menu-grid">
-                <?php if (PermissionHelper::check('deparments/default/index')): ?>
-                    <?= Html::a('<i class="fe fe-edit text-info"></i><div class="home-menu-label">Đăng ký công việc</div>', ['deparments/default', 'menu' => 'cv3'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'cv3']) ?>
+                <?php if (PermissionHelper::check('/work-registered/register/index')): ?>
+                    <?= Html::a('<i class="fe fe-edit text-info"></i><div class="home-menu-label">Đăng ký công việc</div>', ['/work-registered/register', 'menu' => 'cv3'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'cv3']) ?>
                 <?php endif; ?>
                 <?php if (PermissionHelper::check('employees/default/index')): ?>
                     <?= Html::a('<i class="fe fe-check-square text-info"></i><div class="home-menu-label">Phê duyệt đăng ký</div>', ['/employees/default', 'menu' => 'cv4'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'cv4']) ?>
