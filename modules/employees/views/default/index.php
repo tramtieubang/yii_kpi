@@ -60,7 +60,7 @@ Yii::$app->params['showView'] = false;
 								Chọn chức năng</h6>'
                     .
                     Html::a('<i class="fas fa fa-plus" aria-hiddi="true"></i> Thêm mới', ['create'],
-                        ['role'=>'modal-remote','title'=> 'Thêm mới','class'=>'dropdown-item'])
+                        ['role'=>'modal-remote-2','title'=> 'Thêm mới','class'=>'dropdown-item'])
                     .
                     Html::a('<i class="fas fa fa-sync" aria-hidden="true"></i> Tải lại', [''],
                         ['data-pjax'=>1, 'class'=>'dropdown-item', 'title'=>'Tải lại'])
@@ -140,7 +140,7 @@ Yii::$app->params['showView'] = false;
         'id'=>'ajaxCrudModal2',
         'tabindex' => false // important for Select2 to work properly
    ],
-   'dialogOptions'=>['class'=>'modal-lg'],
+   'dialogOptions'=>['class'=>'modal-xl'],
    'closeButton'=>['label'=>'<span aria-hidden=\'true\'>×</span>'],
    'id'=>'ajaxCrudModal2',
     'footer'=>'',// always need it for jquery plugin

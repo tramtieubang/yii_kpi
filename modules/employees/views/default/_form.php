@@ -17,6 +17,7 @@ use yii\widgets\ActiveForm;
 <div class="employees-form-form">
 
     <?php $form = ActiveForm::begin([
+		'id' => 'form-employees',
         'enableClientValidation' => true,
         'options' => ['autocomplete' => 'off'],
     ]); ?>
@@ -83,7 +84,9 @@ use yii\widgets\ActiveForm;
 								}
 
 								echo $form->field($model, 'department_id', [
-										'template' => '<label class="control-label fw-bold" style="margin-bottom:0px;">{label}</label> ' . 
+										'template' => '
+											<div class="d-flex align-items-center mb-0">
+											<label class="control-label fw-bold" style="margin-bottom:0px;">{label}</label> ' . 
 											Html::a(
 												'<i class="fa fa-plus"></i>',
 												['/departments/default/create'],
@@ -91,14 +94,17 @@ use yii\widgets\ActiveForm;
 													'title' => 'Thêm phòng ban mới',
 													'class' => 'btn btn-outline-primary btn-sm rounded-circle',
 													'id' => 'btn-add-position',
-													'style' => 'margin-left:5px; padding:0.25rem 0.35rem; width:17px; height:17px; display:inline-flex; align-items:center; justify-content:center;',
-													'role' => 'modal-remote-2',
+													'style' => 'margin:-10px 0px 0px 5px; padding:0.25rem 0.35rem; width:17px; height:17px; display:inline-flex; align-items:center; justify-content:center;',
+													'role' => 'modal-remote-3',
 													'data-pjax' => 0,
-													'data-target' => '#ajaxCrudModal2',
+													'data-target' => '#ajaxCrudModal3',
 													'data-bs-toggle' => 'tooltip',
 													'data-bs-placement' => 'top',
 												]
-											)  . "{input}{hint}{error}",
+											)  . "
+											</div>
+											<div>{input}</div>
+											{hint}{error}",
 											// Tắt tự động thêm dấu * mặc định
         									'labelOptions' => ['class' => 'fw-bold', 'encode' => false],
 								])->widget(Select2::classname(), [
@@ -109,14 +115,15 @@ use yii\widgets\ActiveForm;
 									],
 									'pluginOptions' => [
 										'escapeMarkup' => new JsExpression('function(markup) { return markup; }'),
-										'dropdownParent' => new JsExpression("$('#ajaxCrudModal .modal-body')"),
+										'dropdownParent' => new JsExpression("$('#ajaxCrudModal2 .modal-body')"),
 										'allowClear' => true,
+										'width' => '100%', // width 100% của container
 									],
 								]);
 							?>
 	
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 col-sm-12">
                            <?php
 								// Lấy danh sách chức vụ và gán STT
 								$items = PositionsForm::find()->all();
@@ -124,12 +131,14 @@ use yii\widgets\ActiveForm;
 								foreach ($items as $index => $dept) {
 									$data[$dept->id] = '<div style="display: flex;">
 															<div style="width:24px;">'.($index + 1).'</div> 
-															<div>'.$dept->name.'</div>
+															<div style="width:100% !important">'.$dept->name.'</div>
 														</div>';
 								}
 
 								echo $form->field($model, 'position_id', [
-										'template' => '<label class="control-label fw-bold" style="margin-bottom:0px;">{label}</label> ' . 
+										'template' => '
+											<div class="d-flex align-items-center mb-0">
+											<label class="control-label fw-bold" style="margin-bottom:0px;">{label}</label> ' . 
 											Html::a(
 												'<i class="fa fa-plus"></i>',
 												['/positions/default/create'],
@@ -137,14 +146,17 @@ use yii\widgets\ActiveForm;
 													'title' => 'Thêm chức vụ mới',
 													'class' => 'btn btn-outline-primary btn-sm rounded-circle',
 													'id' => 'btn-add-position',
-													'style' => 'margin-left:5px; padding:0.25rem 0.35rem; width:17px; height:17px; display:inline-flex; align-items:center; justify-content:center;',
-													'role' => 'modal-remote-2',
+													'style' => 'margin:-10px 0px 0px 5px; padding:0.25rem 0.35rem; width:17px; height:17px; display:inline-flex; align-items:center; justify-content:center;',
+													'role' => 'modal-remote-3',
 													'data-pjax' => 0,
-													'data-target' => '#ajaxCrudModal2',
+													'data-target' => '#ajaxCrudModal3',
 													'data-bs-toggle' => 'tooltip',
 													'data-bs-placement' => 'top',
 												]
-											)  . "{input}{hint}{error}",
+											)  . "
+											</div>
+											<div>{input}</div>
+											{hint}{error}",
 								])->widget(Select2::classname(), [
 									'data' => $data,
 									'options' => [
@@ -153,8 +165,9 @@ use yii\widgets\ActiveForm;
 									],
 									'pluginOptions' => [
 										'escapeMarkup' => new JsExpression('function(markup) { return markup; }'),
-										'dropdownParent' => new JsExpression("$('#ajaxCrudModal .modal-body')"),
+										'dropdownParent' => new JsExpression("$('#ajaxCrudModal2 .modal-body')"),
 										'allowClear' => true,
+										'width' => '100%', // width 100% của container
 									],
 								]);
 							?>	
@@ -162,7 +175,7 @@ use yii\widgets\ActiveForm;
                     </div>
 
                     <div class="row g-3">
-                        <div class="col-12">                          
+                        <div class="col-md-12">                          
 							<?php
 								// Lấy danh sách linh vuc kinh doanh và gán STT
 								$items = BusinessFieldsForm::find()->all();
@@ -175,7 +188,9 @@ use yii\widgets\ActiveForm;
 								}
 
 								echo $form->field($model, 'business_field_id', [
-										'template' => '<label class="control-label fw-bold" style="margin-bottom:0px;">{label}</label> ' . 
+										'template' => '
+											<div class="d-flex align-items-center mb-0">
+											<label class="control-label fw-bold" style="margin-bottom:0px;">{label}</label> ' . 
 											Html::a(
 												'<i class="fa fa-plus"></i>',
 												['/business-fields/default/create'],
@@ -183,14 +198,17 @@ use yii\widgets\ActiveForm;
 													'title' => 'Thêm lĩnh vực kinh doanh mới',
 													'class' => 'btn btn-outline-primary btn-sm rounded-circle',
 													'id' => 'btn-add-position',
-													'style' => 'margin-left:5px; padding:0.25rem 0.35rem; width:17px; height:17px; display:inline-flex; align-items:center; justify-content:center;',
-													'role' => 'modal-remote-2',
+													'style' => 'margin:-10px 0px 0px 5px; padding:0.25rem 0.35rem; width:17px; height:17px; display:inline-flex; align-items:center; justify-content:center;',
+													'role' => 'modal-remote-3',
 													'data-pjax' => 0,
-													'data-target' => '#ajaxCrudModal2',
+													'data-target' => '#ajaxCrudModal3',
 													'data-bs-toggle' => 'tooltip',
 													'data-bs-placement' => 'top',
 												]
-											)  . "{input}{hint}{error}",
+											)  ."
+											</div>
+											<div>{input}</div>
+											{hint}{error}",
 								])->widget(Select2::classname(), [
 									'data' => $data,
 									'options' => [
@@ -199,8 +217,9 @@ use yii\widgets\ActiveForm;
 									],
 									'pluginOptions' => [
 										'escapeMarkup' => new JsExpression('function(markup) { return markup; }'),
-										'dropdownParent' => new JsExpression("$('#ajaxCrudModal .modal-body')"),
+										'dropdownParent' => new JsExpression("$('#ajaxCrudModal2 .modal-body')"),
 										'allowClear' => true,
+										'width' => '100%', // width 100% của container
 									],
 								]);
 							?>	

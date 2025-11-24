@@ -19,7 +19,8 @@ class KpiKpiSearch extends KpiKpiForm
     {
         return [
             [['id'], 'integer'],
-            [['code', 'name', 'description', 'created_at', 'updated_at'], 'safe'],
+            [['code', 'name', 'unit', 'description', 'color', 'created_at', 'updated_at'], 'safe'],
+            [['target', 'weight'], 'number'],
         ];
     }
 
@@ -57,18 +58,24 @@ class KpiKpiSearch extends KpiKpiForm
 		if($cusomSearch != NULL){
 			$query->andFilterWhere ( [ 'OR' ,['like', 'code', $cusomSearch],
             ['like', 'name', $cusomSearch],
-            ['like', 'description', $cusomSearch]] );
+            ['like', 'unit', $cusomSearch],
+            ['like', 'description', $cusomSearch],
+            ['like', 'color', $cusomSearch]] );
  
 		} else {
         	$query->andFilterWhere([
             'id' => $this->id,
+            'target' => $this->target,
+            'weight' => $this->weight,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
 
         $query->andFilterWhere(['like', 'code', $this->code])
             ->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'description', $this->description]);
+            ->andFilterWhere(['like', 'unit', $this->unit])
+            ->andFilterWhere(['like', 'description', $this->description])
+            ->andFilterWhere(['like', 'color', $this->color]);
 		}
         return $dataProvider;
     }

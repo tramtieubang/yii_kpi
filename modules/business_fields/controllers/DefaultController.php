@@ -6,6 +6,7 @@ use Yii;
 use app\modules\business_fields\models\BusinessFieldsForm;
 use app\modules\business_fields\models\BusinessFieldsSearch;
 use app\modules\employees\models\EmployeesForm;
+use app\modules\staff\models\StaffForm;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -258,7 +259,7 @@ class DefaultController extends Controller
         $request = Yii::$app->request;
         $model = $this->findModel($id);
 
-        $item = EmployeesForm::find()
+        $item = StaffForm::find()
             ->select('business_field_id')
             ->where(['business_field_id' => $id])
             ->exists(); // dùng exists() nhanh hơn, trả true/false
@@ -307,7 +308,7 @@ class DefaultController extends Controller
             $model = $this->findModel($pk);
 
             // Kiểm tra Vị trí kinh doanh có nhân viên hay không
-            $hasEmployee = EmployeesForm::find()
+            $hasEmployee = StaffForm::find()
                 ->where(['business_field_id' => $pk])
                 ->exists();   // Tốt hơn all()
 

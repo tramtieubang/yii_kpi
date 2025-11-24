@@ -12,28 +12,27 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin(); ?>
 	
 	<div class="row g-3">
-		<div class="col-md-4"> 
-			<?= $form->field($model, 'code', [
-					'labelOptions' => ['class' => 'form-label fw-bold'],
-					'template' => "{label}\n{input}\n{error}",
-				])->textInput(['maxlength' => true])
-				->label($model->getAttributeLabel('code') . ' <span class="text-danger">*</span>') ?>
+		<div class="col-md-4">
+			<?= $form->field($model, 'code')->textInput(['maxlength' => true])->label('Mã KPI') ?>
 		</div>
-		<div class="col-md-8">    
-			<?= $form->field($model, 'name', [
-					'labelOptions' => ['class' => 'form-label fw-bold'],
-					'template' => "{label}\n{input}\n{error}",
-				])->textInput(['maxlength' => true])
-				->label($model->getAttributeLabel('name') . ' <span class="text-danger">*</span>') ?>
+		<div class="col-md-4">
+			<?= $form->field($model, 'name')->textInput(['maxlength' => true])->label('Tên KPI') ?>
 		</div>
-		<div class="col-md-12">    
-			<?= $form->field($model, 'description', [
-					'labelOptions' => ['class' => 'form-label fw-bold'],
-					'template' => "{label}\n{input}\n{error}",
-				])->textarea(['rows' => 4, 'class' => 'form-control'])
-				->label($model->getAttributeLabel('description')) ?>
-
-		</div>  
+		<div class="col-md-4">
+			<?= $form->field($model, 'unit')->textInput(['maxlength' => true])->label('Đơn vị') ?>
+		</div>
+		<div class="col-md-4">
+			<?= $form->field($model, 'target')->textInput(['maxlength' => true])->label('Mục tiêu') ?>
+		</div>
+		<div class="col-md-4">
+			<?= $form->field($model, 'weight')->textInput(['maxlength' => true])->label('Trọng số') ?>
+		</div>
+		<div class="col-md-4">
+			<?= $form->field($model, 'color')->input('color', ['value' => $model->color ?? '#ff0000'])->label('Màu sắc') ?>
+		</div>
+		<div class="col-md-12">
+			<?= $form->field($model, 'description')->textarea(['rows' => 4])->label('Mô tả') ?>
+		</div>
 	</div>
 
 	<?php if (!Yii::$app->request->isAjax){ ?>

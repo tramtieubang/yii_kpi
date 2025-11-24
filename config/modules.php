@@ -2,13 +2,17 @@
 
 return [
 
-    'departments' => [ 
-        'class' => 'app\modules\departments\Module', 
+    'department' => [ 
+        'class' => 'app\modules\department\Module', 
     ],
 
     'employees' => [ 
         'class' => 'app\modules\employees\Module', 
     ],  
+
+    'staff' => [ 
+        'class' => 'app\modules\staff\Module', 
+    ],
     
     'kpi' => [ 
         'class' => 'app\modules\kpi\Module', 

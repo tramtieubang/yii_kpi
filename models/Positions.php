@@ -7,13 +7,13 @@ use Yii;
 /**
  * This is the model class for table "positions".
  *
- * @property int $id ID chức vụ
- * @property string $name Tên chức vụ
- * @property string|null $description Mô tả chức vụ
- * @property string $created_at Thời gian tạo
- * @property string $updated_at Thời gian cập nhật
+ * @property int $position_id
+ * @property string $name
+ * @property string|null $description
+ * @property string|null $created_at
+ * @property string|null $updated_at
  *
- * @property Employees[] $employees
+ * @property Staff[] $staff
  */
 class Positions extends \yii\db\ActiveRecord
 {
@@ -47,7 +47,7 @@ class Positions extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
+            'position_id' => 'Position ID',
             'name' => 'Name',
             'description' => 'Description',
             'created_at' => 'Created At',
@@ -56,13 +56,13 @@ class Positions extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Employees]].
+     * Gets query for [[Staff]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getEmployees()
+    public function getStaff()
     {
-        return $this->hasMany(Employees::class, ['position_id' => 'id']);
+        return $this->hasMany(Staff::class, ['position_id' => 'position_id']);
     }
 
 }

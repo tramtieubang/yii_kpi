@@ -7,8 +7,8 @@ use yii\helpers\Html;
 <?php if (
 	PermissionHelper::check('positions/default/index') ||
 	PermissionHelper::check('business-fields/default/index') ||
-	PermissionHelper::check('deparments/default/index') || 
-    PermissionHelper::check('employees/default/index') || 
+	PermissionHelper::check('deparment/default/index') || 
+    PermissionHelper::check('staff/default/index') || 
     PermissionHelper::check('kpi/default/index') 
 ): ?>
     <li class="slide">
@@ -32,14 +32,14 @@ use yii\helpers\Html;
                                         <?= Html::a('<i class="fe fe-briefcase"></i> Lĩnh vực kinh doanh', ['/business-fields/default', 'menu'=>'dm2'], ['class' => 'slide-item', 'data-menu' => 'dm2']) ?>
                                     </li>
                                 <?php endif; ?>
-                                <?php if (PermissionHelper::check('departments/default')): ?>
+                                <?php if (PermissionHelper::check('department/default')): ?>
                                     <li>
-                                        <?= Html::a('<i class="fe fe-grid"></i> Phòng ban', ['/departments/default', 'menu'=>'dm3'], ['class' => 'slide-item', 'data-menu' => 'dm3']) ?>
+                                        <?= Html::a('<i class="fe fe-grid"></i> Phòng ban', ['/department/default', 'menu'=>'dm3'], ['class' => 'slide-item', 'data-menu' => 'dm3']) ?>
                                     </li>
                                 <?php endif; ?>                               
-                                <?php if (PermissionHelper::check('employees/default')): ?>
+                                <?php if (PermissionHelper::check('staff/default')): ?>
                                     <li>
-                                        <?= Html::a('<i class="fe fe-users"></i> Nhân viên', ['/employees/default', 'menu'=>'dm6'], ['class' => 'slide-item', 'data-menu' => 'dm6']) ?>
+                                        <?= Html::a('<i class="fe fe-users"></i> Nhân viên', ['/staff/default', 'menu'=>'dm6'], ['class' => 'slide-item', 'data-menu' => 'dm6']) ?>
                                     </li>
                                 <?php endif; ?>
                                 <?php if (PermissionHelper::check('kpi/default')): ?>

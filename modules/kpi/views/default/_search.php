@@ -17,9 +17,19 @@ use yii\widgets\ActiveForm;
             ]
       	]); ?>
 	<div class="row">
-<div class="col-md-4">    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+<div class="col-md-4">    <?= $form->field($model, 'code')->textInput(['maxlength' => true]) ?>
+
+</div><div class="col-md-4">    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+
+</div><div class="col-md-4">    <?= $form->field($model, 'unit')->textInput(['maxlength' => true]) ?>
+
+</div><div class="col-md-4">    <?= $form->field($model, 'target')->textInput(['maxlength' => true]) ?>
+
+</div><div class="col-md-4">    <?= $form->field($model, 'weight')->textInput(['maxlength' => true]) ?>
 
 </div><div class="col-md-4">    <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
+
+</div><div class="col-md-4">    <?= $form->field($model, 'color')->textInput(['maxlength' => true]) ?>
 
 </div><div class="col-md-4">    <?= $form->field($model, 'created_at')->textInput() ?>
 

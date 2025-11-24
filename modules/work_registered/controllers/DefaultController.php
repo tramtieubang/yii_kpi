@@ -2,9 +2,12 @@
 
 namespace app\modules\work_registered\controllers;
 
+use app\models\KpiWorkRegistered;
+use app\models\KpiWorkRegisteredHistory;
 use Yii;
 use app\modules\work_registered\models\KpiWorkRegisteredForm;
 use app\modules\work_registered\models\KpiWorkRegisteredSearch;
+use yii\data\ArrayDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -17,7 +20,7 @@ use yii\filters\AccessControl;
  */
 class DefaultController extends Controller
 {
-    /**
+       /**
      * @inheritdoc
      */
     public function behaviors() {
@@ -29,6 +32,7 @@ class DefaultController extends Controller
     				'class' => VerbFilter::className(),
     				'actions' => [
     					'delete' => ['POST'],
+                        'history-delete' => ['POST'], // add this
     				],
     			],
 		];
@@ -39,12 +43,33 @@ class DefaultController extends Controller
      * @return mixed
      */
     public function actionIndex()
+    {
+        $searchModel = new KpiWorkRegisteredSearch();
+
+        if (isset($_POST['search']) && $_POST['search'] !== null) {
+            $dataProvider = $searchModel->search(Yii::$app->request->post(), $_POST['search']);
+        } elseif ($searchModel->load(Yii::$app->request->post())) {
+            $searchModel = new KpiWorkRegisteredSearch(); // reset
+            $dataProvider = $searchModel->search(Yii::$app->request->post());
+        } else {
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        }
+
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+
+    public function actionIndex1()
     {    
         $searchModel = new KpiWorkRegisteredSearch();
   		if(isset($_POST['search']) && $_POST['search'] != null){
             $dataProvider = $searchModel->search(Yii::$app->request->post(), $_POST['search']);
         } else if ($searchModel->load(Yii::$app->request->post())) {
             $searchModel = new KpiWorkRegisteredSearch(); // "reset"
+            
             $dataProvider = $searchModel->search(Yii::$app->request->post());
         } else {
             $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -312,5 +337,23 @@ class DefaultController extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+
+   public function actionHistoryDelete($id)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $model = KpiWorkRegisteredHistory::findOne($id);
+        if (!$model) {
+            return ['success' => false, 'message' => 'Không tìm thấy dữ liệu.'];
+        }
+
+        if($model->delete()){
+            return ['success' => true, 'message' => 'Đã xóa lịch sử.'];
+        } else {
+            return ['success' => false, 'message' => 'Xóa thất bại.'];
+        }
+    }
+
+
 
 }

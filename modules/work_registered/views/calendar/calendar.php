@@ -89,13 +89,28 @@ Yii::$app->params['showView'] = true;
                     force_close: true
                 });
 
-                const url = '<?= Url::to(['/contact/default/create']) ?>' + '?' + params.toString();
+                const url = '<?= Url::to(['/work-registered/register/create']) ?>' + '?' + params.toString();
 
-                if (modal) {
+               /*  if (modal) {
                     modal.open({
                         href: url
                     });
-                }
+                } */
+                // Mở AJAX CRUD Modal đúng cách
+                // Mở modal và load nội dung
+               $.get(url, function(data){
+                    if(data.title) {
+                        $('#ajaxCrudModal .modal-title').html(data.title);
+                    }
+                    if(data.content) {
+                        $('#ajaxCrudModal .modal-body').html(data.content);
+                    }
+                    if(data.footer) {
+                        $('#ajaxCrudModal .modal-footer').html(data.footer);
+                    }
+                    $('#ajaxCrudModal').modal('show');
+                });
+
 
                 calendar.unselect()
             },
@@ -109,6 +124,14 @@ Yii::$app->params['showView'] = true;
 
         calendar.render();
     });
+
+    // Giữ lớp 'modal-open' nếu còn modal đang mở khi đóng một modal
+    document.addEventListener('hidden.bs.modal', function (event) {
+        const modals = document.querySelectorAll('.modal.show');
+        if (modals.length > 0) {
+            document.body.classList.add('modal-open');
+        }
+    });     
 </script>
 
 <?php Modal::begin([

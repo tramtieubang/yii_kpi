@@ -1,4 +1,6 @@
 <?php
+
+use app\modules\staff\models\StaffForm;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\widgets\Pjax;
@@ -7,7 +9,6 @@ use kartik\select2\Select2;
 use kartik\grid\GridView;
 use yii\bootstrap5\Modal;
 use yii\helpers\ArrayHelper;
-use app\modules\employees\models\EmployeesForm;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\modules\work_registered\models\KpiWorkRegisteredSearch */
@@ -17,8 +18,8 @@ $this->title = 'Quản lý danh sách';
 $this->params['breadcrumbs'][] = $this->title;
 
 // Lấy danh sách nhân viên
-$employees = EmployeesForm::find()->orderBy('name')->all();
-$employeeList = ArrayHelper::map($employees, 'id', 'name');
+$staff = StaffForm::find()->orderBy('name')->all();
+$staffList = ArrayHelper::map($staff, 'id', 'name');
 ?>
 
 <style>
@@ -125,6 +126,25 @@ $employeeList = ArrayHelper::map($employees, 'id', 'name');
     margin:0 !important;
     padding:0 !important;
 }
+
+.table-group-row {
+    background: #f0f3f7;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.job-row {
+    background: #fff;
+}
+
+.hidden-job {
+    display: none !important;
+}
+
+.toggle-jobs {
+    font-size: 18px;
+}
+
 </style>
 
 <!-- ===== Form Filter ===== -->
@@ -170,11 +190,11 @@ $employeeList = ArrayHelper::map($employees, 'id', 'name');
 
         <!-- Nhân viên -->
         <div class="kpi-input" style="width:180px;">
-            <?= $form->field($searchModel, 'employee_id', [
+            <?= $form->field($searchModel, 'staff_id', [
                 'labelOptions'=>['class'=>'form-label mb-1'],
                 'template'=>'{label}{input}',
             ])->widget(Select2::class, [
-                'data'=>$employeeList,
+                'data'=>$staffList,
                 'options'=>['placeholder'=>'Chọn nhân viên ...','class'=>'form-control form-control-sm'],
                 'pluginOptions'=>['allowClear'=>true,'width'=>'100%'],
             ]) ?>
@@ -203,50 +223,65 @@ $employeeList = ArrayHelper::map($employees, 'id', 'name');
 </div>
 
 <!-- ===== PJAX Grid ===== -->
-<?php Pjax::begin(['id'=>'myGrid','timeout'=>10000,'formSelector'=>'#filterForm']); ?>
-<div class="kpi-work-registered-form-index">
-    <div id="ajaxCrudDatatable">
-        <?= GridView::widget([
-            'id'=>'crud-datatable',
-            'dataProvider'=>$dataProvider,
-            'pjax'=>true,
-            'columns'=>require(__DIR__.'/_columns.php'),
-            'striped'=>false,
-            'condensed'=>true,
-            'responsive'=>false,
-            'toolbar'=>[
-                ['content'=>
-                    '<div class="dropdown">
-                        <button class="btn dropdown-toggle" data-bs-toggle="dropdown" type="button"><i class="fa fa-navicon"></i></button>
-                        <div class="dropdown-menu tx-13">
-                            <h6 class="dropdown-header tx-uppercase tx-11 tx-bold bg-info tx-spacing-1">Chọn chức năng</h6>'
-                    . Html::a('<i class="fas fa fa-plus"></i> Thêm mới', ['create'], ['role'=>'modal-remote','title'=>'Thêm mới','class'=>'dropdown-item'])
-                    . Html::a('<i class="fas fa fa-sync"></i> Tải lại', [''], ['data-pjax'=>1,'class'=>'dropdown-item'])
-                    . Html::a('<i class="fas fa fa-trash"></i> Xóa danh sách', ['bulkdelete'], ['role'=>'modal-remote-bulk','class'=>'dropdown-item text-secondary'])
-                    . '</div></div>' . '{export}'
-                ],
-            ],
-            'panel'=>[
-                'heading'=>'<i class="typcn typcn-folder-open"></i> XEM DANH SÁCH',
-                'headingOptions'=>['class'=>'card-header rounded-bottom-0 card-header text-dark'],
-                'before'=>false,
-            ],
-            'panelHeadingTemplate' => '<div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
-                <div class="kv-title">{title}</div>
-                <div class="kv-toolbar">{toolbar}</div>
-            </div>',
-            'panelFooterTemplate' => '<div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
-                <div class="kv-summary">{summary}</div>
-                <div class="kv-pager">{pager}</div>
-            </div>',
-            'summary'=>'Tổng: {totalCount} dòng dữ liệu',
-            'export'=>['options'=>['class'=>'btn']]
-        ]) ?>
-    </div>
-</div>
-<?php Pjax::end(); ?>
 
-<!-- ===== JS ===== -->
+ <?php Pjax::begin([
+        'id' => 'crud-datatable-pjax',
+        'timeout' => 10000,
+        'formSelector' => '.myFilterForm'
+    ]); ?>
+    
+
+    <div class="card-white">
+       
+        <!-- GridView -->
+        <div id="ajaxCrudDatatable">
+            <?= GridView::widget([
+                'id' => 'work-registered-grid',
+                'dataProvider' => $dataProvider,
+                'pjax' => false,
+                'panel' => false,
+                'summary' => false,
+                'responsive' => true,
+                'striped' => false,
+                'condensed' => true,
+                'hover' => true,
+                'columns' => require(__DIR__.'/_columns.php'),
+                'toolbar'=> [
+                    ['content'=>
+                        Html::a('<i class="fas fa fa-plus" aria-hidden="true"></i> Thêm công việc mới', ['create'],
+                        ['role'=>'modal-remote','title'=> 'Thêm mới Users','class'=>'btn btn-outline-primary']).
+                        Html::a('<i class="fas fa fa-sync" aria-hidden="true"></i> Tải lại', [''],
+                        ['data-pjax'=>1, 'class'=>'btn btn-outline-primary', 'title'=>'Tải lại']).
+                      
+                        //'{toggleData}'.
+                        '{export}'
+                    ],
+                ],    
+                'striped' => false,
+                'condensed' => true,
+                'responsive' => true,   
+                'panelHeadingTemplate'=>'{title}',
+                'panelFooterTemplate'=>'{summary}',
+                'summary'=>'Hiển thị dữ liệu {count}/{totalCount}, Trang {page}/{pageCount}',
+                'panel' => [
+                    //'type' => 'primary', 
+                    //'heading' => '<i class="fas fa fa-list" aria-hidden="true"></i> Danh sách',
+                    //'heading' => $this->render('//layouts\menus/gridview_heading'),
+                    'heading' => 'NHẬT KÝ CÔNG VIỆC ĐĂNG KÝ',
+                    'headingOptions' => ['class'=>'card-header'],
+                    'before'=>'<em>* '.Html::encode($this->title).'</em>',
+                    '<div class="clearfix"></div>',
+                ],  
+
+            ]); ?>
+        </div>       
+
+       
+    </div>
+
+    <?php Pjax::end(); ?>
+
+    <!-- ===== JS ===== -->
 <script>
     // Toggle filter
     const btnScrollFilter = document.getElementById('btnScrollFilter');
@@ -266,11 +301,104 @@ $employeeList = ArrayHelper::map($employees, 'id', 'name');
         $(form).find('select').val(null).trigger('change');
         $(form).find('input.kv-date').each(function(){ $(this).datepicker('update',''); });
     });
+
+    document.addEventListener('hidden.bs.modal', function (event) {
+        const modals = document.querySelectorAll('.modal.show');
+        if (modals.length > 0) {
+            document.body.classList.add('modal-open');
+        }
+    });    
+
+
+// Khi modal đóng
+/* $(document).on('hidden.bs.modal', '.modal', function () {
+    if ($('.modal.show').length > 0) {
+        $('body').addClass('modal-open'); // giữ scroll
+    }
+}); */
+
+
+ // ✅ Lắng nghe mọi AJAX phản hồi (khi thêm/sửa/xóa)
+$(document).on('ajaxComplete', function (event, xhr) {
+    let response;
+    try {
+        response = JSON.parse(xhr.responseText);
+    } catch (e) {
+        return; // Không phải JSON, bỏ qua
+    }
+
+    // ✅ Nếu có systemId → chỉ reload ExpandRow tương ứng
+    if (response.system_id) {
+        const $row = $('tr[data-key="' + response.system_id + '"]');
+
+        // Nếu hàng đang expand thì reload nội dung con
+        if ($row.hasClass('kv-state-expanded')) {
+            const $expandCell = $row.next('.kv-expand-detail-row');
+            const $expandContainer = $expandCell.find('.kv-detail-content');
+
+            if ($expandContainer.length) {
+                $.pjax.reload({
+                    container: $expandContainer.find('.pjax-jobs-grid').attr('id'),
+                    async: false
+                });
+            } else {
+                // Nếu không có PJAX con, fallback: đóng mở lại
+                const expandBtn = $row.find('.kv-expand-icon');
+                expandBtn.click();
+                setTimeout(() => expandBtn.click(), 600);
+            }
+        }
+    }
+
+});
+
+
+
 </script>
 
 <?php 
 // ===== Modal =====
-Modal::begin(['options'=>['id'=>'ajaxCrudModal','tabindex'=>false],'dialogOptions'=>['class'=>'modal-lg'],'closeButton'=>['label'=>'×'],'footer'=>'']); Modal::end();
-Modal::begin(['options'=>['id'=>'ajaxCrudModal2','tabindex'=>false],'dialogOptions'=>['class'=>'modal-lg'],'closeButton'=>['label'=>'×'],'footer'=>'']); Modal::end();
-Modal::begin(['options'=>['id'=>'ajaxCrudModal3','tabindex'=>false],'dialogOptions'=>['class'=>'modal-lg'],'closeButton'=>['label'=>'×'],'footer'=>'']); Modal::end();
+/* Modal::begin(['options'=>['id'=>'ajaxCrudModal','tabindex'=>false],'dialogOptions'=>['class'=>'modal-lg'],'closeButton'=>['label'=>'×'],'footer'=>'', 'title'=>'']); Modal::end();
+Modal::begin(['options'=>['id'=>'ajaxCrudModal2','tabindex'=>false],'dialogOptions'=>['class'=>'modal-lg'],'closeButton'=>['label'=>'×'],'footer'=>'', 'title'=>'']); Modal::end();
+Modal::begin(['options'=>['id'=>'ajaxCrudModal3','tabindex'=>false],'dialogOptions'=>['class'=>'modal-lg'],'closeButton'=>['label'=>'×'],'footer'=>'', 'title'=>'']); Modal::end(); */
 ?>
+
+<?php Modal::begin([
+   'options' => [
+        'id'=>'ajaxCrudModal',
+        'tabindex' => false // important for Select2 to work properly
+   ],
+   'dialogOptions'=>['class'=>'modal-lg'],
+   'closeButton'=>['label'=>'<span aria-hidden=\'true\'>×</span>'],
+   'id'=>'ajaxCrudModal',
+    'footer'=>'',// always need it for jquery plugin
+])?>
+
+<?php Modal::end(); ?>
+
+<?php Modal::begin([
+   'options' => [
+        'id'=>'ajaxCrudModal2',
+        'tabindex' => false // important for Select2 to work properly
+   ],
+   'dialogOptions'=>['class'=>'modal-xl'],
+   'closeButton'=>['label'=>'<span aria-hidden=\'true\'>×</span>'],
+   'id'=>'ajaxCrudModal2',
+    'footer'=>'',// always need it for jquery plugin
+])?>
+
+<?php Modal::end(); ?>
+
+<?php Modal::begin([
+   'options' => [
+        'id'=>'ajaxCrudModal3',
+        'tabindex' => false // important for Select2 to work properly
+   ],
+   'dialogOptions'=>['class'=>'modal-lg'],
+   'closeButton'=>['label'=>'<span aria-hidden=\'true\'>×</span>'],
+   'id'=>'ajaxCrudModal3',
+    'footer'=>'',// always need it for jquery plugin
+])?>
+
+<?php Modal::end(); ?>
+

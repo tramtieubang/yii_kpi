@@ -2,34 +2,39 @@
 
 namespace app\modules\work_registered\models;
 
-use app\models\Employees;
 use app\models\KpiKpi;
 use app\models\KpiWorkAssignment;
 use app\models\KpiWorkRegistered;
+use app\models\KpiWorkRegisteredHistory;
+use app\models\KpiWorkRegisteredStatus;
+use app\models\Staff;
 use Yii;
 
 /**
  * This is the model class for table "kpi_work_registered".
  *
- * @property int $id ID đăng ký công việc
- * @property int $employee_id ID nhân viên đăng ký
- * @property int $kpi_id ID KPI liên quan
+ * @property int $id
+ * @property int $staff_id ID nhân viên
+ * @property int $kpi_id ID KPI
  * @property string $title Tiêu đề công việc
- * @property string|null $description Mô tả công việc
- * @property int $status Trạng thái (0: chờ duyệt, 1: duyệt, 2: từ chối)
- * @property string $date_start Ngày bắt đầu
- * @property string|null $date_end Ngày kết thúc dự kiến
- * @property string $created_at Thời gian tạo
- * @property string $updated_at Thời gian cập nhật
+ * @property string|null $description Mô tả
+ * @property int $status_id ID trạng thái
+ * @property string $date_start
+ * @property string|null $date_end
+ * @property string $created_at
+ * @property string $updated_at
  *
- * @property Employees $employee
+ * @property Staff $staff
  * @property KpiKpi $kpi
  * @property KpiWorkAssignment[] $kpiWorkAssignments
+ * @property KpiWorkRegisteredHistory[] $kpiWorkRegisteredHistories
+ * @property KpiWorkRegisteredStatus $status
  */
 class KpiWorkRegisteredForm extends KpiWorkRegistered
 {
-
-
+     // Thuộc tính ảo để phân biệt nhân viên (parent) và công việc (child)
+    public $is_parent;
+    
     /**
      * {@inheritdoc}
      */
@@ -41,33 +46,15 @@ class KpiWorkRegisteredForm extends KpiWorkRegistered
     /**
      * {@inheritdoc}
      */
-    public function rules()
-    {
-        return [
-            [['description', 'date_end'], 'default', 'value' => null],
-            [['status'], 'default', 'value' => 0],
-            [['employee_id', 'kpi_id', 'title', 'date_start'], 'required'],
-            [['employee_id', 'kpi_id', 'status'], 'integer'],
-            [['description'], 'string'],
-            [['date_start', 'date_end', 'created_at', 'updated_at'], 'safe'],
-            [['title'], 'string', 'max' => 255],
-            [['employee_id'], 'exist', 'skipOnError' => true, 'targetClass' => Employees::class, 'targetAttribute' => ['employee_id' => 'id']],
-            [['kpi_id'], 'exist', 'skipOnError' => true, 'targetClass' => KpiKpi::class, 'targetAttribute' => ['kpi_id' => 'id']],
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
-       return [
+        return [
             'id' => 'ID',
-            'employee_id' => 'Nhân viên',
+            'staff_id' => 'Nhân viên',
             'kpi_id' => 'KPI',
             'title' => 'Tiêu đề',
-            'description' => 'Mô tả công việc',
-            'status' => 'Trạng thái',
+            'description' => 'Mô tả',
+            'status_id' => 'Trạng thái',
             'date_start' => 'Ngày bắt đầu',
             'date_end' => 'Ngày kết thúc',
             'created_at' => 'Ngày tạo',
@@ -75,34 +62,5 @@ class KpiWorkRegisteredForm extends KpiWorkRegistered
         ];
     }
 
-    /**
-     * Gets query for [[Employee]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getEmployee()
-    {
-        return $this->hasOne(Employees::class, ['id' => 'employee_id']);
-    }
-
-    /**
-     * Gets query for [[Kpi]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getKpi()
-    {
-        return $this->hasOne(KpiKpi::class, ['id' => 'kpi_id']);
-    }
-
-    /**
-     * Gets query for [[KpiWorkAssignments]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getKpiWorkAssignments()
-    {
-        return $this->hasMany(KpiWorkAssignment::class, ['work_registered_id' => 'id']);
-    }
 
 }

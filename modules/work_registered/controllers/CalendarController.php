@@ -2,6 +2,7 @@
 
 namespace app\modules\work_registered\controllers;
 
+use app\common\helpers\DateHelper;
 use app\modules\employees\models\EmployeesForm;
 use Yii;
 use app\modules\work_registered\models\KpiWorkRegisteredForm;
@@ -59,5 +60,60 @@ class CalendarController extends Controller
         return $this->render('calendar');
     }
 
+     public function actionCreate($start_str = null, $end_str = null)
+    {
+        $request = Yii::$app->request;
+        $model = new KpiWorkRegisteredForm();
+
+        // Gán ngày giờ mặc định từ FullCalendar
+        $model->date_start = DateHelper::formatVN($start_str);
+        /* if (!$model->date_start) {
+            // Chuyển ISO 8601 sang datetime
+            $dt = new \DateTime($start_str);
+            $model->date_start = $dt->format('d/m/Y H:i:s');
+        } */
+        $model->date_end = DateHelper::formatVN($end_str);
+
+        // Nếu request AJAX
+        if ($request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+
+            // Hiển thị form lần đầu (AJAX GET)
+            if ($request->isGet) {
+                
+                return [
+                    'title' => "Đăng ký công việc",
+                    'content' => $this->renderAjax('create', ['model' => $model]),
+                    'footer' => Html::button('Đóng', ['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]) .
+                                Html::button('Lưu', ['class'=>'btn btn-primary','type'=>"submit"])
+                ];
+ 
+            }
+
+            // Xử lý submit form (AJAX POST)
+            if ($model->load($request->post()) && $model->save()) {
+                return [
+                    'forceReload' => '#crud-datatable-pjax',
+                    'title' => "Thêm mới thành công",
+                    'content' => '<span class="text-success">Đã lưu dữ liệu!</span>',
+                    'footer' => Html::button('Đóng', ['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"])
+                ];
+            }
+
+            // Lỗi validate
+            return [
+                'title' => "Lỗi dữ liệu",
+                'content' => $this->renderAjax('create', ['model' => $model]),
+                'footer' => Html::button('Đóng', ['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"])
+            ];
+        }
+
+        // Nếu không phải AJAX
+        if ($model->load($request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+        }
+
+        return $this->render('create', ['model' => $model]);
+    }
 
 }

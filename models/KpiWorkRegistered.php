@@ -7,24 +7,27 @@ use Yii;
 /**
  * This is the model class for table "kpi_work_registered".
  *
- * @property int $id ID đăng ký công việc
- * @property int $employee_id ID nhân viên đăng ký
+ * @property int $id ID công việc đăng ký
+ * @property int $staff_id ID nhân viên
  * @property int $kpi_id ID KPI liên quan
  * @property string $title Tiêu đề công việc
  * @property string|null $description Mô tả công việc
- * @property int $status Trạng thái (0: chờ duyệt, 1: duyệt, 2: từ chối)
- * @property string $date_start Ngày bắt đầu
- * @property string|null $date_end Ngày kết thúc dự kiến
- * @property string $created_at Thời gian tạo
- * @property string $updated_at Thời gian cập nhật
+ * @property int $status_id Trạng thái công việc
+ * @property string $date_start Ngày bắt đầu công việc
+ * @property string|null $date_end Ngày kết thúc công việc
+ * @property string|null $created_at Ngày tạo
+ * @property string|null $updated_at Ngày cập nhật
  *
- * @property Employees $employee
  * @property KpiKpi $kpi
  * @property KpiWorkAssignment[] $kpiWorkAssignments
+ * @property KpiWorkRegisteredHistory[] $kpiWorkRegisteredHistories
+ * @property Staff $staff
+ * @property KpiWorkRegisteredStatus $status
  */
 class KpiWorkRegistered extends \yii\db\ActiveRecord
 {
-
+    // Thuộc tính ảo
+    public $isGroupedRow = false;
 
     /**
      * {@inheritdoc}
@@ -41,14 +44,15 @@ class KpiWorkRegistered extends \yii\db\ActiveRecord
     {
         return [
             [['description', 'date_end'], 'default', 'value' => null],
-            [['status'], 'default', 'value' => 0],
-            [['employee_id', 'kpi_id', 'title', 'date_start'], 'required'],
-            [['employee_id', 'kpi_id', 'status'], 'integer'],
+            [['status_id'], 'default', 'value' => 1],
+            [['staff_id', 'kpi_id', 'title', 'date_start'], 'required'],
+            [['staff_id', 'kpi_id', 'status_id'], 'integer'],
             [['description'], 'string'],
             [['date_start', 'date_end', 'created_at', 'updated_at'], 'safe'],
             [['title'], 'string', 'max' => 255],
-            [['employee_id'], 'exist', 'skipOnError' => true, 'targetClass' => Employees::class, 'targetAttribute' => ['employee_id' => 'id']],
             [['kpi_id'], 'exist', 'skipOnError' => true, 'targetClass' => KpiKpi::class, 'targetAttribute' => ['kpi_id' => 'id']],
+            [['staff_id'], 'exist', 'skipOnError' => true, 'targetClass' => Staff::class, 'targetAttribute' => ['staff_id' => 'staff_id']],
+            [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => KpiWorkRegisteredStatus::class, 'targetAttribute' => ['status_id' => 'id']],
         ];
     }
 
@@ -59,26 +63,16 @@ class KpiWorkRegistered extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'employee_id' => 'Employee ID',
+            'staff_id' => 'Staff ID',
             'kpi_id' => 'Kpi ID',
             'title' => 'Title',
             'description' => 'Description',
-            'status' => 'Status',
+            'status_id' => 'Status ID',
             'date_start' => 'Date Start',
             'date_end' => 'Date End',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
-    }
-
-    /**
-     * Gets query for [[Employee]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getEmployee()
-    {
-        return $this->hasOne(Employees::class, ['id' => 'employee_id']);
     }
 
     /**
@@ -99,6 +93,36 @@ class KpiWorkRegistered extends \yii\db\ActiveRecord
     public function getKpiWorkAssignments()
     {
         return $this->hasMany(KpiWorkAssignment::class, ['work_registered_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[KpiWorkRegisteredHistories]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getKpiWorkRegisteredHistories()
+    {
+        return $this->hasMany(KpiWorkRegisteredHistory::class, ['work_registered_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Staff]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStaff()
+    {
+        return $this->hasOne(Staff::class, ['staff_id' => 'staff_id']);
+    }
+
+    /**
+     * Gets query for [[Status]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStatus()
+    {
+        return $this->hasOne(KpiWorkRegisteredStatus::class, ['id' => 'status_id']);
     }
 
 }

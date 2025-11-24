@@ -10,12 +10,19 @@ use Yii;
  * @property int $id ID KPI
  * @property string $code Mã KPI
  * @property string $name Tên KPI
+ * @property string|null $unit Đơn vị tính
+ * @property float|null $target Mục tiêu KPI
+ * @property float|null $weight Trọng số KPI
  * @property string|null $description Mô tả KPI
- * @property string $created_at Thời gian tạo
- * @property string $updated_at Thời gian cập nhật
+ * @property string|null $color Màu đại diện KPI
+ * @property string|null $created_at Ngày tạo
+ * @property string|null $updated_at Ngày cập nhật
  *
+ * @property KpiFormula[] $kpiFormulas
  * @property KpiKpiEvaluation[] $kpiKpiEvaluations
  * @property KpiWorkRegistered[] $kpiWorkRegistereds
+ * @property KpiWorkRelation[] $kpiWorkRelations
+ * @property KpiWorkResult[] $kpiWorkResults
  */
 class KpiKpi extends \yii\db\ActiveRecord
 {
@@ -35,12 +42,15 @@ class KpiKpi extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['description'], 'default', 'value' => null],
+            [['unit', 'target', 'weight', 'description', 'color'], 'default', 'value' => null],
             [['code', 'name'], 'required'],
+            [['target', 'weight'], 'number'],
             [['description'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
-            [['code'], 'string', 'max' => 50],
+            [['code', 'unit'], 'string', 'max' => 50],
             [['name'], 'string', 'max' => 255],
+            [['color'], 'string', 'max' => 20],
+            [['code'], 'unique'],
         ];
     }
 
@@ -53,10 +63,24 @@ class KpiKpi extends \yii\db\ActiveRecord
             'id' => 'ID',
             'code' => 'Code',
             'name' => 'Name',
+            'unit' => 'Unit',
+            'target' => 'Target',
+            'weight' => 'Weight',
             'description' => 'Description',
+            'color' => 'Color',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
+    }
+
+    /**
+     * Gets query for [[KpiFormulas]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getKpiFormulas()
+    {
+        return $this->hasMany(KpiFormula::class, ['kpi_id' => 'id']);
     }
 
     /**
@@ -77,6 +101,26 @@ class KpiKpi extends \yii\db\ActiveRecord
     public function getKpiWorkRegistereds()
     {
         return $this->hasMany(KpiWorkRegistered::class, ['kpi_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[KpiWorkRelations]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getKpiWorkRelations()
+    {
+        return $this->hasMany(KpiWorkRelation::class, ['kpi_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[KpiWorkResults]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getKpiWorkResults()
+    {
+        return $this->hasMany(KpiWorkResult::class, ['kpi_id' => 'id']);
     }
 
 }

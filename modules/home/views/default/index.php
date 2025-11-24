@@ -213,18 +213,18 @@ body {
     <!-- DANH GIA KPI -->
     <?php if (
         PermissionHelper::check('deparments/default/index') ||
-	    PermissionHelper::check('employees/default/index') ||
+	    PermissionHelper::check('staff/default/index') ||
 	    PermissionHelper::check('kpi/default/index') 
         ): 
     ?>
         <div class="home-panel">
             <h5><i class="fe fe-target text-danger"></i> Đánh giá KPI </h5>
             <div class="home-menu-grid">
-                <?php if (PermissionHelper::check('deparments/default/index')): ?>
-                    <?= Html::a('<i class="fe fe-edit text-danger"></i><div class="home-menu-label">Chấm điểm KPI </div>', ['/deparments/default', 'menu' => 'dg1'], ['class' => 'home-menu-item home-menu-admin', 'data-menu' => 'dg1']) ?>
+                <?php if (PermissionHelper::check('deparment/default/index')): ?>
+                    <?= Html::a('<i class="fe fe-edit text-danger"></i><div class="home-menu-label">Chấm điểm KPI </div>', ['/deparment/default', 'menu' => 'dg1'], ['class' => 'home-menu-item home-menu-admin', 'data-menu' => 'dg1']) ?>
                 <?php endif; ?>
-                <?php if (PermissionHelper::check('employees/default/index')): ?>
-                    <?= Html::a('<i class="fe fe-user-check text-danger"></i><div class="home-menu-label">Đánh giá hiệu suất cá nhân </div>', ['/employees/default', 'menu' => 'dg2'], ['class' => 'home-menu-item home-menu-admin', 'data-menu' => 'dg2']) ?>
+                <?php if (PermissionHelper::check('staff/default/index')): ?>
+                    <?= Html::a('<i class="fe fe-user-check text-danger"></i><div class="home-menu-label">Đánh giá hiệu suất cá nhân </div>', ['/staff/default', 'menu' => 'dg2'], ['class' => 'home-menu-item home-menu-admin', 'data-menu' => 'dg2']) ?>
                 <?php endif; ?>
                 <?php if (PermissionHelper::check('kpi/default/index')): ?>
                     <?= Html::a('<i class="fe fe-users text-danger"></i><div class="home-menu-label">Đánh giá theo phòng ban </div>', ['/kpi/default', 'menu' => 'dg3'], ['class' => 'home-menu-item home-menu-admin', 'data-menu' => 'dg3']) ?>

@@ -18,7 +18,7 @@ class KpiWorkRegisteredSearch extends KpiWorkRegisteredForm
     public function rules()
     {
         return [
-            [['id', 'employee_id', 'kpi_id', 'status'], 'integer'],
+            [['id', 'staff_id', 'kpi_id', 'status_id'], 'integer'],
             [['title', 'description', 'date_start', 'date_end', 'created_at', 'updated_at'], 'safe'],
         ];
     }
@@ -39,80 +39,49 @@ class KpiWorkRegisteredSearch extends KpiWorkRegisteredForm
      *
      * @return ActiveDataProvider
      */
-    public function search($params, $cusomSearch = null)
+    public function search($params, $cusomSearch=NULL)
     {
         $query = KpiWorkRegisteredForm::find();
 
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,
+        'query' => $query,
+            'sort' => [
+                'defaultOrder' => [
+                    'date_start' => SORT_DESC,
+                    'date_end'   => SORT_DESC,
+                ],
+            ],
         ]);
+       /*  $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]); */
 
         $this->load($params);
 
         if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
             return $dataProvider;
         }
+		if($cusomSearch != NULL){
+			$query->andFilterWhere ( [ 'OR' ,['like', 'title', $cusomSearch],
+            ['like', 'description', $cusomSearch]] );
+ 
+		} else {
+        	$query->andFilterWhere([
+            'id' => $this->id,
+            'staff_id' => $this->staff_id,
+            'kpi_id' => $this->kpi_id,
+            'status_id' => $this->status_id,
+            'date_start' => $this->date_start,
+            'date_end' => $this->date_end,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ]);
 
-        // Nếu có custom search
-        if ($cusomSearch != null) {
-            $query->andFilterWhere([
-                'OR',
-                ['like', 'title', $cusomSearch],
-                ['like', 'description', $cusomSearch]
-            ]);
-        } else {
-           /*  // Chỉ lọc bằng >= và <=, convert ngày sang Y-m-d
-            if (!empty($this->date_start)) {
-                $dateStart = \DateTime::createFromFormat('d/m/Y', $this->date_start);
-                if ($dateStart) {
-                    $query->andFilterWhere(['>=', 'date_start', $dateStart->format('Y-m-d')]);
-                }
-            }
-
-            if (!empty($this->date_end)) {
-                $dateEnd = \DateTime::createFromFormat('d/m/Y', $this->date_end);
-                if ($dateEnd) {
-                    $query->andFilterWhere(['<=', 'date_end', $dateEnd->format('Y-m-d')]);
-                }
-            } */
-
-            // Nếu muốn OR thay vì AND
-            $orCondition = ['or'];
-
-            if (!empty($this->date_start)) {
-                $dateStart = \DateTime::createFromFormat('d/m/Y', $this->date_start);
-                if ($dateStart) {
-                    $orCondition[] = ['>=', 'date_start', $dateStart->format('Y-m-d')];
-                }
-            }
-
-            if (!empty($this->date_end)) {
-                $dateEnd = \DateTime::createFromFormat('d/m/Y', $this->date_end);
-                if ($dateEnd) {
-                    $orCondition[] = ['<=', 'date_end', $dateEnd->format('Y-m-d')];
-                }
-            }
-
-            if (count($orCondition) > 1) {
-                $query->andFilterWhere($orCondition);
-            }    
-
-            // Filter các trường khác bình thường
-            $query->andFilterWhere([
-                'id' => $this->id,
-                'employee_id' => $this->employee_id,
-                'kpi_id' => $this->kpi_id,
-                'status' => $this->status,
-                'created_at' => $this->created_at,
-                'updated_at' => $this->updated_at,
-            ]);
-
-            $query->andFilterWhere(['like', 'title', $this->title])
-                ->andFilterWhere(['like', 'description', $this->description]);
-        }
-
+        $query->andFilterWhere(['like', 'title', $this->title])
+            ->andFilterWhere(['like', 'description', $this->description]);
+		}
         return $dataProvider;
     }
-
-
 }

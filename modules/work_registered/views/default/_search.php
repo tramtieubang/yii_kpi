@@ -17,7 +17,7 @@ use yii\widgets\ActiveForm;
             ]
       	]); ?>
 	<div class="row">
-<div class="col-md-4">    <?= $form->field($model, 'employee_id')->textInput() ?>
+<div class="col-md-4">    <?= $form->field($model, 'staff_id')->textInput() ?>
 
 </div><div class="col-md-4">    <?= $form->field($model, 'kpi_id')->textInput() ?>
 

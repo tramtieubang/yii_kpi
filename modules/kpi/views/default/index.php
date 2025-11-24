@@ -43,11 +43,6 @@ Yii::$app->params['showView'] = false;
         <?=GridView::widget([
             'id'=>'crud-datatable',
             'dataProvider' => $dataProvider,
-            'formatter' => [
-                'class' => 'yii\i18n\Formatter',
-                'nullDisplay' => '', // không hiển thị gì khi null
-            ],
-
             //'filterModel' => $searchModel,
             'pjax'=>true,
             'columns' => require(__DIR__.'/_columns.php'),
@@ -61,7 +56,7 @@ Yii::$app->params['showView'] = false;
 								Chọn chức năng</h6>'
                     .
                     Html::a('<i class="fas fa fa-plus" aria-hiddi="true"></i> Thêm mới', ['create'],
-                        ['role'=>'modal-remote','title'=> 'Thêm mới','class'=>'dropdown-item'])
+                        ['role'=>'modal-remote-2','title'=> 'Thêm mới','class'=>'dropdown-item'])
                     .
                     Html::a('<i class="fas fa fa-sync" aria-hidden="true"></i> Tải lại', [''],
                         ['data-pjax'=>1, 'class'=>'dropdown-item', 'title'=>'Tải lại'])

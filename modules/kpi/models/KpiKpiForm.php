@@ -2,9 +2,12 @@
 
 namespace app\modules\kpi\models;
 
+use app\models\KpiFormula;
 use app\models\KpiKpi;
 use app\models\KpiKpiEvaluation;
 use app\models\KpiWorkRegistered;
+use app\models\KpiWorkRelation;
+use app\models\KpiWorkResult;
 use Yii;
 
 /**
@@ -13,12 +16,19 @@ use Yii;
  * @property int $id ID KPI
  * @property string $code Mã KPI
  * @property string $name Tên KPI
+ * @property string|null $unit Đơn vị tính
+ * @property float|null $target Mục tiêu KPI
+ * @property float|null $weight Trọng số KPI
  * @property string|null $description Mô tả KPI
- * @property string $created_at Thời gian tạo
- * @property string $updated_at Thời gian cập nhật
+ * @property string|null $color Màu đại diện KPI
+ * @property string|null $created_at Ngày tạo
+ * @property string|null $updated_at Ngày cập nhật
  *
+ * @property KpiFormula[] $kpiFormulas
  * @property KpiKpiEvaluation[] $kpiKpiEvaluations
  * @property KpiWorkRegistered[] $kpiWorkRegistereds
+ * @property KpiWorkRelation[] $kpiWorkRelations
+ * @property KpiWorkResult[] $kpiWorkResults
  */
 class KpiKpiForm extends KpiKpi
 {
@@ -32,54 +42,25 @@ class KpiKpiForm extends KpiKpi
         return 'kpi_kpi';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
-    {
-        return [
-            [['description'], 'default', 'value' => null],
-            [['code', 'name'], 'required'],
-            [['description'], 'string'],
-            [['created_at', 'updated_at'], 'safe'],
-            [['code'], 'string', 'max' => 50],
-            [['name'], 'string', 'max' => 255],
-        ];
-    }
 
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+     public function attributeLabels()
     {
-         return [
-            'id' => 'Mã',
-            'code' => 'Mã code',
+       return [
+            'id' => 'ID',
+            'code' => 'Mã',
             'name' => 'Tên',
+            'unit' => 'Đơn vị',
+            'target' => 'Mục tiêu',
+            'weight' => 'Trọng số',
             'description' => 'Mô tả',
+            'color' => 'Màu',
             'created_at' => 'Ngày tạo',
             'updated_at' => 'Ngày cập nhật',
         ];
-    }
 
-    /**
-     * Gets query for [[KpiKpiEvaluations]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getKpiKpiEvaluations()
-    {
-        return $this->hasMany(KpiKpiEvaluation::class, ['kpi_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[KpiWorkRegistereds]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getKpiWorkRegistereds()
-    {
-        return $this->hasMany(KpiWorkRegistered::class, ['kpi_id' => 'id']);
     }
 
 }

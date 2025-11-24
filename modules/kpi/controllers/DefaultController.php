@@ -2,13 +2,9 @@
 
 namespace app\modules\kpi\controllers;
 
-use app\models\KpiWorkRegistered;
-use app\modules\employees\models\EmployeesForm;
 use Yii;
 use app\modules\kpi\models\KpiKpiForm;
 use app\modules\kpi\models\KpiKpiSearch;
-use app\modules\kpi_evaluation\models\KpiKpiEvaluationForm;
-use app\modules\work_registered\models\KpiWorkRegisteredForm;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -25,16 +21,16 @@ class DefaultController extends Controller
      * @inheritdoc
      */
     public function behaviors() {
-    	return [
-            'ghost-access'=> [
-            'class' => 'webvimark\modules\UserManagement\components\GhostAccessControl',
-            ],
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
+    		return [
+    			'ghost-access'=> [
+    			'class' => 'webvimark\modules\UserManagement\components\GhostAccessControl',
+        		],
+    			'verbs' => [
+    				'class' => VerbFilter::className(),
+    				'actions' => [
+    					'delete' => ['POST'],
+    				],
+    			],
 		];
 	}
 
@@ -101,9 +97,7 @@ class DefaultController extends Controller
             *   Process for ajax request
             */
             Yii::$app->response->format = Response::FORMAT_JSON;
-
-             // --- Hiển thị form lần đầu ---
-             if($request->isGet){
+            if($request->isGet){
                 return [
                     'title'=> "Thêm mới",
                     'content'=>$this->renderAjax('create', [
@@ -113,51 +107,40 @@ class DefaultController extends Controller
                                 Html::button('Lưu lại',['class'=>'btn btn-primary','type'=>"submit"])
         
                 ];         
-            }
-            
-             // --- Lưu thành công ---
-            if($model->load($request->post()) && $model->save()){
-
-                 // ⚡ Reset form (model mới)
-                $model = new KpiKpiForm();
-
+            }else if($model->load($request->post()) && $model->save()){
                 return [
                     'forceReload'=>'#crud-datatable-pjax',
+                    'title'=> "Thêm mới",
+                    'content'=>'<span class="text-success">Thêm mới thành công</span>',
+                    'tcontent'=>'Thêm mới thành công!',
+                    'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]).
+                            Html::a('Tiếp tục thêm',['create'],['class'=>'btn btn-primary','role'=>'modal-remote'])
+        
+                ];         
+            }else{           
+                return [
                     'title'=> "Thêm mới",
                     'content'=>$this->renderAjax('create', [
                         'model' => $model,
                     ]),
-                    'tcontent'=>'Thêm mới thành công!',
+                    'tcontent'=>Html::errorSummary($model),
                     'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]).
-                            Html::button('Lưu lại',['class'=>'btn btn-primary','type'=>"submit"])
+                                Html::button('Lưu lại',['class'=>'btn btn-primary','type'=>"submit"])
         
                 ];         
-            } 
-            
-            // --- Lỗi validate ---          
-            return [
-                'title'=> "Thêm mới",
-                'content'=>$this->renderAjax('create', [
+            }
+        }else{
+            /*
+            *   Process for non-ajax request
+            */
+            if ($model->load($request->post()) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            } else {
+                return $this->render('create', [
                     'model' => $model,
-                ]),
-                'tcontent'=>Html::errorSummary($model),
-                'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]).
-                            Html::button('Lưu lại',['class'=>'btn btn-primary','type'=>"submit"])
-    
-            ];         
-           
+                ]);
+            }
         }
-        /*
-        *   Process for non-ajax request
-        */
-        // --- Trường hợp không dùng ajax ---
-        if ($model->load($request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } 
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
        
     }
 
@@ -168,7 +151,7 @@ class DefaultController extends Controller
      * @param integer $id
      * @return mixed
      */
-     public function actionUpdate($id)
+    public function actionUpdate($id)
     {
         $request = Yii::$app->request;
         $model = $this->findModel($id);       
@@ -178,8 +161,6 @@ class DefaultController extends Controller
             *   Process for ajax request
             */
             Yii::$app->response->format = Response::FORMAT_JSON;
-
-            // Hiển thị form lần đầu
             if($request->isGet){
                 return [
                     'title'=> "Cập nhật",
@@ -189,15 +170,11 @@ class DefaultController extends Controller
                     'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]).
                                 Html::button('Lưu lại',['class'=>'btn btn-primary','type'=>"submit"])
                 ];         
-            }
-            
-             // Lưu thành công → Không đóng form, giữ nguyên form đang mở
-            if($model->load($request->post()) && $model->save()){
+            }else if($model->load($request->post()) && $model->save()){
             	if(Yii::$app->params['showView']){
                     return [
                         'forceReload'=>'#crud-datatable-pjax',
                         'title'=> "Cập nhật",
-                         // render lại chính form update với dữ liệu mới vừa lưu
                         'content'=>$this->renderAjax('view', [
                             'model' => $model,
                         ]),
@@ -206,45 +183,31 @@ class DefaultController extends Controller
                                 Html::a('Sửa',['update','id'=>$id],['class'=>'btn btn-primary','role'=>'modal-remote'])
                     ];    
                 }else{
-                	
-                    return [
-                        //'forceClose'=>true,
-                        'forceReload' => '#crud-datatable-pjax',
-                        'title'       => "Cập nhật",
-                        // render lại chính form update với dữ liệu mới vừa lưu
-                        'content'     => $this->renderAjax('update', ['model' => $model]),
-                        'tcontent'    => 'Cập nhật thành công!',
-                        'footer'      =>
-                            Html::button('Đóng lại', ['class' => 'btn btn-default pull-left', 'data-bs-dismiss' => "modal"]) .
-                            Html::button('Lưu lại', ['class' => 'btn btn-primary', 'type' => "submit"])
-                    ];
+                	return ['forceClose'=>true,'forceReload'=>'#crud-datatable-pjax','tcontent'=>'Cập nhật thành công!',];
                 }
+            }else{
+                 return [
+                    'title'=> "Cập nhật",
+                    'content'=>$this->renderAjax('update', [
+                        'model' => $model,
+                    ]),
+                    'tcontent'=>Html::errorSummary($model),
+                    'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]).
+                                Html::button('Lưu lại',['class'=>'btn btn-primary','type'=>"submit"])
+                ];        
             }
-
-            // Nếu validate lỗi
-            return [
-                'title'=> "Cập nhật",
-                'content'=>$this->renderAjax('update', [
+        }else{
+            /*
+            *   Process for non-ajax request
+            */
+            if ($model->load($request->post()) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            } else {
+                return $this->render('update', [
                     'model' => $model,
-                ]),
-                'tcontent'=>Html::errorSummary($model),
-                'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]).
-                            Html::button('Lưu lại',['class'=>'btn btn-primary','type'=>"submit"])
-            ];  
-            
+                ]);
+            }
         }
-
-        /*
-        *   Process for non-ajax request
-        */
-        // Không phải ajax
-        if ($model->load($request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
-        }       
     }
 
     /**
@@ -254,124 +217,67 @@ class DefaultController extends Controller
      * @param integer $id
      * @return mixed
      */
-
     public function actionDelete($id)
     {
         $request = Yii::$app->request;
         $model = $this->findModel($id);
 
-        $item = KpiWorkRegisteredForm::find()
-            ->select('kpi_id')
-            ->where(['kpi_id' => $id])
-            ->exists(); // dùng exists() nhanh hơn, trả true/false
-
-        // Nếu có kpi đa được đăng ký → không cho xóa
-        if ($item) {
-            Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            return [
-                'forceClose' => true,
-                'tcontent' => 'KPI đã có nhân viên đăng ký, bạn không thể xóa!'
-            ];
-        }
-
-        $item = KpiKpiEvaluationForm::find()
-            ->select('kpi_id')
-            ->where(['kpi_id' => $id])
-            ->exists(); // dùng exists() nhanh hơn, trả true/false
-
-        // Nếu có kpi đa được đăng ký → không cho xóa
-        if ($item) {
-            Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            return [
-                'forceClose' => true,
-                'tcontent' => 'KPI đã có được tổng hợp, bạn không thể xóa!'
-            ];
-        }
-
-        // Nếu không có nhân viên đăng ký → xóa
         $model->delete();
 
-        // AJAX request
-        if ($request->isAjax) {
-            Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            return [
-                'forceClose' => true,
-                'forceReload' => '#crud-datatable-pjax'
-            ];
+        if($request->isAjax){
+            /*
+            *   Process for ajax request
+            */
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ['forceClose'=>true,'forceReload'=>'#crud-datatable-pjax'];
+        }else{
+            /*
+            *   Process for non-ajax request
+            */
+            return $this->redirect(['index']);
         }
 
-        // Non-Ajax → redirect
-        return $this->redirect(['index']);
+
     }
 
-
      /**
-     * Delete multiple existing DepartmentsForm model.
+     * Delete multiple existing KpiKpiForm model.
      * For ajax request will return json object
      * and for non-ajax request if deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
      */
-   public function actionBulkdelete()
-    {
+    public function actionBulkdelete()
+    {        
         $request = Yii::$app->request;
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        $pks = explode(',', $request->post('pks'));
-        $failedList = [];
-
-        foreach ($pks as $pk) {
-
+        $pks = explode(',', $request->post( 'pks' )); // Array or selected records primary keys
+        $delOk = true;
+        $fList = array();
+        foreach ( $pks as $pk ) {
             $model = $this->findModel($pk);
-
-            // Kiểm tra trong bảng đăng ký công việc
-            $relatedRegistered = KpiWorkRegisteredForm::find()
-                ->where(['kpi_id' => $pk])
-                ->exists();
-
-            // Kiểm tra trong bảng đánh giá KPI
-            $relatedEvaluation = KpiKpiEvaluationForm::find()
-                ->where(['kpi_id' => $pk])
-                ->exists();
-
-            if ($relatedRegistered || $relatedEvaluation) {
-                $failedList[] = $model->name;
-                continue;
-            }
-
-            // Nếu không liên quan thì xóa
-            try {
-                $model->delete();
-            } catch (\Exception $e) {
-                $failedList[] = $model->name;
+            try{
+            	$model->delete();
+            }catch(\Exception $e) {
+            	$delOk = false;
+            	$fList[] = $model->id;
             }
         }
 
-        // 👉 Trường hợp xóa thành công toàn bộ
-        if (empty($failedList)) {
-            return [
-                'forceClose'  => true,
-                'forceReload' => '#crud-datatable-pjax',
-                'tcontent'    => 'Xóa thành công!',
+        if($request->isAjax){
+            /*
+            *   Process for ajax request
+            */
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ['forceClose'=>true,'forceReload'=>'#crud-datatable-pjax',
+            			'tcontent'=>$delOk==true?'Xóa thành công!':('Không thể xóa:'.implode('</br>', $fList)),
             ];
+        }else{
+            /*
+            *   Process for non-ajax request
+            */
+            return $this->redirect(['index']);
         }
-
-        // 👉 Trường hợp có lỗi
-        return [
-            'title'   => 'Không thể xóa',
-            'content' => 
-                '<div class="alert alert-danger">
-                    Các mục sau <b>không thể xóa</b> vì đã có dữ liệu liên quan:<br>
-                    <b>' . implode(', ', $failedList) . '</b>
-                </div>
-                <script>
-                    setTimeout(function(){
-                        $(\'#ajaxCrudModal\').modal(\'hide\');
-                    }, 5000);
-                </script>',
-            'forceClose'  => false,       // Không đóng modal
-            'forceReload' => '#crud-datatable-pjax',
-        ];
+       
     }
 
     /**

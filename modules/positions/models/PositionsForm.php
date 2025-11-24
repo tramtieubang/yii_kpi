@@ -19,8 +19,6 @@ use Yii;
  */
 class PositionsForm extends Positions
 {
-
-
     /**
      * {@inheritdoc}
      */
@@ -32,39 +30,16 @@ class PositionsForm extends Positions
     /**
      * {@inheritdoc}
      */
-    public function rules()
-    {
-        return [
-            [['description'], 'default', 'value' => null],
-            [['name'], 'required'],
-            [['description'], 'string'],
-            [['created_at', 'updated_at'], 'safe'],
-            [['name'], 'string', 'max' => 255],
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
-       return [
-            'id' => 'ID chức vụ',
-            'name' => 'Tên chức vụ',
-            'description' => 'Mô tả chức vụ',
-            'created_at' => 'Thời gian tạo',
-            'updated_at' => 'Thời gian cập nhật',
+      return [
+            'position_id' => 'ID Chức vụ',
+            'name' => 'Tên Chức vụ',
+            'description' => 'Mô tả',
+            'created_at' => 'Ngày tạo',
+            'updated_at' => 'Ngày cập nhật',
         ];
-    }
 
-    /**
-     * Gets query for [[Employees]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getEmployees()
-    {
-        return $this->hasMany(Employees::class, ['position_id' => 'id']);
     }
 
 }

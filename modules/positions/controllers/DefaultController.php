@@ -2,10 +2,10 @@
 
 namespace app\modules\positions\controllers;
 
-use app\modules\employees\models\EmployeesForm;
 use Yii;
 use app\modules\positions\models\PositionsForm;
 use app\modules\positions\models\PositionsSearch;
+use app\modules\staff\models\StaffForm;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -27,7 +27,7 @@ class DefaultController extends Controller
     			'class' => 'webvimark\modules\UserManagement\components\GhostAccessControl',
         		],
     			'verbs' => [
-    				'class' => VerbFilter::class,
+    				'class' => VerbFilter::className(),
     				'actions' => [
     					'delete' => ['POST'],
     				],
@@ -88,7 +88,6 @@ class DefaultController extends Controller
      * and for non-ajax request if creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-   
     public function actionCreate()
     {
         $request = Yii::$app->request;
@@ -258,12 +257,12 @@ class DefaultController extends Controller
         $request = Yii::$app->request;
         $model = $this->findModel($id);
 
-        $item = EmployeesForm::find()
+        $item = StaffForm::find()
             ->select('position_id')
             ->where(['position_id' => $id])
             ->exists(); // dùng exists() nhanh hơn, trả true/false
 
-        // Nếu có nhân viên thuộc Chức vụ → không cho xóa
+        // Nếu có nhân viên có Chức vụ → không cho xóa
         if ($item) {
             Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             return [
@@ -287,6 +286,7 @@ class DefaultController extends Controller
         // Non-Ajax → redirect
         return $this->redirect(['index']);
     }
+
      /**
      * Delete multiple existing PositionsForm model.
      * For ajax request will return json object
@@ -294,7 +294,7 @@ class DefaultController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionBulkdelete()
+   public function actionBulkdelete()
     {        
         $request = Yii::$app->request;
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -305,8 +305,8 @@ class DefaultController extends Controller
         foreach ($pks as $pk) {
             $model = $this->findModel($pk);
 
-            // Kiểm tra chức vụ có nhân viên hay không
-            $hasEmployee = EmployeesForm::find()
+            // Kiểm tra phòng ban có nhân viên hay không
+            $hasEmployee = StaffForm::find()
                 ->where(['position_id' => $pk])
                 ->exists();   // Tốt hơn all()
 
@@ -337,7 +337,7 @@ class DefaultController extends Controller
             'content' => 
                 '<div class="alert alert-danger">
                     Không thể xóa các chức vụ: <b>' . implode(', ', $failedList) . '</b><br>
-                    Do đã có nhân viên.
+                    Do đã bổ nhiệm nhân viên.
                 </div>
                 <script>
                     setTimeout(function(){
@@ -348,6 +348,7 @@ class DefaultController extends Controller
             'forceReload' => '#crud-datatable-pjax',
         ];
     }
+
 
     /**
      * Finds the PositionsForm model based on its primary key value.

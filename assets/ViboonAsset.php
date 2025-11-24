@@ -60,6 +60,8 @@ class ViboonAsset extends AssetBundle
         'js/tinymce/tinymce_5.10.7.min.js',
 
         'assets/js/sweetalert2.all.min.js',
+
+        'js/bootbox.js',
        
         //'assets/plugins/tabs/jquery.multipurpose_tabcontent.js',
         //'assets/plugins/tabs/tab-content.js'

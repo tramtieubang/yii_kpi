@@ -18,7 +18,7 @@ class PositionsSearch extends PositionsForm
     public function rules()
     {
         return [
-            [['id'], 'integer'],
+            [['position_id'], 'integer'],
             [['name', 'description', 'created_at', 'updated_at'], 'safe'],
         ];
     }
@@ -60,7 +60,7 @@ class PositionsSearch extends PositionsForm
  
 		} else {
         	$query->andFilterWhere([
-            'id' => $this->id,
+            'position_id' => $this->position_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);

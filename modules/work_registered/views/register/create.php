@@ -5,6 +5,10 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model app\modules\work_registered\models\KpiWorkRegisteredForm */
 
+// Chuyển định dạng ngày sang Flatpickr
+//$model->date_start = $model->date_start ? date('d/m/Y H:i:s', strtotime($model->date_start)) : null;
+//$model->date_end   = $model->date_end   ? date('d/m/Y H:i:s', strtotime($model->date_end))   : null;
+
 ?>
 
 <div class="register-create">
@@ -22,25 +26,29 @@ use yii\widgets\ActiveForm;
         <div class="col-md-12">
             <?= $form->field($model, 'description')->textarea(['rows' => 4]) ?>
         </div>
-         <div class="col-md-6">
-            <?php
-                //$form->field($model, 'date_start')->textInput(['readonly'=>true]) 
-
-                echo $form->field($model, 'date_start')->widget(codenixsv\flatpickr\Flatpickr::class, [
-                    'clientOptions' => [
-                        'enableTime'    => true,
-                        'enableSeconds' => true,
-                        'dateFormat'    => 'd/m/Y H:i:s',
-                        'time_24hr'     => true,
-                        'locale'        => 'vn',
-                    ],
-                    'options' => ['class' => 'form-control flatpickr-input'],
-                ]);
-      
-            ?>
+            <div class="col-md-6">
+            <?= $form->field($model, 'date_start')->widget(codenixsv\flatpickr\Flatpickr::class, [
+                'clientOptions' => [
+                    'enableTime'    => true,
+                    'enableSeconds' => true,
+                    'dateFormat'    => 'd/m/Y H:i:s',
+                    'time_24hr'     => true,
+                    'locale'        => 'vn',
+                ],
+                'options' => ['class' => 'form-control flatpickr-input'],
+            ]); ?>
         </div>
         <div class="col-md-6">
-            <?= $form->field($model, 'date_end')->textInput(['readonly'=>true]) ?>
+            <?= $form->field($model, 'date_end')->widget(codenixsv\flatpickr\Flatpickr::class, [
+                'clientOptions' => [
+                    'enableTime'    => true,
+                    'enableSeconds' => true,
+                    'dateFormat'    => 'd/m/Y H:i:s',
+                    'time_24hr'     => true,
+                    'locale'        => 'vn',
+                ],
+                'options' => ['class' => 'form-control flatpickr-input'],
+            ]); ?>
         </div>    
     </div>
 

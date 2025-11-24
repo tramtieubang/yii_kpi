@@ -8,73 +8,89 @@ class m251116_091121_create_positions_business_fields_and_insert_demo extends Mi
      * {@inheritdoc}
      */
 
-   public function safeUp()
+    public function safeUp()
     {
+        $now = date('Y-m-d H:i:s');
+
         // 1️⃣ Bảng positions
         $this->createTable('{{%positions}}', [
-            'id' => $this->primaryKey()->comment('ID chức vụ'),
-            'name' => $this->string(255)->notNull()->comment('Tên chức vụ'),
-            'description' => $this->text()->null()->comment('Mô tả chức vụ'),
-            'created_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP')->comment('Thời gian tạo'),
-            'updated_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')->comment('Thời gian cập nhật'),
-        ], 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT="Bảng chức vụ"');
+            'position_id' => $this->primaryKey(),
+            'name' => $this->string(255)->notNull(),
+            'description' => $this->text()->null(),
+            'created_at' => $this->dateTime()->defaultExpression('CURRENT_TIMESTAMP'),
+            'updated_at' => $this->dateTime()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
+        ], 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT="Chức vụ nhân viên"');
 
         // 2️⃣ Bảng business_fields
         $this->createTable('{{%business_fields}}', [
-            'id' => $this->primaryKey()->comment('ID lĩnh vực kinh doanh'),
-            'name' => $this->string(255)->notNull()->comment('Tên lĩnh vực kinh doanh'),
-            'description' => $this->text()->null()->comment('Mô tả lĩnh vực'),
-            'created_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP')->comment('Thời gian tạo'),
-            'updated_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')->comment('Thời gian cập nhật'),
+            'business_field_id' => $this->primaryKey(),
+            'name' => $this->string(255)->notNull(),
+            'description' => $this->text()->null(),
+            'created_at' => $this->dateTime()->defaultExpression('CURRENT_TIMESTAMP'),
+            'updated_at' => $this->dateTime()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ], 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT="Lĩnh vực kinh doanh"');
 
-        // 3️⃣ Bảng departments
-        $this->createTable('{{%departments}}', [
-            'id' => $this->primaryKey()->comment('ID phòng ban'),
-            'code' => $this->string(50)->notNull()->unique()->comment('Mã phòng ban'),
-            'name' => $this->string(255)->notNull()->comment('Tên phòng ban'),
-            'description' => $this->text()->comment('Mô tả phòng ban'),
-            'created_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP')->comment('Thời gian tạo'),
-            'updated_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')->comment('Thời gian cập nhật'),
+        // 3️⃣ Bảng department
+        $this->createTable('{{%department}}', [
+            'department_id' => $this->primaryKey(),
+            'name' => $this->string(255)->null(),
+            'code' => $this->string(100)->null(),
+            'description' => $this->text()->null(),
         ], 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT="Bảng phòng ban"');
 
-        // 4️⃣ Bảng employees
-        $this->createTable('{{%employees}}', [
-            'id' => $this->primaryKey()->comment('ID nhân viên'),
-            'user_id' => $this->integer()->null()->comment('ID user trong bảng user'),
+        // 4️⃣ Bảng staff
+        $this->createTable('{{%staff}}', [
+            'staff_id' => $this->primaryKey()->comment('ID nhân viên'),
             'department_id' => $this->integer()->notNull()->comment('ID phòng ban'),
-            'position_id' => $this->integer()->null()->comment('ID chức vụ'), // SET NULL → phải null
-            'business_field_id' => $this->integer()->null()->comment('ID lĩnh vực kinh doanh'), // SET NULL → phải null
+            'position_id' => $this->integer()->null()->comment('ID chức vụ'),
+            'business_field_id' => $this->integer()->null()->comment('ID lĩnh vực kinh doanh'),
             'name' => $this->string(255)->notNull()->comment('Họ tên nhân viên'),
-            'email' => $this->string(255)->notNull()->unique()->comment('Email nhân viên'),
-            'phone' => $this->string(50)->comment('Số điện thoại'),
-            'hire_date' => $this->date()->comment('Ngày tuyển dụng'),
-            'created_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP')->comment('Thời gian tạo'),
-            'updated_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')->comment('Thời gian cập nhật'),
+            'email' => $this->string(191)->notNull()->unique()->comment('Email nhân viên'),
+            'phone' => $this->string(50)->null()->comment('Số điện thoại'),
+            'hire_date' => $this->date()->null()->comment('Ngày tuyển dụng'),
+            'created_at' => $this->dateTime()->defaultExpression('CURRENT_TIMESTAMP')->comment('Thời gian tạo'),
+            'updated_at' => $this->dateTime()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')->comment('Thời gian cập nhật'),
         ], 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT="Bảng nhân viên"');
 
-        // 5️⃣ Foreign keys
-        $this->addForeignKey('fk_employees_user', '{{%employees}}', 'user_id', '{{%user}}', 'id', 'CASCADE', 'CASCADE');
-        $this->addForeignKey('fk_employees_department', '{{%employees}}', 'department_id', '{{%departments}}', 'id', 'CASCADE', 'CASCADE');
-        $this->addForeignKey('fk_employees_position', '{{%employees}}', 'position_id', '{{%positions}}', 'id', 'SET NULL', 'CASCADE');
-        $this->addForeignKey('fk_employees_business_field', '{{%employees}}', 'business_field_id', '{{%business_fields}}', 'id', 'SET NULL', 'CASCADE');
+        // 🔗 Thêm FK cho staff
+        $this->addForeignKey(
+            'fk_staff_department',
+            '{{%staff}}', 'department_id',
+            '{{%department}}', 'department_id',
+            'CASCADE'
+        );
+
+        $this->addForeignKey(
+            'fk_staff_position',
+            '{{%staff}}', 'position_id',
+            '{{%positions}}', 'position_id',
+            'SET NULL'
+        );
+
+        $this->addForeignKey(
+            'fk_staff_business_field',
+            '{{%staff}}', 'business_field_id',
+            '{{%business_fields}}', 'business_field_id',
+            'SET NULL'
+        );
+
+        // ✅ Chèn dữ liệu demo vào positions
+        $this->batchInsert('{{%positions}}', ['name', 'description', 'created_at', 'updated_at'], [
+            ['Giám đốc', 'Mô tả Giám đốc', $now, $now],
+            ['Trưởng phòng', 'Mô tả Trưởng phòng', $now, $now],
+            ['Nhân viên', 'Mô tả Nhân viên', $now, $now],
+        ]);
     }
 
     public function safeDown()
     {
-        // 1️⃣ Xóa foreign key employees
-        $this->dropForeignKey('fk_employees_business_field', '{{%employees}}');
-        $this->dropForeignKey('fk_employees_position', '{{%employees}}');
-        $this->dropForeignKey('fk_employees_department', '{{%employees}}');
-        $this->dropForeignKey('fk_employees_user', '{{%employees}}');
+        // Xóa FK trước khi drop bảng
+        $this->dropForeignKey('fk_staff_department', '{{%staff}}');
+        $this->dropForeignKey('fk_staff_position', '{{%staff}}');
+        $this->dropForeignKey('fk_staff_business_field', '{{%staff}}');
 
-        // 2️⃣ Xóa bảng employees
-        $this->dropTable('{{%employees}}');
-
-        // 3️⃣ Xóa bảng departments
-        $this->dropTable('{{%departments}}');
-
-        // 4️⃣ Xóa bảng business_fields & positions
+        $this->dropTable('{{%staff}}');
+        $this->dropTable('{{%department}}');
         $this->dropTable('{{%business_fields}}');
         $this->dropTable('{{%positions}}');
     }

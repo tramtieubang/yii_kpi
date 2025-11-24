@@ -21,15 +21,15 @@ return [
         'urlCreator' => function($action, $model, $key, $index) {
         	return Url::to([$action,'id'=>$key]);
         },        
-        'viewOptions'=>['role'=>'modal-remote','title'=>'View','title'=>'Xem',
+        'viewOptions'=>['role'=>'modal-remote-2','title'=>'View','title'=>'Xem',
                'class'=>'btn ripple btn-primary btn-sm',
               'data-bs-placement'=>'top',
               'data-bs-toggle'=>'tooltip-primary'],
-        'updateOptions'=>['role'=>'modal-remote','title'=>'Sửa', 
+        'updateOptions'=>['role'=>'modal-remote-2','title'=>'Sửa', 
             'class'=>'btn ripple btn-info btn-sm',
             'data-bs-placement'=>'top',
             'data-bs-toggle'=>'tooltip-info'],
-        'deleteOptions'=>['role'=>'modal-remote-2','title'=>'Xóa', 
+        'deleteOptions'=>['role'=>'modal-remote-3','title'=>'Xóa', 
                       'data-confirm'=>false, 'data-method'=>false,// for overide yii data api
                       'data-request-method'=>'post',
                       'data-toggle'=>'tooltip',

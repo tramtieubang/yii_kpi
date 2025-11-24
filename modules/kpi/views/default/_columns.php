@@ -30,11 +30,11 @@ return [
                'class'=>'btn ripple btn-primary btn-sm',
               'data-bs-placement'=>'top',
               'data-bs-toggle'=>'tooltip-primary'],
-        'updateOptions'=>['role'=>'modal-remote','title'=>'Sửa', 
+        'updateOptions'=>['role'=>'modal-remote-2','title'=>'Sửa', 
             'class'=>'btn ripple btn-info btn-sm',
             'data-bs-placement'=>'top',
             'data-bs-toggle'=>'tooltip-info'],
-        'deleteOptions'=>['role'=>'modal-remote','title'=>'Xóa', 
+        'deleteOptions'=>['role'=>'modal-remote-2','title'=>'Xóa', 
                       'data-confirm'=>false, 'data-method'=>false,// for overide yii data api
                       'data-request-method'=>'post',
                       'data-toggle'=>'tooltip',
@@ -65,8 +65,35 @@ return [
     ],
     [
         'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'description',
+        'attribute'=>'unit',
     ],
+    [
+        'class'=>'\kartik\grid\DataColumn',
+        'attribute'=>'target',
+    ],
+    [
+        'class'=>'\kartik\grid\DataColumn',
+        'attribute'=>'weight',
+    ],
+    // [
+        // 'class'=>'\kartik\grid\DataColumn',
+        // 'attribute'=>'description',
+    // ],
+    [
+        'class' => '\kartik\grid\DataColumn',
+        'attribute' => 'color',
+        'format' => 'raw', // để render HTML
+        'value' => function($model) {
+            $color = $model->color ?: '#ffffff';
+            return "<div style='display:flex; align-items:center;'>
+                        <div style='width:18px; height:18px; background-color:{$color}; border:1px solid #ccc; margin-right:5px;'></div>
+                        <span>{$color}</span>
+                    </div>";
+        },
+        'hAlign' => 'center',
+        'vAlign' => 'middle',
+    ],
+
     // [
         // 'class'=>'\kartik\grid\DataColumn',
         // 'attribute'=>'created_at',

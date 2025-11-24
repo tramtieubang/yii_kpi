@@ -18,7 +18,7 @@ class BusinessFieldsSearch extends BusinessFieldsForm
     public function rules()
     {
         return [
-            [['id'], 'integer'],
+            [['business_field_id'], 'integer'],
             [['name', 'description', 'created_at', 'updated_at'], 'safe'],
         ];
     }
@@ -60,7 +60,7 @@ class BusinessFieldsSearch extends BusinessFieldsForm
  
 		} else {
         	$query->andFilterWhere([
-            'id' => $this->id,
+            'business_field_id' => $this->business_field_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);

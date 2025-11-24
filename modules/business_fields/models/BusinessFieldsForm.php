@@ -19,9 +19,7 @@ use Yii;
  */
 class BusinessFieldsForm extends BusinessFields
 {
-
-
-    /**
+     /**
      * {@inheritdoc}
      */
     public static function tableName()
@@ -29,19 +27,6 @@ class BusinessFieldsForm extends BusinessFields
         return 'business_fields';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
-    {
-        return [
-            [['description'], 'default', 'value' => null],
-            [['name'], 'required'],
-            [['description'], 'string'],
-            [['created_at', 'updated_at'], 'safe'],
-            [['name'], 'string', 'max' => 255],
-        ];
-    }
 
     /**
      * {@inheritdoc}
@@ -49,22 +34,12 @@ class BusinessFieldsForm extends BusinessFields
     public function attributeLabels()
     {
         return [
-            'id' => 'ID lĩnh vực',
+            'business_field_id' => 'ID lĩnh vực',
             'name' => 'Tên lĩnh vực kinh doanh',
             'description' => 'Mô tả lĩnh vực',
             'created_at' => 'Thời gian tạo',
             'updated_at' => 'Thời gian cập nhật',
         ];
-    }
-
-    /**
-     * Gets query for [[Employees]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getEmployees()
-    {
-        return $this->hasMany(Employees::class, ['business_field_id' => 'id']);
     }
 
 }
