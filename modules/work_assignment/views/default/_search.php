@@ -3,11 +3,11 @@ use yii\bootstrap5\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model app\modules\work_registered\models\KpiWorkRegisteredForm */
+/* @var $model app\modules\work_assignment\models\KpiWorkAssignmentForm */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="kpi-work-registered-form-search">
+<div class="kpi-work-assignment-form-search">
 
     <?php $form = ActiveForm::begin([
         	'id'=>'myFilterForm',
@@ -17,23 +17,21 @@ use yii\widgets\ActiveForm;
             ]
       	]); ?>
 	<div class="row">
-<div class="col-md-4">    <?= $form->field($model, 'staff_id')->textInput() ?>
+<div class="col-md-4">    <?= $form->field($model, 'work_registered_id')->textInput() ?>
 
-</div><div class="col-md-4">    <?= $form->field($model, 'kpi_id')->textInput() ?>
+</div><div class="col-md-4">    <?= $form->field($model, 'staff_id')->textInput() ?>
 
-</div><div class="col-md-4">    <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
-
-</div><div class="col-md-4">    <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
-
-</div><div class="col-md-4">    <?= $form->field($model, 'status')->textInput() ?>
+</div><div class="col-md-4">    <?= $form->field($model, 'status_id')->textInput() ?>
 
 </div><div class="col-md-4">    <?= $form->field($model, 'start_date')->textInput() ?>
 
 </div><div class="col-md-4">    <?= $form->field($model, 'end_date')->textInput() ?>
 
-</div><div class="col-md-4">    <?= $form->field($model, 'created_at')->textInput() ?>
+</div><div class="col-md-4">    <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
-</div><div class="col-md-4">    <?= $form->field($model, 'updated_at')->textInput() ?>
+</div><div class="col-md-4">    <?= $form->field($model, 'color')->textInput(['maxlength' => true]) ?>
+
+</div><div class="col-md-4">    <?= $form->field($model, 'assigned_at')->textInput() ?>
 
 </div>  
 	</div>

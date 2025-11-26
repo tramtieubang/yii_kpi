@@ -14,5 +14,16 @@ class PermissionHelper
         } else {
             return User::canRoute($permission);
         }
-    }
+    } 
+
+   /*  public static function check($permission)
+    {
+        // Nếu user là superadmin theo RBAC
+        if (Yii::$app->user->isSuperadmin) {
+            return true;
+        }
+
+        return User::canRoute($permission) ? true : false;
+    }   */
+
 }

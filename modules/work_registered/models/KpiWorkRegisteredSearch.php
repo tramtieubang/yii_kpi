@@ -19,7 +19,7 @@ class KpiWorkRegisteredSearch extends KpiWorkRegisteredForm
     {
         return [
             [['id', 'staff_id', 'kpi_id', 'status_id'], 'integer'],
-            [['title', 'description', 'date_start', 'date_end', 'created_at', 'updated_at'], 'safe'],
+            [['title', 'description', 'start_date', 'end_date', 'created_at', 'updated_at'], 'safe'],
         ];
     }
 
@@ -39,49 +39,52 @@ class KpiWorkRegisteredSearch extends KpiWorkRegisteredForm
      *
      * @return ActiveDataProvider
      */
-    public function search($params, $cusomSearch=NULL)
-    {
-        $query = KpiWorkRegisteredForm::find();
+  public function search($params, $customSearch = null)
+{
+    $query = KpiWorkRegisteredForm::find();
 
-        $dataProvider = new ActiveDataProvider([
+    // Thêm group by nhân viên
+    $query->groupBy('staff_id');
+
+    $dataProvider = new ActiveDataProvider([
         'query' => $query,
-            'sort' => [
-                'defaultOrder' => [
-                    'date_start' => SORT_DESC,
-                    'date_end'   => SORT_DESC,
-                ],
+        'sort' => [
+            'defaultOrder' => [
+                'start_date' => SORT_DESC,
+                'end_date'   => SORT_DESC,
             ],
+        ],
+    ]);
+
+    $this->load($params);
+
+    if (!$this->validate()) {
+        return $dataProvider;
+    }
+
+    if ($customSearch != null) {
+        $query->andFilterWhere([
+            'OR',
+            ['like', 'title', $customSearch],
+            ['like', 'description', $customSearch]
         ]);
-       /*  $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-        ]); */
-
-        $this->load($params);
-
-        if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
-            return $dataProvider;
-        }
-		if($cusomSearch != NULL){
-			$query->andFilterWhere ( [ 'OR' ,['like', 'title', $cusomSearch],
-            ['like', 'description', $cusomSearch]] );
- 
-		} else {
-        	$query->andFilterWhere([
+    } else {
+        $query->andFilterWhere([
             'id' => $this->id,
             'staff_id' => $this->staff_id,
             'kpi_id' => $this->kpi_id,
             'status_id' => $this->status_id,
-            'date_start' => $this->date_start,
-            'date_end' => $this->date_end,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-        ]);
-
-        $query->andFilterWhere(['like', 'title', $this->title])
-            ->andFilterWhere(['like', 'description', $this->description]);
-		}
-        return $dataProvider;
+        ])
+        ->andFilterWhere(['like', 'title', $this->title])
+        ->andFilterWhere(['like', 'description', $this->description]);
     }
+
+    return $dataProvider;
+}
+
+
 }

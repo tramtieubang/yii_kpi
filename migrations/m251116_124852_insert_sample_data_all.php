@@ -116,8 +116,8 @@ class m251116_124852_insert_sample_data_all extends Migration
                 'title' => "Công việc đăng ký $i",
                 'description' => "Mô tả công việc $i",
                 'status_id' => rand(1, 3),
-                'date_start' => "2025-11-" . str_pad($i, 2, '0', STR_PAD_LEFT) . " 08:00:00",
-                'date_end' => "2025-11-" . str_pad($i + 3, 2, '0', STR_PAD_LEFT) . " 17:00:00",
+                'start_date' => "2025-11-" . str_pad($i, 2, '0', STR_PAD_LEFT) . " 08:00:00",
+                'end_date' => "2025-11-" . str_pad($i + 3, 2, '0', STR_PAD_LEFT) . " 17:00:00",
                 'created_at' => $now,
                 'updated_at' => $now
             ]);
@@ -128,8 +128,8 @@ class m251116_124852_insert_sample_data_all extends Migration
                 'work_registered_id' => $workId,
                 'title' => "Công việc đăng ký $i",
                 'description' => "Mô tả công việc $i",
-                'date_start' => "2025-11-" . str_pad($i, 2, '0', STR_PAD_LEFT) . " 08:00:00",
-                'date_end' => "2025-11-" . str_pad($i + 3, 2, '0', STR_PAD_LEFT) . " 17:00:00",
+                'start_date' => "2025-11-" . str_pad($i, 2, '0', STR_PAD_LEFT) . " 08:00:00",
+                'end_date' => "2025-11-" . str_pad($i + 3, 2, '0', STR_PAD_LEFT) . " 17:00:00",
                 'action_type' => 'create',
                 'updated_by' => $staffId,
                 'created_at' => $now
@@ -154,14 +154,14 @@ class m251116_124852_insert_sample_data_all extends Migration
             $assignmentIds[] = $assignmentId;
 
             // Calendar
-            $this->insert('{{%kpi_work_calendar}}', [
+           /*  $this->insert('{{%kpi_work_calendar}}', [
                 'assignment_id' => $assignmentId,
                 'title' => "Công việc chính thức " . ($i + 1),
                 'start_time' => "2025-11-" . str_pad($i + 1, 2, '0', STR_PAD_LEFT) . " 08:00:00",
                 'end_time' => "2025-11-" . str_pad($i + 4, 2, '0', STR_PAD_LEFT) . " 17:00:00",
                 'color' => '#00FF00',
                 'is_all_day' => false
-            ]);
+            ]); */
 
             // Work Relation
             $this->insert('{{%kpi_work_relation}}', [
@@ -229,7 +229,7 @@ class m251116_124852_insert_sample_data_all extends Migration
         $this->delete('{{%kpi_work_report}}');
         $this->delete('{{%kpi_kpi_evaluation}}');
         $this->delete('{{%kpi_work_relation}}');
-        $this->delete('{{%kpi_work_calendar}}');
+        //$this->delete('{{%kpi_work_calendar}}');
         $this->delete('{{%kpi_work_assignment}}');
         $this->delete('{{%kpi_work_registered_history}}');
         $this->delete('{{%kpi_work_registered}}');

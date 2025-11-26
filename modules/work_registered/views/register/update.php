@@ -2,8 +2,8 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
-/* $model->date_start = $model->date_start ? date('Y-m-d H:i:s', strtotime($model->date_start)) : null;
-$model->date_end   = $model->date_end   ? date('Y-m-d H:i:s', strtotime($model->date_end)) : null;
+/* $model->start_date = $model->start_date ? date('Y-m-d H:i:s', strtotime($model->start_date)) : null;
+$model->end_date   = $model->end_date   ? date('Y-m-d H:i:s', strtotime($model->end_date)) : null;
  */
 ?>
 
@@ -23,14 +23,29 @@ $model->date_end   = $model->date_end   ? date('Y-m-d H:i:s', strtotime($model->
             <?= $form->field($model, 'description')->textarea(['rows' => 4]) ?>
         </div>
         <div class="col-md-6">
-            <?= $form->field($model, 'date_start')->input('datetime-local', [
-                'value' => $model->date_start ? date('Y-m-d\TH:i', strtotime($model->date_start)) : ''
+            <?= $form->field($model, 'start_date')->input('datetime-local', [
+                'value' => $model->start_date ? date('Y-m-d\TH:i', strtotime($model->start_date)) : ''
             ]) ?>
         </div>
         <div class="col-md-6">
-            <?= $form->field($model, 'date_end')->input('datetime-local', [
-                'value' => $model->date_end ? date('Y-m-d\TH:i', strtotime($model->date_end)) : ''
+            <?= $form->field($model, 'end_date')->input('datetime-local', [
+                'value' => $model->end_date ? date('Y-m-d\TH:i', strtotime($model->end_date)) : ''
             ]) ?>
+        </div>
+    </div>
+
+     <!-- Slider Duyệt / Chưa duyệt -->
+    <div class="col-12">
+        <?= $form->field($model, 'status', [
+                'template' => "{label}\n<div class='input-group'>
+                    <input type='range' class='form-range' min='1' max='3' step='1' value='2' id='statusRange'>
+                    {input}
+                </div>\n{error}"
+            ])->label('Trạng thái', ['class' => 'fw-bold']) ?>
+        <div class="form-text" id="statusText">
+            <?php 
+                echo 'Đã duyệt'; 
+            ?>
         </div>
     </div>
 
@@ -72,3 +87,17 @@ JS;
 $this->registerJs($js);
 ?>
 
+
+<script>
+    $(document).off('input', '#statusRange').on('input', '#statusRange', function() {
+		let value = parseInt(this.value);
+		let text = '';
+		switch(value){
+			case 1: text = 'Chưa duyệt'; break;
+			case 2: text = 'Đã duyệt'; break;
+			case 3: text = 'Từ chối'; break;
+		}
+		$('#statusText').text(text);
+		$('#staffform-status').val(value);
+	}); 
+</script>

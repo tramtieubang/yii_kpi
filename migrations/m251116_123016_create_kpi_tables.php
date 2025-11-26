@@ -36,7 +36,7 @@ class m251116_123016_create_kpi_tables extends Migration
             'color' => $this->string(20)->null()->comment('Màu đại diện'),
         ], 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
 
-        $this->batchInsert('{{%kpi_work_registered_status}}', ['id','name','description'], [
+        $this->batchInsert('{{%kpi_work_registered_status}}', ['id','name','description','color'], [
             [1, 'Chờ duyệt', 'Công việc vừa tạo, chờ phê duyệt', '#f39c12'], // màu cam
             [2, 'Duyệt', 'Công việc đã được phê duyệt', '#00a65a'],       // màu xanh lá
             [3, 'Từ chối', 'Công việc bị từ chối', '#dd4b39'],             // màu đỏ
@@ -95,12 +95,12 @@ class m251116_123016_create_kpi_tables extends Migration
         $this->createTable('{{%kpi_work_registered}}', [
             'id' => $this->primaryKey()->comment('ID công việc đăng ký'),
             'staff_id' => $this->integer()->notNull()->comment('ID nhân viên'),
-            'kpi_id' => $this->integer()->notNull()->comment('ID KPI liên quan'),
+            'kpi_id' => $this->integer()->comment('ID KPI liên quan'),
             'title' => $this->string(255)->notNull()->comment('Tiêu đề công việc'),
             'description' => $this->text()->comment('Mô tả công việc'),
             'status_id' => $this->integer()->notNull()->defaultValue(1)->comment('Trạng thái công việc'),
-            'date_start' => $this->dateTime()->notNull()->comment('Ngày bắt đầu công việc'),
-            'date_end' => $this->dateTime()->comment('Ngày kết thúc công việc'),
+            'start_date' => $this->dateTime()->notNull()->comment('Ngày bắt đầu công việc'),
+            'end_date' => $this->dateTime()->comment('Ngày kết thúc công việc'),
             'created_at' => $this->dateTime()->defaultExpression('CURRENT_TIMESTAMP')->comment('Ngày tạo'),
             'updated_at' => $this->dateTime()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')->comment('Ngày cập nhật'),
         ], 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
@@ -117,8 +117,8 @@ class m251116_123016_create_kpi_tables extends Migration
             'work_registered_id' => $this->integer()->notNull()->comment('ID công việc đăng ký'),
             'title' => $this->string(255)->notNull()->comment('Tiêu đề công việc'),
             'description' => $this->text()->comment('Mô tả công việc'),
-            'date_start' => $this->dateTime()->notNull()->comment('Ngày bắt đầu công việc'),
-            'date_end' => $this->dateTime()->comment('Ngày kết thúc công việc'),
+            'start_date' => $this->dateTime()->notNull()->comment('Ngày bắt đầu công việc'),
+            'end_date' => $this->dateTime()->comment('Ngày kết thúc công việc'),
             'action_type' => $this->string(20)->defaultValue('update')->comment('Loại hành động (create/update/delete)'),
             'updated_by' => $this->integer()->comment('ID người cập nhật'),
             'created_at' => $this->dateTime()->defaultExpression('CURRENT_TIMESTAMP')->comment('Ngày tạo bản ghi lịch sử'),
@@ -134,6 +134,14 @@ class m251116_123016_create_kpi_tables extends Migration
             'work_registered_id' => $this->integer()->notNull()->comment('ID công việc đăng ký'),
             'staff_id' => $this->integer()->notNull()->comment('ID nhân viên được phân công'),
             'status_id' => $this->integer()->notNull()->defaultValue(1)->comment('Trạng thái phân công'),
+            
+            // Lịch từ ngày → đến ngày
+            'start_date' => $this->date()->notNull()->comment('Ngày bắt đầu'),
+            'end_date' => $this->date()->notNull()->comment('Ngày kết thúc'),
+
+            'title' => $this->string(255)->notNull()->comment('Tiêu đề công việc'),
+            'color' => $this->string(20)->defaultValue('#3788d8')->comment('Màu lịch'),
+                    
             'assigned_at' => $this->dateTime()->defaultExpression('CURRENT_TIMESTAMP')->comment('Ngày phân công'),
         ], 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
 
@@ -144,7 +152,7 @@ class m251116_123016_create_kpi_tables extends Migration
         // -------------------------------
         // 3b. Bảng lịch công việc
         // -------------------------------
-        $this->createTable('{{%kpi_work_calendar}}', [
+       /*  $this->createTable('{{%kpi_work_calendar}}', [
             'id' => $this->primaryKey()->comment('ID lịch'),
             'assignment_id' => $this->integer()->notNull()->comment('ID phân công'),
             'title' => $this->string(255)->notNull()->comment('Tiêu đề lịch'),
@@ -155,7 +163,7 @@ class m251116_123016_create_kpi_tables extends Migration
         ], 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
 
         $this->addForeignKey('fk_calendar_assignment','{{%kpi_work_calendar}}','assignment_id','{{%kpi_work_assignment}}','id','CASCADE');
-
+ */
         // -------------------------------
         // 4️⃣ Bảng mối quan hệ KPI ↔ công việc
         // -------------------------------
@@ -242,7 +250,7 @@ class m251116_123016_create_kpi_tables extends Migration
         $this->dropTable('{{%kpi_work_result}}');
         $this->dropTable('{{%kpi_work_report}}');
         $this->dropTable('{{%kpi_work_relation}}');
-        $this->dropTable('{{%kpi_work_calendar}}');
+        //$this->dropTable('{{%kpi_work_calendar}}');
         $this->dropTable('{{%kpi_work_assignment}}');
         $this->dropTable('{{%kpi_work_registered_history}}');
         $this->dropTable('{{%kpi_work_registered}}');

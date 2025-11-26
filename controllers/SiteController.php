@@ -28,7 +28,7 @@ class SiteController extends Controller
         ];
     } */
 
-    public function behaviors()
+    /* public function behaviors()
     {
         return [
                 'ghost-access' => [
@@ -44,9 +44,32 @@ class SiteController extends Controller
             ],
 
         ];
+    } */
+
+    public function behaviors()
+    {
+        return [
+                'ghost-access' => [
+                'class' => \yii\filters\AccessControl::class,
+                'only' => ['logout', 'check-session'],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['check-session'],
+                        'roles' => ['@'], // user login mới được phép
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['logout'],
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+        ];
     }
 
-    public function actionCheckSession()
+    
+    /* public function actionCheckSession()
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
@@ -66,7 +89,35 @@ class SiteController extends Controller
         return [
             'logged_out' => $loggedOut
         ];
-    }    
+    }     */
+
+    public function actionCheckSession()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $loggedOut = true; // mặc định là logout
+
+        if (!Yii::$app->user->isGuest) {
+            $sessionId = Yii::$app->session->id;
+
+            $session = \app\modules\user_management\session_manager\models\UserSessionsForm::find()
+                ->where(['session_id' => $sessionId])
+                ->one();
+
+            // Nếu session tồn tại, chưa bị logout, chưa bị revoke
+            if ($session && $session->logout_time === null && !$session->revoked_by_admin) {
+                $loggedOut = false;
+            }
+        }
+
+        return [
+            'success' => true,
+            'logged_out' => $loggedOut,
+            'user_id' => Yii::$app->user->isGuest ? null : Yii::$app->user->id,
+            'username' => Yii::$app->user->isGuest ? null : Yii::$app->user->identity->username,
+        ];
+    }
+
 
     /**
      * Actions chuẩn

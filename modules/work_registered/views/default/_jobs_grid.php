@@ -15,10 +15,10 @@ Pjax::begin([
     <h6 class="text-primary mb-0">
         <i class="fas fa-user"></i> Nhân viên: <?= Html::encode($system->staff->name) ?>
     </h6>
-    <?= Html::a('<i class="fas fa-plus"></i> Thêm mới', ['/work_registered/default/create', 'system_id' => $system->id], [
+    <?= Html::a('<i class="fas fa-plus"></i> Thêm mới', ['/work-registered/default/create', 'staff_id' => $system->staff->staff_id], [
         'class' => 'btn btn-sm btn-outline-primary',
-        'role' => 'modal-remote-3',
-        'title' => 'Thêm mới profile',
+        'role' => 'modal-remote',
+        'title' => 'Thêm mới',
     ]) ?>
 </div>
 <?= GridView::widget([
@@ -34,11 +34,11 @@ Pjax::begin([
             //'label' => 'Mô tả',
         ],
         [
-            'attribute' => 'date_start',
+            'attribute' => 'start_date',
             'format' => ['datetime', 'php:d/m/Y h:i A'], // h = 12h, H = 24h, A = AM/PM
         ],
         [
-            'attribute' => 'date_end',
+            'attribute' => 'end_date',
             //'label' => 'Ngày kết thúc',
              'format' => ['datetime', 'php:d/m/Y h:i A'], // h = 12h, H = 24h, A = AM/PM
         ],
@@ -61,7 +61,7 @@ Pjax::begin([
             'width' => '110px', // tăng chiều rộng đủ cho 3 nút
             'buttons' => [                
                 'view' => function($url, $model, $key) {
-                    return Html::a('<i class="fas fa-eye"></i>', ['/work_registered/default/view', 'id' => $model->id], [
+                    return Html::a('<i class="fas fa-eye"></i>', ['/work-registered/default/view', 'id' => $model->id], [
                         'class' => 'btn btn-primary btn-sm',
                         'role' => 'modal-remote',
                         'title' => 'Xem chi tiết',
@@ -69,17 +69,17 @@ Pjax::begin([
                         'data-bs-placement' => 'top',
                     ]);
                 },
-                'update' => fn($url, $model) => Html::a('<i class="fas fa-edit"></i>', ['/work_registered/default/update', 'id' => $model->id], [
+                'update' => fn($url, $model) => Html::a('<i class="fas fa-edit"></i>', ['/work-registered/default/update', 'id' => $model->id], [
                     'class' => 'btn btn-sm btn-outline-primary',
-                    'role' => 'modal-remote-3',
-                    'title' => 'Cập nhật profile',
+                    'role' => 'modal-remote',
+                    'title' => 'Cập nhật',
                 ]),
-                'delete' => fn($url, $model) => Html::a('<i class="fas fa-trash"></i>', ['/work_registered/default/delete', 'id' => $model->id], [
+                'delete' => fn($url, $model) => Html::a('<i class="fas fa-trash"></i>', ['/work-registered/default/delete', 'id' => $model->id], [
                     'class' => 'btn btn-sm btn-outline-danger',
-                    'role' => 'modal-remote-2',
+                    'role' => 'modal-remote',
                     'data-request-method' => 'post',
                     'data-confirm-title' => 'Xác nhận xóa?',
-                    'data-confirm-message' => 'Bạn có chắc muốn xóa thanh nhôm này?',
+                    'data-confirm-message' => 'Bạn có chắc muốn xóa công việc này?',
                     'title' => 'Xóa',
                 ]),
             ],

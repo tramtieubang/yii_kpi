@@ -184,20 +184,21 @@ body {
     <?php endif; ?>
 
     <!-- QUAN LY CONG VIEC -->
-    <?php if (
+    <?php if (        
+        PermissionHelper::check('work-registered/register/index') ||
         PermissionHelper::check('deparments/default/index') ||
-	    PermissionHelper::check('employees/default/index') ||
+	    PermissionHelper::check('staff/default/index') ||
 	    PermissionHelper::check('kpi/default/index') 
         ): 
     ?>
         <div class="home-panel">
             <h5><i class="fe fe-briefcase text-info"></i> Quản lý công việc </h5>
             <div class="home-menu-grid">
-                <?php if (PermissionHelper::check('/work-registered/register/index')): ?>
+                <?php if (PermissionHelper::check('work-registered/register/index')): ?>
                     <?= Html::a('<i class="fe fe-edit text-info"></i><div class="home-menu-label">Đăng ký công việc</div>', ['/work-registered/register', 'menu' => 'cv3'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'cv3']) ?>
                 <?php endif; ?>
-                <?php if (PermissionHelper::check('employees/default/index')): ?>
-                    <?= Html::a('<i class="fe fe-check-square text-info"></i><div class="home-menu-label">Phê duyệt đăng ký</div>', ['/employees/default', 'menu' => 'cv4'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'cv4']) ?>
+                <?php if (PermissionHelper::check('staff/default/index')): ?>
+                    <?= Html::a('<i class="fe fe-check-square text-info"></i><div class="home-menu-label">Phê duyệt đăng ký</div>', ['/staff/default', 'menu' => 'cv4'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'cv4']) ?>
                 <?php endif; ?>
                 <?php if (PermissionHelper::check('kpi/default/index')): ?>
                     <?= Html::a('<i class="fe fe-share-2 text-info"></i><div class="home-menu-label">Phân công công việc</div>', ['/kpi/default', 'menu' => 'cv5'], ['class' => 'home-menu-item home-menu-admin','data-menu' => 'cv5']) ?>

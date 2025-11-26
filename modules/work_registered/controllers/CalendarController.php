@@ -2,17 +2,14 @@
 
 namespace app\modules\work_registered\controllers;
 
-use app\common\helpers\DateHelper;
-use app\modules\employees\models\EmployeesForm;
+use app\models\KpiWorkAssignment;
+use app\modules\staff\models\StaffForm;
 use Yii;
-use app\modules\work_registered\models\KpiWorkRegisteredForm;
-use app\modules\work_registered\models\KpiWorkRegisteredSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use \yii\web\Response;
 use yii\helpers\Html;
-use yii\filters\AccessControl;
 
 /**
  * RegisterController implements the Controller.
@@ -43,9 +40,9 @@ class CalendarController extends Controller
 
     public function actionIndex()
     {
-         $model = EmployeesForm::find()
-        ->select(['id', 'name'])
-        ->indexBy('id')
+         $model = StaffForm::find()
+        ->select(['staff_id', 'name'])
+        ->indexBy('staff_id')
         ->column();
 
         //return $this->render('@app/modules/work_registered/views/default/calendar.php', [
@@ -60,60 +57,65 @@ class CalendarController extends Controller
         return $this->render('calendar');
     }
 
-     public function actionCreate($start_str = null, $end_str = null)
+   public function actionView($id)
     {
-        $request = Yii::$app->request;
-        $model = new KpiWorkRegisteredForm();
+        Yii::$app->response->format = Response::FORMAT_JSON;
 
-        // Gán ngày giờ mặc định từ FullCalendar
-        $model->date_start = DateHelper::formatVN($start_str);
-        /* if (!$model->date_start) {
-            // Chuyển ISO 8601 sang datetime
-            $dt = new \DateTime($start_str);
-            $model->date_start = $dt->format('d/m/Y H:i:s');
-        } */
-        $model->date_end = DateHelper::formatVN($end_str);
+        // 🔹 Query assignment theo ID
+        $query = KpiWorkAssignment::find()->where(['id' => $id]);
 
-        // Nếu request AJAX
-        if ($request->isAjax) {
-            Yii::$app->response->format = Response::FORMAT_JSON;
+        // 🔹 Lấy 1 bản ghi duy nhất (ActiveRecord object)
+        $model = $query->one();
 
-            // Hiển thị form lần đầu (AJAX GET)
-            if ($request->isGet) {
-                
-                return [
-                    'title' => "Đăng ký công việc",
-                    'content' => $this->renderAjax('create', ['model' => $model]),
-                    'footer' => Html::button('Đóng', ['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]) .
-                                Html::button('Lưu', ['class'=>'btn btn-primary','type'=>"submit"])
-                ];
- 
-            }
+        // 🔹 Kiểm tra tồn tại
+        if (!$model) {
+            throw new NotFoundHttpException("Không tìm thấy phân công có ID: $id");
+        }
 
-            // Xử lý submit form (AJAX POST)
-            if ($model->load($request->post()) && $model->save()) {
-                return [
-                    'forceReload' => '#crud-datatable-pjax',
-                    'title' => "Thêm mới thành công",
-                    'content' => '<span class="text-success">Đã lưu dữ liệu!</span>',
-                    'footer' => Html::button('Đóng', ['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"])
-                ];
-            }
+        // 🔹 Trả dữ liệu JSON cho modal
+        return [
+            'title' => "Chi tiết lịch",
+            'content' => $this->renderAjax('view', ['model' => $model]),
+            'footer' => Html::button('Đóng', [
+                            'class'=>'btn btn-default pull-left',
+                            'data-bs-dismiss'=>"modal"
+                        ]) 
+        ];
+    }
 
-            // Lỗi validate
-            return [
-                'title' => "Lỗi dữ liệu",
-                'content' => $this->renderAjax('create', ['model' => $model]),
-                'footer' => Html::button('Đóng', ['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"])
+    public function actionEvents($start = null, $end = null)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        // FullCalendar gửi dạng 2025-02-17T00:00:00Z
+        if ($start) $start = date('Y-m-d H:i:s', strtotime($start));
+        if ($end)   $end   = date('Y-m-d H:i:s', strtotime($end));
+     
+        // Giả sử role superadmin lưu trong Yii::$app->user->identity->role
+        // Hoặc dùng RBAC: Yii::$app->user->can('superadmin')        
+        $query = KpiWorkAssignment::find()
+            ->where(['>=', 'start_date', $start]);
+            //->andWhere(['<=', 'end_date', $end]);
+       if (!Yii::$app->user->isSuperadmin){
+            $query->andWhere(['staff_id' => Yii::$app->user->id]);
+        }
+        $models = $query->all();    
+
+        $events = [];
+
+        foreach ($models as $m) {
+            $events[] = [
+                'id'    => $m->id,
+                'title' => $m->title,
+                'start' => $m->start_date,
+                'end'   => $m->end_date,
+                'color' => $m->status->color, //'#257e4a',  // tuỳ chỉnh
+                'status' => $m->status->name,
             ];
         }
 
-        // Nếu không phải AJAX
-        if ($model->load($request->post()) && $model->save()) {
-            return $this->redirect(['index']);
-        }
-
-        return $this->render('create', ['model' => $model]);
+        return $events;
     }
+
 
 }

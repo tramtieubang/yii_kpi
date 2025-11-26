@@ -13,7 +13,7 @@ $menuItems = [
         'label' => 'Đăng ký công việc',
         'icon' => 'fe fe-clipboard',
         'url' => ['/work-registered/register', 'menu'=>'cv1'],
-        'permission' => '/work-registered/register',
+        'permission' => '/work-registered/register/index',
         'controller' => 'register',
         'actions' => ['index','view','update'],
         'dataMenu' => 'cv-register'
@@ -22,7 +22,7 @@ $menuItems = [
         'label' => 'Lịch làm việc',
         'icon' => 'fa-solid fa-calendar-days',
         'url' => ['/work-registered/calendar', 'menu'=>'cv1'],
-        'permission' => '/work-registered/calendar',
+        'permission' => '/work-registered/calendar/index',
         'controller' => 'calendar',
         'actions' => ['index'],
         'dataMenu' => 'cv-calendar'
@@ -31,7 +31,7 @@ $menuItems = [
         'label' => 'Nhật ký công việc',
         'icon' => 'fa-solid fa-history',
         'url' => ['/work-registered/default', 'menu'=>'cv1'],
-        'permission' => '/work-registered/default',
+        'permission' => '/work-registered/default/index',
         'controller' => 'default',
         'actions' => ['index'],
         'dataMenu' => 'cv-default'
@@ -90,7 +90,7 @@ $menuItems = [
 
 <div class="gridheading-menu">
 <?php foreach ($menuItems as $item): ?>
-    <?php if (PermissionHelper::check($item['permission'])): ?>
+    <?php if (PermissionHelper::check($item['permission']) == 1): ?>
         <?php 
             // Chỉ active nếu module + controller + action khớp
             $active = ($currentModule == 'work-registered' 

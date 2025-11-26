@@ -1,23 +1,23 @@
 <?php
 
-namespace app\modules\work_registered\controllers;
+namespace app\modules\work_assignment\controllers;
 
-use app\models\KpiWorkRegisteredHistory;
 use Yii;
-use app\modules\work_registered\models\KpiWorkRegisteredForm;
-use app\modules\work_registered\models\KpiWorkRegisteredSearch;
+use app\modules\work_assignment\models\KpiWorkAssignmentForm;
+use app\modules\work_assignment\models\KpiWorkAssignmentSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use \yii\web\Response;
 use yii\helpers\Html;
+use yii\filters\AccessControl;
 
 /**
- * DefaultController implements the CRUD actions for KpiWorkRegisteredForm model.
+ * DefaultController implements the CRUD actions for KpiWorkAssignmentForm model.
  */
 class DefaultController extends Controller
 {
-       /**
+    /**
      * @inheritdoc
      */
     public function behaviors() {
@@ -29,45 +29,22 @@ class DefaultController extends Controller
     				'class' => VerbFilter::className(),
     				'actions' => [
     					'delete' => ['POST'],
-                        'history-delete' => ['POST'], // add this
     				],
     			],
 		];
 	}
 
     /**
-     * Lists all KpiWorkRegisteredForm models.
+     * Lists all KpiWorkAssignmentForm models.
      * @return mixed
      */
     public function actionIndex()
-    {
-        $searchModel = new KpiWorkRegisteredSearch();
-
-        if (isset($_POST['search']) && $_POST['search'] !== null) {
-            $dataProvider = $searchModel->search(Yii::$app->request->post(), $_POST['search']);
-        } elseif ($searchModel->load(Yii::$app->request->post())) {
-            $searchModel = new KpiWorkRegisteredSearch(); // reset
-            $dataProvider = $searchModel->search(Yii::$app->request->post()); 
-        } else { // khoi tao
-            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        }
-
-        //dd($dataProvider);
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
-
-    public function actionIndex1()
     {    
-        $searchModel = new KpiWorkRegisteredSearch();
+        $searchModel = new KpiWorkAssignmentSearch();
   		if(isset($_POST['search']) && $_POST['search'] != null){
             $dataProvider = $searchModel->search(Yii::$app->request->post(), $_POST['search']);
         } else if ($searchModel->load(Yii::$app->request->post())) {
-            $searchModel = new KpiWorkRegisteredSearch(); // "reset"
-            
+            $searchModel = new KpiWorkAssignmentSearch(); // "reset"
             $dataProvider = $searchModel->search(Yii::$app->request->post());
         } else {
             $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -80,7 +57,7 @@ class DefaultController extends Controller
 
 
     /**
-     * Displays a single KpiWorkRegisteredForm model.
+     * Displays a single KpiWorkAssignmentForm model.
      * @param integer $id
      * @return mixed
      */
@@ -90,7 +67,7 @@ class DefaultController extends Controller
         if($request->isAjax){
             Yii::$app->response->format = Response::FORMAT_JSON;
             return [
-                    'title'=> "Xem",
+                    'title'=> "KpiWorkAssignmentForm",
                     'content'=>$this->renderAjax('view', [
                         'model' => $this->findModel($id),
                     ]),
@@ -104,40 +81,16 @@ class DefaultController extends Controller
         }
     }
 
-    public function actionFilter()
-    {
-        $searchModel = new KpiWorkRegisteredSearch();
-
-        // Lấy dữ liệu POST
-        $postData = Yii::$app->request->post();
-
-        // Truyền vào search model
-        $dataProvider = $searchModel->search($postData);
-
-        // Render view cùng searchModel và dataProvider
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
     /**
-     * Creates a new KpiWorkRegisteredForm model.
+     * Creates a new KpiWorkAssignmentForm model.
      * For ajax request will return json object
      * and for non-ajax request if creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($staff_id = null)
+    public function actionCreate()
     {
         $request = Yii::$app->request;
-        $model = new KpiWorkRegisteredForm();  
-
-        // Gán staff_id mặc định nếu có
-        if ($staff_id !== null) {
-            $model->staff_id = $staff_id;
-        }
-
-        //$model->staff_id = 8;
+        $model = new KpiWorkAssignmentForm();  
 
         if($request->isAjax){
             /*
@@ -192,7 +145,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * Updates an existing KpiWorkRegisteredForm model.
+     * Updates an existing KpiWorkAssignmentForm model.
      * For ajax request will return json object
      * and for non-ajax request if update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
@@ -258,7 +211,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * Delete an existing KpiWorkRegisteredForm model.
+     * Delete an existing KpiWorkAssignmentForm model.
      * For ajax request will return json object
      * and for non-ajax request if deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
@@ -283,10 +236,12 @@ class DefaultController extends Controller
             */
             return $this->redirect(['index']);
         }
+
+
     }
 
      /**
-     * Delete multiple existing KpiWorkRegisteredForm model.
+     * Delete multiple existing KpiWorkAssignmentForm model.
      * For ajax request will return json object
      * and for non-ajax request if deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
@@ -326,37 +281,18 @@ class DefaultController extends Controller
     }
 
     /**
-     * Finds the KpiWorkRegisteredForm model based on its primary key value.
+     * Finds the KpiWorkAssignmentForm model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return KpiWorkRegisteredForm the loaded model
+     * @return KpiWorkAssignmentForm the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = KpiWorkRegisteredForm::findOne($id)) !== null) {
+        if (($model = KpiWorkAssignmentForm::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
-
-   public function actionHistoryDelete($id)
-    {
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        $model = KpiWorkRegisteredHistory::findOne($id);
-        if (!$model) {
-            return ['success' => false, 'message' => 'Không tìm thấy dữ liệu.'];
-        }
-
-        if($model->delete()){
-            return ['success' => true, 'message' => 'Đã xóa lịch sử.'];
-        } else {
-            return ['success' => false, 'message' => 'Xóa thất bại.'];
-        }
-    }
-
-
-
 }

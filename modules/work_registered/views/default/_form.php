@@ -50,8 +50,10 @@ use yii\web\JqueryAsset;
             <?= $form->field($model, 'staff_id', [
                 'template' => '{label}<div class="input-group">{input}<button class="btn btn-outline-primary btn-add" role="modal-remote-2" data-url="'.Url::to(['/staff/default/create']).'" data-target="#ajaxCrudModal2" data-pjax="0"><i class="fa fa-plus"></i></button></div>{error}'
             ])->widget(Select2::class, [
-                'data' => ArrayHelper::map(StaffForm::find()->all(), 'id', fn($m) => $m->staff_id.' - '.$m->name),
-                'options' => ['placeholder' => 'Chọn nhân viên...'],
+                'data' => ArrayHelper::map(StaffForm::find()->all(), 'staff_id', fn($m) => $m->staff_id.' - '.$m->name),
+                'options' => [
+                    'placeholder' => 'Chọn nhân viên...',
+                ],
                 'pluginOptions' => [
                     'allowClear' => true,
                     'dropdownParent' => new JsExpression("$('#ajaxCrudModal .modal-body')")
@@ -75,15 +77,15 @@ use yii\web\JqueryAsset;
 
         <!-- Ngày bắt đầu -->
         <div class="col-md-4 kpi-form-field">
-            <?= $form->field($model, 'date_start')->input('datetime-local', [
-                'value' => $model->date_start ? date('Y-m-d\TH:i', strtotime($model->date_start)) : ''
+            <?= $form->field($model, 'start_date')->input('datetime-local', [
+                'value' => $model->start_date ? date('Y-m-d\TH:i', strtotime($model->start_date)) : ''
             ]) ?>
         </div>
 
         <!-- Ngày kết thúc -->
         <div class="col-md-4 kpi-form-field">
-            <?= $form->field($model, 'date_end')->input('datetime-local', [
-                'value' => $model->date_end ? date('Y-m-d\TH:i', strtotime($model->date_end)) : ''
+            <?= $form->field($model, 'end_date')->input('datetime-local', [
+                'value' => $model->end_date ? date('Y-m-d\TH:i', strtotime($model->end_date)) : ''
             ]) ?>
         </div>
 
@@ -131,8 +133,8 @@ use yii\web\JqueryAsset;
             <tr>
                 <td><?= $i+1 ?></td>
                 <td><?= Html::encode($history->title) ?></td>
-                <td><?= $history->date_start ? date('d/m/Y H:i', strtotime($history->date_start)) : '' ?></td>
-                <td><?= $history->date_end ? date('d/m/Y H:i', strtotime($history->date_end)) : '' ?></td>
+                <td><?= $history->start_date ? date('d/m/Y H:i', strtotime($history->start_date)) : '' ?></td>
+                <td><?= $history->end_date ? date('d/m/Y H:i', strtotime($history->end_date)) : '' ?></td>
                 <?php
                     $labels = ['update'=>['Cập nhật','#FFD700'],'create'=>['Thêm mới','#90EE90']];
                     $label = $labels[$history->action_type][0] ?? $history->action_type;

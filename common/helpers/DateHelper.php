@@ -73,27 +73,37 @@ class DateHelper
 
 
     /**
-     * Convert string -> MySQL datetime (Y-m-d H:i:s)
-     */
+ * Convert string datetime sang định dạng MySQL (Y-m-d H:i:s)
+ *
+ * @param string $datetime Chuỗi datetime đầu vào (ví dụ: d/m/Y H:i:s)
+ * @param string $fromFormat Định dạng datetime đầu vào, mặc định 'd/m/Y H:i:s'
+ * @param string $timezone Múi giờ, mặc định 'Asia/Ho_Chi_Minh'
+ * @return string|null Trả về datetime chuẩn MySQL hoặc null nếu không hợp lệ
+ */
     public static function toMySQL($datetime, $fromFormat = 'd/m/Y H:i:s', $timezone = 'Asia/Ho_Chi_Minh')
     {
         if (empty($datetime)) {
             return null;
         }
 
-        // 🔹 Chuẩn hóa chuỗi datetime trước khi parse
-        // Trường hợp giây chỉ có 1 chữ số thì thêm số 0 vào cuối
+        // 🔹 Chuẩn hóa chuỗi datetime: nếu giây chỉ có 1 chữ số, thêm số 0 vào cuối
+        // Ví dụ: "13/11/2025 13:51:0" -> "13/11/2025 13:51:00"
         if (preg_match('/^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d$/', $datetime)) {
-            $datetime .= '0'; // ví dụ: 13:51:0 -> 13:51:00
+            $datetime .= '0';
         }
 
-        $dt = \DateTime::createFromFormat($fromFormat, $datetime, new \DateTimeZone($timezone));
+        try {
+            $dt = \DateTime::createFromFormat($fromFormat, $datetime, new \DateTimeZone($timezone));
 
-        if ($dt === false) {
-            return null;
+            // Nếu parse thất bại, thử parse với các định dạng phổ biến khác
+            if ($dt === false) {
+                $dt = new \DateTime($datetime, new \DateTimeZone($timezone));
+            }
+
+            return $dt->format('Y-m-d H:i:s');
+        } catch (\Exception $e) {
+            return null; // Không parse được -> trả về null
         }
-
-        return $dt->format('Y-m-d H:i:s'); // chuẩn MySQL
     }
 
     /**

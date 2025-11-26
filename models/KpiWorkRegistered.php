@@ -13,8 +13,8 @@ use Yii;
  * @property string $title Tiêu đề công việc
  * @property string|null $description Mô tả công việc
  * @property int $status_id Trạng thái công việc
- * @property string $date_start Ngày bắt đầu công việc
- * @property string|null $date_end Ngày kết thúc công việc
+ * @property string $start_date Ngày bắt đầu công việc
+ * @property string|null $end_date Ngày kết thúc công việc
  * @property string|null $created_at Ngày tạo
  * @property string|null $updated_at Ngày cập nhật
  *
@@ -43,12 +43,12 @@ class KpiWorkRegistered extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['description', 'date_end'], 'default', 'value' => null],
+            [['description', 'end_date'], 'default', 'value' => null],
             [['status_id'], 'default', 'value' => 1],
-            [['staff_id', 'kpi_id', 'title', 'date_start'], 'required'],
+            [['staff_id', 'kpi_id', 'title', 'start_date'], 'required'],
             [['staff_id', 'kpi_id', 'status_id'], 'integer'],
             [['description'], 'string'],
-            [['date_start', 'date_end', 'created_at', 'updated_at'], 'safe'],
+            [['start_date', 'end_date', 'created_at', 'updated_at'], 'safe'],
             [['title'], 'string', 'max' => 255],
             [['kpi_id'], 'exist', 'skipOnError' => true, 'targetClass' => KpiKpi::class, 'targetAttribute' => ['kpi_id' => 'id']],
             [['staff_id'], 'exist', 'skipOnError' => true, 'targetClass' => Staff::class, 'targetAttribute' => ['staff_id' => 'staff_id']],
@@ -68,8 +68,8 @@ class KpiWorkRegistered extends \yii\db\ActiveRecord
             'title' => 'Title',
             'description' => 'Description',
             'status_id' => 'Status ID',
-            'date_start' => 'Date Start',
-            'date_end' => 'Date End',
+            'start_date' => 'Start date',
+            'end_date' => 'End date',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];

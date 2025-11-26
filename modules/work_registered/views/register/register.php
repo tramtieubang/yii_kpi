@@ -72,6 +72,7 @@ $this->params['breadcrumbs'][] = $this->title;
     }
 
 </style>
+
 <div>
     <?= 
         $this->render('//layouts/menus/quanlycongviec/gridview_heading')
@@ -116,9 +117,8 @@ document.addEventListener('DOMContentLoaded', function() {
         initialView: 'timeGridWeek',
         locale: 'vi',
         timeZone: 'local',
-        slotMinTime: "06:00:00", // ⬅️ Giờ bắt đầu hiển thị
-        slotMaxTime: "24:00:00", //Muốn đặt giờ kết thúc (ví dụ 20:00)?
-        //allDaySlot: false, //Nếu muốn ẩn các giờ không dùng?
+        slotMinTime: "06:00:00",
+        slotMaxTime: "24:00:00",
 
         events: {
             url: '<?= Url::to(['/work-registered/register/events']) ?>',
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
         selectable: true,
         dayMaxEvents: true,
 
-        // Click ô trống → create
+        // Click vùng trống -> Tạo mới
         select: function(arg) {
             const params = new URLSearchParams({
                 start_str: arg.startStr,
@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
             calendar.unselect();
         },
 
-        // Click event → update
+        // Click event -> cập nhật
         eventClick: function(info) {
             const eventId = info.event.id;
             const url = '<?= Url::to(['/work-registered/register/update']) ?>' + '?id=' + eventId;
@@ -164,12 +164,56 @@ document.addEventListener('DOMContentLoaded', function() {
                 if(data.footer) $('#ajaxCrudModal .modal-footer').html(data.footer);
                 $('#ajaxCrudModal').modal('show');
             });
+        },
+
+        // ================================
+        //   RÊ CHUỘT HIỆN POPUP TRẠNG THÁI
+        // ================================
+        eventMouseEnter: function(info) {
+            let tooltip = document.createElement('div');
+            tooltip.className = 'fc-tooltip';
+            tooltip.style.position = 'absolute';
+            tooltip.style.zIndex = '9999';
+            tooltip.style.padding = '6px 10px';
+            tooltip.style.background = 'rgba(0,0,0,0.75)';
+            tooltip.style.color = '#fff';
+            tooltip.style.borderRadius = '4px';
+            tooltip.style.fontSize = '13px';
+            tooltip.style.pointerEvents = 'none';
+
+            let status = info.event.extendedProps.status ?? 'Không có';
+            let start = info.event.start.toLocaleString('vi-VN');
+            let end = info.event.end ? info.event.end.toLocaleString('vi-VN') : '';
+
+            tooltip.innerHTML = `
+                <b>${info.event.title}</b><br>
+                Trạng thái: <span style="color:#ffd700">${status}</span><br>
+                Thời gian: ${start}${end ? ' - ' + end : ''}
+            `;
+
+            document.body.appendChild(tooltip);
+
+            info.el.addEventListener('mousemove', function(e) {
+                tooltip.style.top = (e.pageY + 10) + 'px';
+                tooltip.style.left = (e.pageX + 10) + 'px';
+            });
+
+            info.el.addEventListener('mouseleave', function() {
+                tooltip.remove();
+            });
+
+            info.el._tooltip = tooltip;
+        },
+
+        eventMouseLeave: function(info) {
+            if (info.el._tooltip) info.el._tooltip.remove();
         }
 
     });
 
     calendar.render();
 });
+
 
 // Giữ class modal-open nếu còn modal khác
 document.addEventListener('hidden.bs.modal', function () {

@@ -52,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-md-4 kpi-form-field">
             <label class="form-label">Ngày bắt đầu</label>
             <div class="form-control-view">
-                <?= $model->date_start ? date('d/m/Y H:i', strtotime($model->date_start)) : '' ?>
+                <?= $model->start_date ? date('d/m/Y H:i', strtotime($model->start_date)) : '' ?>
             </div>
         </div>
 
@@ -60,7 +60,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-md-4 kpi-form-field">
             <label class="form-label">Ngày kết thúc</label>
             <div class="form-control-view">
-                <?= $model->date_end ? date('d/m/Y H:i', strtotime($model->date_end)) : '' ?>
+                <?= $model->end_date ? date('d/m/Y H:i', strtotime($model->end_date)) : '' ?>
             </div>
         </div>
 
@@ -110,8 +110,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <tr>
                 <td><?= $i + 1 ?></td>
                 <td><?= Html::encode($history->title) ?></td>
-                <td><?= $history->date_start ? date('d/m/Y H:i', strtotime($history->date_start)) : '' ?></td>
-                <td><?= $history->date_end ? date('d/m/Y H:i', strtotime($history->date_end)) : '' ?></td>
+                <td><?= $history->start_date ? date('d/m/Y H:i', strtotime($history->start_date)) : '' ?></td>
+                <td><?= $history->end_date ? date('d/m/Y H:i', strtotime($history->end_date)) : '' ?></td>
 
                 <?php
                 switch ($history->action_type) {

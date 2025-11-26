@@ -22,6 +22,10 @@ return [
         'class' => 'app\modules\work_registered\Module', 
     ],
 
+    'work-assignment' => [ 
+        'class' => 'app\modules\work_assignment\Module', 
+    ],
+
     'kpi-evaluation' => [ 
         'class' => 'app\modules\kpi_evaluation\Module', 
     ],

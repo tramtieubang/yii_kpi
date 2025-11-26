@@ -3,7 +3,7 @@
 namespace app\modules\employees\models;
 
 use app\models\BusinessFields;
-use app\models\Departments;
+use app\models\Department;
 use app\models\Employees;
 use app\models\KpiKpiEvaluation;
 use app\models\KpiSummary;
@@ -96,7 +96,7 @@ class EmployeesForm extends Employees
             [['phone'], 'string', 'max' => 50],
             [['email'], 'unique'],
             [['business_field_id'], 'exist', 'skipOnError' => true, 'targetClass' => BusinessFields::class, 'targetAttribute' => ['business_field_id' => 'id']],
-            [['department_id'], 'exist', 'skipOnError' => true, 'targetClass' => Departments::class, 'targetAttribute' => ['department_id' => 'id']],
+            [['department_id'], 'exist', 'skipOnError' => true, 'targetClass' => Department::class, 'targetAttribute' => ['department_id' => 'id']],
             [['position_id'], 'exist', 'skipOnError' => true, 'targetClass' => Positions::class, 'targetAttribute' => ['position_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
@@ -143,7 +143,7 @@ class EmployeesForm extends Employees
      */
     public function getDepartment()
     {
-        return $this->hasOne(Departments::class, ['id' => 'department_id']);
+        return $this->hasOne(Department::class, ['id' => 'department_id']);
     }
 
     /**

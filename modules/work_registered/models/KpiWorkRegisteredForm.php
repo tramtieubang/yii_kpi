@@ -19,8 +19,8 @@ use Yii;
  * @property string $title Tiêu đề công việc
  * @property string|null $description Mô tả
  * @property int $status_id ID trạng thái
- * @property string $date_start
- * @property string|null $date_end
+ * @property string $start_date
+ * @property string|null $end_date
  * @property string $created_at
  * @property string $updated_at
  *
@@ -34,7 +34,7 @@ class KpiWorkRegisteredForm extends KpiWorkRegistered
 {
      // Thuộc tính ảo để phân biệt nhân viên (parent) và công việc (child)
     public $is_parent;
-    
+
     /**
      * {@inheritdoc}
      */
@@ -55,11 +55,16 @@ class KpiWorkRegisteredForm extends KpiWorkRegistered
             'title' => 'Tiêu đề',
             'description' => 'Mô tả',
             'status_id' => 'Trạng thái',
-            'date_start' => 'Ngày bắt đầu',
-            'date_end' => 'Ngày kết thúc',
+            'start_date' => 'Ngày bắt đầu',
+            'end_date' => 'Ngày kết thúc',
             'created_at' => 'Ngày tạo',
             'updated_at' => 'Ngày cập nhật',
         ];
+    }
+
+     // Relation jobs
+   public function getJobs() {
+        return $this->hasMany(KpiWorkRegisteredForm::class, ['staff_id'=>'staff_id']); // chỉ lấy công việc con
     }
 
 

@@ -170,7 +170,7 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
 
         <!-- Ngày bắt đầu -->
         <div class="kpi-input" style="width:180px;">
-            <?= $form->field($searchModel, 'date_start', [
+            <?= $form->field($searchModel, 'start_date', [
                 'labelOptions'=>['class'=>'form-label mb-1'],
             ])->widget(DatePicker::class, [
                 'options'=>['placeholder'=>'Ngày bắt đầu','class'=>'form-control form-control-sm kv-date'],
@@ -180,7 +180,7 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
 
         <!-- Ngày kết thúc -->
         <div class="kpi-input" style="width:180px;">
-            <?= $form->field($searchModel, 'date_end', [
+            <?= $form->field($searchModel, 'end_date', [
                 'labelOptions'=>['class'=>'form-label mb-1'],
             ])->widget(DatePicker::class, [
                 'options'=>['placeholder'=>'Ngày kết thúc','class'=>'form-control form-control-sm kv-date'],
@@ -248,8 +248,6 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
                 'columns' => require(__DIR__.'/_columns.php'),
                 'toolbar'=> [
                     ['content'=>
-                        Html::a('<i class="fas fa fa-plus" aria-hidden="true"></i> Thêm công việc mới', ['create'],
-                        ['role'=>'modal-remote','title'=> 'Thêm mới Users','class'=>'btn btn-outline-primary']).
                         Html::a('<i class="fas fa fa-sync" aria-hidden="true"></i> Tải lại', [''],
                         ['data-pjax'=>1, 'class'=>'btn btn-outline-primary', 'title'=>'Tải lại']).
                       
@@ -317,44 +315,75 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
     }
 }); */
 
+/* jQuery(function($) {
+    // ✅ Lắng nghe mọi AJAX phản hồi (khi thêm/sửa/xóa)
+    $(document).on('ajaxComplete', function (event, xhr) {
+        let response;
+        try {
+            response = JSON.parse(xhr.responseText);
+        } catch (e) {
+            return; // Không phải JSON, bỏ qua
+        }
 
- // ✅ Lắng nghe mọi AJAX phản hồi (khi thêm/sửa/xóa)
-$(document).on('ajaxComplete', function (event, xhr) {
-    let response;
-    try {
-        response = JSON.parse(xhr.responseText);
-    } catch (e) {
-        return; // Không phải JSON, bỏ qua
-    }
+        // ✅ Nếu có systemId → chỉ reload ExpandRow tương ứng
+        if (response.system_id) {
+            const $row = $('tr[data-key="' + response.system_id + '"]');
 
-    // ✅ Nếu có systemId → chỉ reload ExpandRow tương ứng
-    if (response.system_id) {
-        const $row = $('tr[data-key="' + response.system_id + '"]');
+            // Nếu hàng đang expand thì reload nội dung con
+            if ($row.hasClass('kv-state-expanded')) {
+                const $expandCell = $row.next('.kv-expand-detail-row');
+                const $expandContainer = $expandCell.find('.kv-detail-content');
 
-        // Nếu hàng đang expand thì reload nội dung con
-        if ($row.hasClass('kv-state-expanded')) {
-            const $expandCell = $row.next('.kv-expand-detail-row');
-            const $expandContainer = $expandCell.find('.kv-detail-content');
-
-            if ($expandContainer.length) {
-                $.pjax.reload({
-                    container: $expandContainer.find('.pjax-jobs-grid').attr('id'),
-                    async: false
-                });
-            } else {
-                // Nếu không có PJAX con, fallback: đóng mở lại
-                const expandBtn = $row.find('.kv-expand-icon');
-                expandBtn.click();
-                setTimeout(() => expandBtn.click(), 600);
+                if ($expandContainer.length) {
+                    $.pjax.reload({
+                        container: $expandContainer.find('.pjax-jobs-grid').attr('id'),
+                        async: false
+                    });
+                } else {
+                    // Nếu không có PJAX con, fallback: đóng mở lại
+                    const expandBtn = $row.find('.kv-expand-icon');
+                    expandBtn.click();
+                    setTimeout(() => expandBtn.click(), 600);
+                }
             }
         }
-    }
 
-});
-
+    });
+}); */
 
 
 </script>
+
+<?php
+    $this->registerJs("
+jQuery(function($) {
+    $(document).on('ajaxComplete', function (event, xhr) {
+        let response;
+        try { response = JSON.parse(xhr.responseText); } catch(e) { return; }
+
+        if (response.system_id) {
+            const \$row = $('tr[data-key=\"' + response.system_id + '\"]');
+            if (\$row.hasClass('kv-state-expanded')) {
+                const \$expandCell = \$row.next('.kv-expand-detail-row');
+                const \$expandContainer = \$expandCell.find('.kv-detail-content');
+
+                if (\$expandContainer.length) {
+                    $.pjax.reload({
+                        container: \$expandContainer.find('.pjax-jobs-grid').attr('id'),
+                        async: false
+                    });
+                } else {
+                    const expandBtn = \$row.find('.kv-expand-icon');
+                    expandBtn.click();
+                    setTimeout(() => expandBtn.click(), 600);
+                }
+            }
+        }
+    });
+});
+");
+
+?>
 
 <?php 
 // ===== Modal =====

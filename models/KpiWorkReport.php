@@ -48,9 +48,9 @@ class KpiWorkReport extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'work_assignment_id' => 'Work Assignment ID',
-            'content' => 'Content',
-            'reported_at' => 'Reported At',
+            'work_assignment_id' => 'Công việc được phân công',
+            'content' => 'Nội dung báo cáo',
+            'reported_at' => 'Ngày báo cáo',
         ];
     }
 
