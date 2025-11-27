@@ -38,6 +38,7 @@ $config = [
             // Tip: you can use this event in any module
             'on beforeAction'=>function(yii\base\ActionEvent $event) {
                 if ( $event->action->uniqueId == 'user-management/auth/login' )
+                //if ( $event->action->uniqueId == 'site/login' )
                 {
                     $event->action->controller->layout = 'loginLayout.php';
                 };

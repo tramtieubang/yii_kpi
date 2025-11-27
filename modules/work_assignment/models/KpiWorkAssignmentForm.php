@@ -50,10 +50,15 @@ class KpiWorkAssignmentForm extends KpiWorkAssignment
             'start_date' => 'Ngày bắt đầu',
             'end_date' => 'Ngày kết thúc',
             'title' => 'Tiêu đề',
+            'description' => 'Mô tả',
             'color' => 'Màu sắc',
             'assigned_at' => 'Ngày phân công',
         ];
     }
 
+    // 🔥 Thêm relation getJobs()
+    public function getJobs() {
+        return $this->hasMany(KpiWorkAssignmentForm::class, ['staff_id'=>'staff_id']); // chỉ lấy công việc con
+    }
 
 }

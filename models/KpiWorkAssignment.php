@@ -42,12 +42,14 @@ class KpiWorkAssignment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['description', 'end_date'], 'default', 'value' => null],
             [['status_id'], 'default', 'value' => 1],
             [['color'], 'default', 'value' => '#3788d8'],
             [['work_registered_id', 'staff_id', 'start_date', 'end_date', 'title'], 'required'],
             [['work_registered_id', 'staff_id', 'status_id'], 'integer'],
             [['start_date', 'end_date', 'assigned_at'], 'safe'],
             [['title'], 'string', 'max' => 255],
+            [['description'], 'string'],
             [['color'], 'string', 'max' => 20],
             [['work_registered_id'], 'exist', 'skipOnError' => true, 'targetClass' => KpiWorkRegistered::class, 'targetAttribute' => ['work_registered_id' => 'id']],
             [['staff_id'], 'exist', 'skipOnError' => true, 'targetClass' => Staff::class, 'targetAttribute' => ['staff_id' => 'staff_id']],
@@ -68,6 +70,7 @@ class KpiWorkAssignment extends \yii\db\ActiveRecord
             'start_date' => 'Start Date',
             'end_date' => 'End Date',
             'title' => 'Title',
+            'description' => 'Description',
             'color' => 'Color',
             'assigned_at' => 'Assigned At',
         ];

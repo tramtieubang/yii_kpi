@@ -78,7 +78,7 @@ $this->title = 'Lịch trình kinh doanh';
 </style>
 
 <div>
-    <?= $this->render('//layouts/menus/quanlycongviec/gridview_heading') ?>
+    <?= $this->render('//layouts/menus/quanlycongviec/tab_registered_heading') ?>
 </div>
 
 <div class="card border-default p-4">

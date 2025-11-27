@@ -32,7 +32,7 @@ class KpiWorkReport extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['content'], 'default', 'value' => null],
+            [['content'], 'required', 'message' => 'Nội dung báo cáo không được để trống'], // ✅ bắt buộc
             [['work_assignment_id'], 'required'],
             [['work_assignment_id'], 'integer'],
             [['content'], 'string'],

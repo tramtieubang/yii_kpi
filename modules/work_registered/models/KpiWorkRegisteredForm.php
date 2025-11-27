@@ -63,7 +63,7 @@ class KpiWorkRegisteredForm extends KpiWorkRegistered
     }
 
      // Relation jobs
-   public function getJobs() {
+    public function getJobs() {
         return $this->hasMany(KpiWorkRegisteredForm::class, ['staff_id'=>'staff_id']); // chỉ lấy công việc con
     }
 

@@ -137,9 +137,10 @@ class m251116_123016_create_kpi_tables extends Migration
             
             // Lịch từ ngày → đến ngày
             'start_date' => $this->date()->notNull()->comment('Ngày bắt đầu'),
-            'end_date' => $this->date()->notNull()->comment('Ngày kết thúc'),
+            'end_date' => $this->date()->comment('Ngày kết thúc'),
 
             'title' => $this->string(255)->notNull()->comment('Tiêu đề công việc'),
+            'description' => $this->text()->comment('Mô tả công việc'),
             'color' => $this->string(20)->defaultValue('#3788d8')->comment('Màu lịch'),
                     
             'assigned_at' => $this->dateTime()->defaultExpression('CURRENT_TIMESTAMP')->comment('Ngày phân công'),

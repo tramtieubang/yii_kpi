@@ -6,7 +6,7 @@ use yii\helpers\Html;
 
 <?php if (
 	PermissionHelper::check('work-registered/register/index') ||
-	PermissionHelper::check('employees/default/index') ||
+	PermissionHelper::check('work-assignment/register/index') ||
 	PermissionHelper::check('kpi/default/index') 
 ): ?>
     <li class="slide">
@@ -25,16 +25,11 @@ use yii\helpers\Html;
                                         <?= Html::a('<i class="fe fe-clipboard"></i> Đăng ký công việc', ['/work-registered/register', 'menu'=>'cv1'], ['class' => 'slide-item', 'data-menu' => 'cv1']) ?>
                                     </li>
                                 <?php endif; ?>                               
-                                <?php if (PermissionHelper::check('employees/default')): ?>
+                                <?php if (PermissionHelper::check('work-assignment/default')): ?>
                                     <li>
-                                        <?= Html::a('<i class="fe fe-thumbs-up"></i> Phê duyệt đăng ký', ['/employees/default', 'menu'=>'cv4'], ['class' => 'slide-item', 'data-menu' => 'cv4']) ?>
+                                        <?= Html::a('<i class="fe fe-thumbs-up"></i> Phê duyệt và phân công việc', ['/work-assignment/default', 'menu'=>'cv4'], ['class' => 'slide-item', 'data-menu' => 'cv4']) ?>
                                     </li>
-                                <?php endif; ?>
-                                <?php if (PermissionHelper::check('kpi/default')): ?>
-                                    <li>
-                                        <?= Html::a('<i class="fe fe-share-2"></i> Phân công công việc', ['/kpi/default', 'menu'=>'cv5'], ['class' => 'slide-item', 'data-menu' => 'cv5']) ?>
-                                    </li>
-                                <?php endif; ?>
+                                <?php endif; ?>                                
                                  <?php if (PermissionHelper::check('kpi/default')): ?>
                                     <li>
                                         <?= Html::a('<i class="fe fe-bar-chart"></i> Báo cáo công việc', ['/kpi/default', 'menu'=>'cv6'], ['class' => 'slide-item', 'data-menu' => 'cv6']) ?>

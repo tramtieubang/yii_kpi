@@ -19,7 +19,7 @@ class KpiWorkAssignmentSearch extends KpiWorkAssignmentForm
     {
         return [
             [['id', 'work_registered_id', 'staff_id', 'status_id'], 'integer'],
-            [['start_date', 'end_date', 'title', 'color', 'assigned_at'], 'safe'],
+            [['start_date', 'end_date', 'title', 'description', 'color', 'assigned_at'], 'safe'],
         ];
     }
 
@@ -43,8 +43,17 @@ class KpiWorkAssignmentSearch extends KpiWorkAssignmentForm
     {
         $query = KpiWorkAssignmentForm::find();
 
-        $dataProvider = new ActiveDataProvider([
+        // Thêm group by nhân viên
+        $query->groupBy('staff_id');
+
+       $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => [
+                'defaultOrder' => [
+                    'start_date' => SORT_DESC,
+                    'end_date'   => SORT_DESC,
+                ],
+            ],
         ]);
 
         $this->load($params);
@@ -55,8 +64,12 @@ class KpiWorkAssignmentSearch extends KpiWorkAssignmentForm
             return $dataProvider;
         }
 		if($cusomSearch != NULL){
-			$query->andFilterWhere ( [ 'OR' ,['like', 'title', $cusomSearch],
-            ['like', 'color', $cusomSearch]] );
+			$query->andFilterWhere ( [ 
+                'OR',
+                ['like', 'title', $cusomSearch],
+                ['like', 'color', $cusomSearch], 
+                ['like', 'description', $cusomSearch]
+            ]);
  
 		} else {
         	$query->andFilterWhere([
@@ -70,7 +83,8 @@ class KpiWorkAssignmentSearch extends KpiWorkAssignmentForm
         ]);
 
         $query->andFilterWhere(['like', 'title', $this->title])
-            ->andFilterWhere(['like', 'color', $this->color]);
+             ->andFilterWhere(['like', 'description', $this->description])
+             ->andFilterWhere(['like', 'color', $this->color]);
 		}
         return $dataProvider;
     }

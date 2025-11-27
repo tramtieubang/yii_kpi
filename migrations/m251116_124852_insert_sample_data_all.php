@@ -143,12 +143,18 @@ class m251116_124852_insert_sample_data_all extends Migration
         foreach ($workIds as $i => $workId) {
             $staffId = $staffIds[array_rand($staffIds)];
 
-            // Assignment
+            // Assignment            
             $this->insert('{{%kpi_work_assignment}}', [
                 'work_registered_id' => $workId,
                 'staff_id' => $staffId,
                 'status_id' => rand(1, 6),
-                'assigned_at' => $now
+                'assigned_at' => $now,
+
+                'kpi_id' => $kpiId,
+                'title' => "Công việc đăng ký $i",
+                'description' => "Mô tả công việc $i",
+                'start_date' => "2025-11-" . str_pad($i, 2, '0', STR_PAD_LEFT) . " 08:00:00",
+                'end_date' => "2025-11-" . str_pad($i + 3, 2, '0', STR_PAD_LEFT) . " 17:00:00",
             ]);
             $assignmentId = (int)$db->getLastInsertID();
             $assignmentIds[] = $assignmentId;

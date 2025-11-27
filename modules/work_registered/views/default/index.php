@@ -150,7 +150,7 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
 <!-- ===== Form Filter ===== -->
 <div>
     <?= 
-        $this->render('//layouts/menus/quanlycongviec/gridview_heading')
+        $this->render('//layouts/menus/quanlycongviec/tab_registered_heading')
     ?>
 </div>
 <div class="card kpi-card shadow-sm mb-3">

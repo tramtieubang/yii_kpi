@@ -219,7 +219,6 @@ class RegisterController extends Controller
         return $this->render('create', ['model' => $model]);
     }
 
-
     public function actionUpdate($id)
     {
         $request = Yii::$app->request;
@@ -231,21 +230,19 @@ class RegisterController extends Controller
 
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-        // Lần đầu load form
         if ($request->isGet) {
             return [
                 'title' => "Cập nhật công việc",
                 'content' => $this->renderAjax('update', ['model' => $model]),
-                'footer' => Html::button('Đóng', ['class'=>'btn btn-default','data-bs-dismiss'=>"modal"]) .
+                'footer' => Html::button('Đóng', ['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]) .
                             Html::button('Cập nhật', ['class'=>'btn btn-primary', 'id'=>'btn-update-register'])
             ];
         }
 
-        // Xử lý submit AJAX (POST)
+        // POST AJAX
         if ($model->load($request->post())) {
             $transaction = Yii::$app->db->beginTransaction();
             try {
-                // Lưu lịch sử trước khi cập nhật
                 Yii::$app->db->createCommand()->insert('{{%kpi_work_registered_history}}', [
                     'work_registered_id' => $model->id,
                     'title' => $model->title,
@@ -257,36 +254,35 @@ class RegisterController extends Controller
                     'created_at' => new \yii\db\Expression('NOW()'),
                 ])->execute();
 
-                //dd( $model);
-
                 $model->save(false);
                 $transaction->commit();
 
-                return [
-                    'forceReload' => '#crud-datatable-pjax',
-                    'title' => "Cập nhật thành công",
-                    'content' => '<span class="text-success">Đã lưu dữ liệu!</span>',
-                    'footer' => Html::button('Đóng', ['class'=>'btn btn-default','data-bs-dismiss'=>"modal"])
+               return [
+                    'forceReload' => '#crud-datatable-pjax',  // PJAX container để reload
+                    'title' => "Cập nhật thành công",         // Tiêu đề modal
+                    'content' => '<span class="text-success">Đã cập nhật dữ liệu thành công!</span>', // Nội dung modal
+                    'footer' => Html::button('Đóng', [
+                        'class' => 'btn btn-default',
+                        'data-bs-dismiss' => "modal"  // Thuộc tính Bootstrap 5 để đóng modal
+                    ])
                 ];
+
             } catch (\Throwable $e) {
                 $transaction->rollBack();
-                Yii::error($e->getMessage(), __METHOD__);
                 return [
                     'title' => "Lỗi cập nhật",
                     'content' => '<span class="text-danger">Lỗi: ' . Html::encode($e->getMessage()) . '</span>',
-                    'footer' => Html::button('Đóng', ['class'=>'btn btn-default','data-bs-dismiss'=>"modal"])
+                    'footer' => Html::button('Đóng', ['class'=>'btn btn-secondary','data-bs-dismiss'=>"modal"])
                 ];
             }
         }
 
-        // Nếu load POST thất bại
         return [
             'title' => "Lỗi dữ liệu",
             'content' => $this->renderAjax('update', ['model' => $model]),
-            'footer' => Html::button('Đóng', ['class'=>'btn btn-default','data-bs-dismiss'=>"modal"])
+            'footer' => Html::button('Đóng', ['class'=>'btn btn-secondary','data-bs-dismiss'=>"modal"])
         ];
     }
-
 
     public function actionApprove($id)
     {
