@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\work_registered\controllers;
+namespace app\modules\work_assignment\controllers;
 
 use app\models\KpiWorkAssignment;
 use app\models\KpiWorkReport;

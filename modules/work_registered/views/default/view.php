@@ -98,7 +98,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <table class="table table-bordered table-hover align-middle mb-0">
         <thead class="table-light">
             <tr>
-                <th width="60">#</th>
+                <th style="width:60px">#</th>
                 <th>Công việc</th>
                 <th>Bắt đầu</th>
                 <th>Kết thúc</th>

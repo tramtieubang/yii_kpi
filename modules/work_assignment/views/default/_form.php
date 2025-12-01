@@ -12,7 +12,7 @@ use yii\widgets\ActiveForm;
 use yii\web\JqueryAsset;
 
 /* @var $this yii\web\View */
-/* @var $model app\modules\work_assignment\models\KpiWorkAssignmentForm */
+/* @var $model app\modules\work_Assignment\models\KpiWorkAssignmentForm */
 
 ?>
 

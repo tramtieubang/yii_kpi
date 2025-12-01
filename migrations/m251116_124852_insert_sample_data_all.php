@@ -159,6 +159,27 @@ class m251116_124852_insert_sample_data_all extends Migration
             $assignmentId = (int)$db->getLastInsertID();
             $assignmentIds[] = $assignmentId;
 
+            // ➕ INSERT LỊCH SỬ PHÂN CÔNG
+            $this->insert('{{%kpi_work_assignment_history}}', [
+                'assignment_id' => $assignmentId,
+                'staff_id' => $staffId,
+                'status_id' => rand(1, 6),
+                'kpi_id' => $kpiId,
+
+                'title' => "Công việc đăng ký $i",
+                'description' => "Mô tả công việc $i",
+
+                'start_date' => "2025-11-" . str_pad($i, 2, '0', STR_PAD_LEFT),
+                'end_date' => "2025-11-" . str_pad($i + 3, 2, '0', STR_PAD_LEFT),
+
+                'color' => '#3788d8',
+                'assigned_at' => $now,
+
+                'action_type' => 'create',
+                'updated_by' => null,
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
+        
             // Calendar
            /*  $this->insert('{{%kpi_work_calendar}}', [
                 'assignment_id' => $assignmentId,

@@ -42,18 +42,20 @@ class KpiWorkAssignmentForm extends KpiWorkAssignment
      */
     public function attributeLabels()
     {
-        return [
-            'id' => 'ID',
-            'work_registered_id' => 'ID đăng ký công việc',
-            'staff_id' => 'Nhân viên',
-            'status_id' => 'Trạng thái',
+       return [
+            'id' => 'Mã phân công',
+            'work_registered_id' => 'Công việc đăng ký',
+            'staff_id' => 'Nhân viên được phân công',
+            'status_id' => 'Trạng thái phân công',
+            'kpi_id' => 'KPI liên quan',
             'start_date' => 'Ngày bắt đầu',
             'end_date' => 'Ngày kết thúc',
-            'title' => 'Tiêu đề',
-            'description' => 'Mô tả',
-            'color' => 'Màu sắc',
+            'title' => 'Tiêu đề công việc',
+            'description' => 'Mô tả công việc',
+            'color' => 'Màu hiển thị',
             'assigned_at' => 'Ngày phân công',
         ];
+
     }
 
     // 🔥 Thêm relation getJobs()

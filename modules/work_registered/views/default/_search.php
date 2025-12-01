@@ -31,6 +31,8 @@ use yii\widgets\ActiveForm;
 
 </div><div class="col-md-4">    <?= $form->field($model, 'end_date')->textInput() ?>
 
+</div><div class="col-md-4">    <?= $form->field($model, 'status_id')->textInput() ?>
+
 </div><div class="col-md-4">    <?= $form->field($model, 'created_at')->textInput() ?>
 
 </div><div class="col-md-4">    <?= $form->field($model, 'updated_at')->textInput() ?>

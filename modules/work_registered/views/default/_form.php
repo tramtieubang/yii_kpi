@@ -91,15 +91,44 @@ use yii\web\JqueryAsset;
 
         <!-- Trạng thái -->
         <div class="col-md-4 kpi-form-field">
-            <?= $form->field($model, 'status_id')->widget(Select2::class, [
-                'data' => ArrayHelper::map(KpiWorkRegisteredStatus::find()->all(), 'id', 'name'),
-                'options' => ['placeholder'=>'Chọn trạng thái...'],
-                'pluginOptions' => [
-                    'allowClear' => true,
-                    'dropdownParent' => new JsExpression("$('#ajaxCrudModal .modal-body')"),
-                    'width'=>'100%',
-                ]
-            ]) ?>
+            <?php 
+                $statuses = KpiWorkRegisteredStatus::find()->all();
+
+                $stt = 1; // biến số thứ tự
+
+                $data = ArrayHelper::map($statuses, 'id', function($model) use (&$stt) {
+                    $markup = '
+                        <div style="display: flex; align-items: center;">
+                            <div style="width: 30px; margin-right: 6px;">' . $stt . '</div>
+                            <div style="
+                                width: 14px; 
+                                height: 14px; 
+                                background: ' . htmlspecialchars($model->color) . ';
+                                border: 1px solid #ccc; 
+                                border-radius: 3px;
+                                margin-right: 6px;
+                            "></div>
+                            <div>' . htmlspecialchars($model->name) . '</div>
+                        </div>
+                    ';
+                    $stt++; // tăng số thứ tự
+                    return $markup;
+                });
+
+                echo $form->field($model, 'status_id')->widget(Select2::classname(), [
+                    'options' => ['placeholder' => 'Chọn trạng thái...'],
+                    'data' => $data,
+                    'pluginOptions' => [
+                        'escapeMarkup' => new JsExpression('function(markup) { return markup; }'),
+                        'allowClear' => true,
+                        'width' => '100%',
+                        'templateResult' => new JsExpression('function(item) { return item.text; }'),
+                        'templateSelection' => new JsExpression('function(item) { return item.text; }'),
+                        'dropdownParent' => new JsExpression("$('#ajaxCrudModal .modal-body')")
+                    ],
+                ]);
+
+            ?>
         </div>
 
         <!-- Tên công việc -->

@@ -2,6 +2,7 @@
 
 namespace app\modules\work_registered\controllers;
 
+use app\common\helpers\CommonSQL;
 use app\common\helpers\DateHelper;
 use app\modules\staff\models\StaffForm;
 use Yii;
@@ -201,7 +202,11 @@ class RegisterController extends Controller
                         'created_at' => new Expression('NOW()'),
                     ])->execute();
 
-                    $this->actionApprove($model->id);
+                    if($model->status_id == 2) {
+                        //$this->approve($model->id);
+                        CommonSQL::approve($model->id);
+                    }
+                    
                     $transaction->commit();
 
                     Yii::$app->session->setFlash('success', 'Đã thêm mới công việc.');
@@ -284,7 +289,7 @@ class RegisterController extends Controller
         ];
     }
 
-    public function actionApprove($id)
+    public function approve($id)
     {
         $iStatus = 0;
 

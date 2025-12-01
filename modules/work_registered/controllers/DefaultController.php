@@ -2,7 +2,9 @@
 
 namespace app\modules\work_registered\controllers;
 
+use app\common\helpers\CommonSQL;
 use app\models\KpiWorkRegisteredHistory;
+use app\models\KpiWorkRegisteredStatus;
 use Yii;
 use app\modules\work_registered\models\KpiWorkRegisteredForm;
 use app\modules\work_registered\models\KpiWorkRegisteredSearch;
@@ -42,7 +44,7 @@ class DefaultController extends Controller
     public function actionIndex()
     {
         $searchModel = new KpiWorkRegisteredSearch();
-
+    
         if (isset($_POST['search']) && $_POST['search'] !== null) {
             $dataProvider = $searchModel->search(Yii::$app->request->post(), $_POST['search']);
         } elseif ($searchModel->load(Yii::$app->request->post())) {
@@ -51,14 +53,12 @@ class DefaultController extends Controller
         } else { // khoi tao
             $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         }
-
-        //dd($dataProvider);
+  
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }
-
 
     public function actionIndex1()
     {    
@@ -111,13 +111,37 @@ class DefaultController extends Controller
         // Lấy dữ liệu POST
         $postData = Yii::$app->request->post();
 
-        // Truyền vào search model
-        $dataProvider = $searchModel->search($postData);
+        // Truyền dữ liệu POST vào search model
+        $dataProvider = $searchModel->search($postData ?: Yii::$app->request->queryParams);
+
+        /* @var \yii\db\ActiveQuery $query */ // giúp IDE nhận dạng
+    /*  $query = $dataProvider->query;
+
+        $sql = $query->createCommand()->getRawSql();
+
+        // ========================
+        // DEBUG SQL: in ra trình duyệt
+        echo "<pre>";
+        echo "SQL= ".$query->createCommand()->getRawSql(); // SQL thực thi
+        echo "</pre>";
+
+        Yii::info(print_r($dataProvider->getModels(), true), __METHOD__); */
+
+        // ========================
+        
+        // Nếu muốn debug dữ liệu thực tế:
+        // echo "<pre>";
+        // print_r($dataProvider->getModels());
+        // echo "</pre>";
+
+        // Dừng script khi debug
+        // exit;
 
         // Render view cùng searchModel và dataProvider
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            //'sql' => $sql,
         ]);
     }
 
@@ -155,6 +179,13 @@ class DefaultController extends Controller
         
                 ];         
             }else if($model->load($request->post()) && $model->save()){
+                // Neu trang thai la duyet
+                // Luu them vao du lieu lich chinh thuc
+                if($model->status_id == 2) {
+                    //$this->approve($model->id);
+                    CommonSQL::approve($model->id);
+                }
+
                 return [
                     'forceReload'=>'#crud-datatable-pjax',
                     'title'=> "Thêm mới",

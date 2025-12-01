@@ -11,9 +11,11 @@ use Yii;
  * @property int $work_registered_id ID công việc đăng ký
  * @property int $staff_id ID nhân viên được phân công
  * @property int $status_id Trạng thái phân công
+ * @property int|null $kpi_id ID KPI liên quan
  * @property string $start_date Ngày bắt đầu
  * @property string $end_date Ngày kết thúc
  * @property string $title Tiêu đề công việc
+ * @property string|null $description Mô tả công việc
  * @property string|null $color Màu lịch
  * @property string|null $assigned_at Ngày phân công
  *
@@ -42,14 +44,14 @@ class KpiWorkAssignment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['description', 'end_date'], 'default', 'value' => null],
+            [['kpi_id', 'description'], 'default', 'value' => null],
             [['status_id'], 'default', 'value' => 1],
             [['color'], 'default', 'value' => '#3788d8'],
             [['work_registered_id', 'staff_id', 'start_date', 'end_date', 'title'], 'required'],
-            [['work_registered_id', 'staff_id', 'status_id'], 'integer'],
+            [['work_registered_id', 'staff_id', 'status_id', 'kpi_id'], 'integer'],
             [['start_date', 'end_date', 'assigned_at'], 'safe'],
-            [['title'], 'string', 'max' => 255],
             [['description'], 'string'],
+            [['title'], 'string', 'max' => 255],
             [['color'], 'string', 'max' => 20],
             [['work_registered_id'], 'exist', 'skipOnError' => true, 'targetClass' => KpiWorkRegistered::class, 'targetAttribute' => ['work_registered_id' => 'id']],
             [['staff_id'], 'exist', 'skipOnError' => true, 'targetClass' => Staff::class, 'targetAttribute' => ['staff_id' => 'staff_id']],
@@ -67,6 +69,7 @@ class KpiWorkAssignment extends \yii\db\ActiveRecord
             'work_registered_id' => 'Work Registered ID',
             'staff_id' => 'Staff ID',
             'status_id' => 'Status ID',
+            'kpi_id' => 'Kpi ID',
             'start_date' => 'Start Date',
             'end_date' => 'End Date',
             'title' => 'Title',
@@ -134,6 +137,11 @@ class KpiWorkAssignment extends \yii\db\ActiveRecord
     public function getWorkRegistered()
     {
         return $this->hasOne(KpiWorkRegistered::class, ['id' => 'work_registered_id']);
+    }
+
+    public function getKpiWorkAssignmentHistories()
+    {
+        return $this->hasMany(KpiWorkAssignmentHistory::class, ['work_assignment_id' => 'id']);
     }
 
 }

@@ -67,7 +67,7 @@ class DefaultController extends Controller
         if($request->isAjax){
             Yii::$app->response->format = Response::FORMAT_JSON;
             return [
-                    'title'=> "Xem",
+                    'title'=> "KpiWorkAssignmentForm",
                     'content'=>$this->renderAjax('view', [
                         'model' => $this->findModel($id),
                     ]),
@@ -79,6 +79,47 @@ class DefaultController extends Controller
                 'model' => $this->findModel($id),
             ]);
         }
+    }
+
+    public function actionFilter()
+    {
+        $searchModel = new KpiWorkAssignmentSearch();
+
+        // Lấy dữ liệu POST
+        $postData = Yii::$app->request->post();
+
+        // Truyền dữ liệu POST vào search model
+        $dataProvider = $searchModel->search($postData ?: Yii::$app->request->queryParams);
+
+        /* @var \yii\db\ActiveQuery $query */ // giúp IDE nhận dạng
+    /*  $query = $dataProvider->query;
+
+        $sql = $query->createCommand()->getRawSql();
+
+        // ========================
+        // DEBUG SQL: in ra trình duyệt
+        echo "<pre>";
+        echo "SQL= ".$query->createCommand()->getRawSql(); // SQL thực thi
+        echo "</pre>";
+
+        Yii::info(print_r($dataProvider->getModels(), true), __METHOD__); */
+
+        // ========================
+        
+        // Nếu muốn debug dữ liệu thực tế:
+        // echo "<pre>";
+        // print_r($dataProvider->getModels());
+        // echo "</pre>";
+
+        // Dừng script khi debug
+        // exit;
+
+        // Render view cùng searchModel và dataProvider
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            //'sql' => $sql,
+        ]);
     }
 
     /**

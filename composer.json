@@ -45,7 +45,8 @@
         "mpdf/mpdf": "^8.2",
         "kartik-v/yii2-widget-fileinput": "^1.0",
         "mihaildev/yii2-ckeditor": "^1.0",
-        "ckeditor/ckeditor": "^4.25"
+        "ckeditor/ckeditor": "^4.25",
+        "kartik-v/yii2-date-range": "@dev"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

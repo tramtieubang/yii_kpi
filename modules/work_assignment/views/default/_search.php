@@ -23,11 +23,15 @@ use yii\widgets\ActiveForm;
 
 </div><div class="col-md-4">    <?= $form->field($model, 'status_id')->textInput() ?>
 
+</div><div class="col-md-4">    <?= $form->field($model, 'kpi_id')->textInput() ?>
+
 </div><div class="col-md-4">    <?= $form->field($model, 'start_date')->textInput() ?>
 
 </div><div class="col-md-4">    <?= $form->field($model, 'end_date')->textInput() ?>
 
 </div><div class="col-md-4">    <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
+
+</div><div class="col-md-4">    <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
 </div><div class="col-md-4">    <?= $form->field($model, 'color')->textInput(['maxlength' => true]) ?>
 

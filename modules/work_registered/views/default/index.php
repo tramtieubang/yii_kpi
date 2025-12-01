@@ -1,5 +1,6 @@
 <?php
 
+use app\models\KpiWorkRegisteredStatus;
 use app\modules\staff\models\StaffForm;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -9,6 +10,8 @@ use kartik\select2\Select2;
 use kartik\grid\GridView;
 use yii\bootstrap5\Modal;
 use yii\helpers\ArrayHelper;
+use yii\web\JsExpression;
+use kartik\daterange\DateRangePicker;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\modules\work_registered\models\KpiWorkRegisteredSearch */
@@ -75,24 +78,46 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
 }
 
 /* Button */
-.kpi-btn-primary, .kpi-btn-reset {
-    height:32px !important;
-    font-size:13px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:4px;
-    padding:0 8px;
+.kpi-btn-primary,
+.kpi-btn-reset {
+    height: 32px !important;           /* Chiều cao cố định */
+    font-size: 13px;                   /* Cỡ chữ */
+    display: flex;                     /* Flex căn giữa */
+    justify-content: center;           
+    align-items: center;               
+    gap: 4px;                          
+    padding: 0 8px;                    
+    border-radius: 4px;                /* Bo góc */
+    cursor: pointer;                   
+    transition: background-color 0.2s; 
+    border: 1px solid #ccc;            /* Viền mặc định */
+    background-color: #fff;            /* Nền mặc định */
+    color: #333;                        /* Màu chữ mặc định */
+}
+
+/* Hiệu ứng hover */
+.kpi-btn-primary:hover {
+    background-color: #0069d9;
+    color: #fff;
+    border-color: #0062cc;            /* đổi viền khi hover */
+}
+
+.kpi-btn-reset:hover {
+    background-color: #f5f5f5;
+    color: #333;
+    border-color: #999;               /* đổi viền khi hover */
 }
 
 /* Toggle filter */
 #filterFormBody {
     display:flex;
     flex-wrap:wrap;
-    gap:8px;
-    padding:8px 0;
+    gap:8px;    
     transition: all 0.3s ease;
     overflow:hidden;
+    
+    /* căn giữa theo chiều ngang */
+    justify-content: center;
 }
 #filterFormBody.collapsed {
     height:0;
@@ -146,15 +171,27 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
 }
 
 </style>
+<?php 
+    /*  $query = $dataProvider1->query; // gán vào biến $query để IDE hiểu
 
+    // =====================
+    // DEBUG SQL
+    echo "<pre>";
+    echo $query->createCommand()->getRawSql(); // in SQL thực thi
+    echo "</pre>"; */
+
+   // echo $sql ?? null;
+
+?>
 <!-- ===== Form Filter ===== -->
 <div>
     <?= 
         $this->render('//layouts/menus/quanlycongviec/tab_registered_heading')
     ?>
 </div>
+
 <div class="card kpi-card shadow-sm mb-3">
-    <div class="card-header kpi-card-header">
+     <div class="card-header kpi-card-header">
         <h6><i class="fe fe-filter"></i> Lọc dữ liệu</h6>
         <button class="btn-scroll" type="button" id="btnScrollFilter">
             <i class="fe fe-chevron-up"></i>
@@ -162,65 +199,145 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
     </div>
 
     <div class="card-body p-2" id="filterFormBody">
-        <?php $form = ActiveForm::begin([
-            'method'=>'post',
-            'action'=>['filter'],
-            'options'=>['class'=>'inline-filter d-flex flex-wrap align-items-end gap-2','id'=>'filterForm'],
-        ]); ?>
+    <?php $form = ActiveForm::begin([
+        'method'=>'post',
+        'action'=>['filter'],
+        'options'=>[
+            'class'=>'inline-filter',
+            'id'=>'filterForm'
+        ],
+    ]); ?>   
 
-        <!-- Ngày bắt đầu -->
-        <div class="kpi-input" style="width:180px;">
-            <?= $form->field($searchModel, 'start_date', [
-                'labelOptions'=>['class'=>'form-label mb-1'],
-            ])->widget(DatePicker::class, [
-                'options'=>['placeholder'=>'Ngày bắt đầu','class'=>'form-control form-control-sm kv-date'],
-                'pluginOptions'=>['autoclose'=>true,'format'=>'dd/mm/yyyy','todayHighlight'=>true],
-            ]) ?>
+        <div class="row gx-3 gy-2 justify-content-between" style="padding-top:8px;"><!-- Dòng 1: 4 cột -->
+            <div class="col-md-3">
+                <label class="form-label mb-1">Ngày giờ bắt đầu từ</label>
+                <?= Html::input('datetime-local', 'start_from_date', Yii::$app->request->post('start_from_date'), [
+                    'class' => 'form-control form-control-sm',
+                ]) ?>
+             
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label mb-1">Ngày giờ bắt đầu đến</label>
+                <?= Html::input('datetime-local', 'start_to_date', Yii::$app->request->post('start_to_date'), [
+                    'class' => 'form-control form-control-sm',
+                ]) ?>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label mb-1">Ngày kết thúc từ</label>
+                <?= Html::input('datetime-local', 'end_from_date', Yii::$app->request->post('end_from_date'), [
+                    'class' => 'form-control form-control-sm',
+                ]) ?>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label mb-1">Ngày kết thúc đến</label>
+                <?= Html::input('datetime-local', 'end_to_date', Yii::$app->request->post('end_to_date'), [
+                    'class' => 'form-control form-control-sm',
+                ]) ?>
+            </div>
         </div>
 
-        <!-- Ngày kết thúc -->
-        <div class="kpi-input" style="width:180px;">
-            <?= $form->field($searchModel, 'end_date', [
-                'labelOptions'=>['class'=>'form-label mb-1'],
-            ])->widget(DatePicker::class, [
-                'options'=>['placeholder'=>'Ngày kết thúc','class'=>'form-control form-control-sm kv-date'],
-                'pluginOptions'=>['autoclose'=>true,'format'=>'dd/mm/yyyy','todayHighlight'=>true],
-            ]) ?>
+        <div class="row gx-3 gy-2 justify-content-between mt-1"><!-- Dòng 2: 4 cột -->
+            <div class="col-md-3">
+                <label class="form-label mb-1">Nhân viên</label>
+                <?php                    
+                   $staffs = StaffForm::find()->all();
+                    $data = [];
+                    foreach ($staffs as $i => $staff) {
+                        $stt = $i + 1; // số thứ tự tăng dần
+                        $data[$staff->staff_id] = '
+                            <div style="display: flex;">
+                                <div style="width: 30px;">' . $stt . '</div>
+                                <div>' . htmlspecialchars($staff->name) . '</div>
+                            </div>
+                        ';
+                    }
+
+                    echo $form->field($searchModel, 'staff_id')->label(false)->widget(Select2::classname(), [
+                        'options' => ['placeholder' => 'Chọn nhân viên....'],
+                        'data' => $data,
+                        'pluginOptions' => [
+                            'escapeMarkup' => new JsExpression('function(markup) { return markup; }'),
+                            'allowClear' => true,
+                            'width' => '100%',
+                        ],
+                    ]);
+                ?>
+            </div>
+
+            <div class="col-md-3">
+                <?= $form->field($searchModel, 'title', [
+                    'labelOptions'=>['class'=>'form-label mb-1'],
+                    'template'=>'{label}{input}'
+                ])->textInput([
+                    'placeholder'=>'Tên công việc',
+                    'class'=>'form-control form-control-sm'
+                ]) ?>
+            </div>
+
+            <div class="col-md-3">
+                <?= $form->field($searchModel, 'description', [
+                    'labelOptions'=>['class'=>'form-label mb-1'],
+                    'template'=>'{label}{input}'
+                ])->textInput([
+                    'placeholder'=>'Mô tả',
+                    'class'=>'form-control form-control-sm'
+                ]) ?>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label mb-1">Trạng thái công việc</label>
+                <?php 
+                   $statuses = KpiWorkRegisteredStatus::find()->all();
+
+                    $stt = 1; // biến số thứ tự
+
+                    $data = ArrayHelper::map($statuses, 'id', function($model) use (&$stt) {
+                        $markup = '
+                            <div style="display: flex; align-items: center;">
+                                <div style="width: 30px; margin-right: 6px;">' . $stt . '</div>
+                                <div style="
+                                    width: 14px; 
+                                    height: 14px; 
+                                    background: ' . htmlspecialchars($model->color) . ';
+                                    border: 1px solid #ccc; 
+                                    border-radius: 3px;
+                                    margin-right: 6px;
+                                "></div>
+                                <div>' . htmlspecialchars($model->name) . '</div>
+                            </div>
+                        ';
+                        $stt++; // tăng số thứ tự
+                        return $markup;
+                    });
+
+                    echo $form->field($searchModel, 'status_id')->label(false)->widget(Select2::classname(), [
+                        'options' => ['placeholder' => 'Chọn trạng thái...'],
+                        'data' => $data,
+                        'pluginOptions' => [
+                            'escapeMarkup' => new JsExpression('function(markup) { return markup; }'),
+                            'allowClear' => true,
+                            'width' => '100%',
+                            'templateResult' => new JsExpression('function(item) { return item.text; }'),
+                            'templateSelection' => new JsExpression('function(item) { return item.text; }'),
+                        ],
+                    ]);
+
+                ?>
+            </div>
         </div>
 
-        <!-- Nhân viên -->
-        <div class="kpi-input" style="width:180px;">
-            <?= $form->field($searchModel, 'staff_id', [
-                'labelOptions'=>['class'=>'form-label mb-1'],
-                'template'=>'{label}{input}',
-            ])->widget(Select2::class, [
-                'data'=>$staffList,
-                'options'=>['placeholder'=>'Chọn nhân viên ...','class'=>'form-control form-control-sm'],
-                'pluginOptions'=>['allowClear'=>true,'width'=>'100%'],
-            ]) ?>
-        </div>
-
-        <!-- Tên công việc -->
-        <div class="kpi-input" style="width:185px;">
-            <?= $form->field($searchModel, 'title', ['labelOptions'=>['class'=>'form-label mb-1']])
-                     ->textInput(['placeholder'=>'Tên công việc','class'=>'form-control form-control-sm']) ?>
-        </div>
-
-        <!-- Mô tả -->
-        <div class="kpi-input" style="width:185px;">
-            <?= $form->field($searchModel, 'description', ['labelOptions'=>['class'=>'form-label mb-1']])
-                     ->textInput(['placeholder'=>'Mô tả','class'=>'form-control form-control-sm']) ?>
-        </div>
-
-        <!-- Nút tìm kiếm / reset -->
         <div class="w-100 d-flex justify-content-center mt-2">
             <?= Html::submitButton('<i class="fe fe-search"></i> Tìm kiếm', ['class'=>'btn kpi-btn-primary btn-sm me-2']) ?>
             <?= Html::resetButton('<i class="fe fe-refresh-cw"></i> Reset', ['class'=>'btn kpi-btn-reset btn-sm','id'=>'btnResetFilter']) ?>
         </div>
-
-        <?php ActiveForm::end(); ?>
+        
     </div>
+    <?php ActiveForm::end(); ?>
 </div>
+
 
 <!-- ===== PJAX Grid ===== -->
 
