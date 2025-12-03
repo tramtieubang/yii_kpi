@@ -85,7 +85,12 @@ class CalendarController extends Controller
                 'start' => $m->start_date,
                 'end'   => $m->end_date,
                 'color' => $m->status->color, //'#257e4a',  // tuỳ chỉnh
-                'status' => $m->status->name,
+                //'status' => $m->status->name,
+                'extendedProps' => [    // ✅ Thêm dữ liệu tùy chỉnh ở đây
+                    'staff' => $m->staff ? $m->staff->name : 'Unknown',
+                    'status' => $m->status ? $m->status->name : 'N/A',
+                    'description' => $m->description,
+                ],
             ];
         }
 

@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
             tooltip.style.fontSize = '13px';
             tooltip.style.pointerEvents = 'none';
 
-            const status = info.event.extendedProps.status ?? 'Không có';
+           /*  const status = info.event.extendedProps.status ?? 'Không có';
             const start = info.event.start.toLocaleString('vi-VN');
             const end = info.event.end ? info.event.end.toLocaleString('vi-VN') : '';
 
@@ -171,6 +171,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 <b>${info.event.title}</b><br>
                 Trạng thái: <span style="color:#ffd700">${status}</span><br>
                 Thời gian: ${start} - ${end}
+            `; */
+
+            let staff = info.event.extendedProps.staff ?? 'Không có';
+            let status = info.event.extendedProps.status ?? 'Không có';
+            let start = info.event.start.toLocaleString('vi-VN');
+            let end = info.event.end ? info.event.end.toLocaleString('vi-VN') : '';
+
+            tooltip.innerHTML = `
+                <b>${staff}</b><br>
+                <b>${info.event.title}</b><br>
+                Trạng thái: <span style="color:#ffd700">${status}</span><br>
+                Thời gian: ${start}${end ? ' - ' + end : ''}
             `;
 
             document.body.appendChild(tooltip);

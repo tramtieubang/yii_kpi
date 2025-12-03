@@ -424,7 +424,55 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
         }
     });    
 
+   
+jQuery(function ($) {
 
+    $(document).on('ajaxComplete', function (event, xhr) {
+        let response;
+        try {
+            response = JSON.parse(xhr.responseText);
+        } catch (e) {
+            return; // Không phải JSON
+        }
+
+        if (!response.system_id) return;
+
+        const $row = $('tr[data-key="' + response.system_id + '"]');
+        if (!$row.length) return;
+
+        // ===== Đây là hàm reload Grid con =====
+        const reloadChildGrid = function () {
+            const $pjaxChild = $row.next('.kv-expand-detail-row').find('.pjax-jobs-grid');
+            if ($pjaxChild.length) {
+                $.pjax.reload({
+                    container: '#' + $pjaxChild.attr('id'),
+                    timeout: 3000,
+                    scrollTo: false, // giữ scroll hiện tại
+                    replace: false
+                });
+            }
+        };
+        // ===== end reloadChildGrid =====
+
+        // Nếu row đang đóng → mở trước rồi reload
+        if ($row.hasClass('kv-state-collapsed')) {
+            $row.find('.kv-expand-icon').click(); // mở expand
+            $(document).one('kvexprow.afterExpand', function () {
+                reloadChildGrid();
+            });
+        } else {
+            reloadChildGrid(); // đang mở → reload ngay
+        }
+
+    });
+
+});
+
+
+
+
+
+ 
 // Khi modal đóng
 /* $(document).on('hidden.bs.modal', '.modal', function () {
     if ($('.modal.show').length > 0) {
@@ -472,7 +520,7 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
 </script>
 
 <?php
-    $this->registerJs("
+    /*  $this->registerJs("
 jQuery(function($) {
     $(document).on('ajaxComplete', function (event, xhr) {
         let response;
@@ -498,8 +546,8 @@ jQuery(function($) {
         }
     });
 });
-");
-
+"); */
+ 
 ?>
 
 <?php 

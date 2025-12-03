@@ -36,16 +36,13 @@ $model->end_date   = $model->end_date   ? date('Y-m-d H:i:s', strtotime($model->
 
      <!-- Slider Duyệt / Chưa duyệt -->
     <div class="col-12">
-        <?= $form->field($model, 'status', [
-                'template' => "{label}\n<div class='input-group'>
-                    <input type='range' class='form-range' min='1' max='3' step='1' value='2' id='statusRange'>
-                    {input}
-                </div>\n{error}"
-            ])->label('Trạng thái', ['class' => 'fw-bold']) ?>
+        <label for="statusRange" class="fw-bold">Trạng thái</label>
+        <div class="input-group">
+            <input type="range" class="form-range" min="1" max="3" step="1"
+                value="<?= $model->status_id ?>" name="status" id="statusRange">
+        </div>
         <div class="form-text" id="statusText">
-            <?php 
-                echo 'Đã duyệt'; 
-            ?>
+            <?= $model->status ? $model->status->name : '' ?>
         </div>
     </div>
 
@@ -67,6 +64,18 @@ $(document).on('click', '#btn-update-register', function(e){
         dataType: 'json',
         success: function(data){
             // 🔔 Hiện thông báo thành công (nếu có)
+            // ❗ Nếu server trả về lỗi (ví dụ: đã có báo cáo)
+            // ❌ Trường hợp báo lỗi
+            if(data.success === false){
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Không thể sửa!',
+                    text: data.message,
+                    confirmButtonText: 'Đóng'
+                });
+                return;
+            }
+
            // Cập nhật modal nếu server trả content
             if(data.content){
                 $('#ajaxCrudModal .modal-body').html(data.content);

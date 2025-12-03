@@ -3,6 +3,7 @@
 namespace app\modules\work_assignment\models;
 
 use app\models\KpiWorkAssignment;
+use app\models\KpiWorkReport;
 use Yii;
 
 /**
@@ -56,11 +57,16 @@ class KpiWorkAssignmentForm extends KpiWorkAssignment
             'assigned_at' => 'Ngày phân công',
         ];
 
+
+
     }
 
     // 🔥 Thêm relation getJobs()
     public function getJobs() {
         return $this->hasMany(KpiWorkAssignmentForm::class, ['staff_id'=>'staff_id']); // chỉ lấy công việc con
     }
+
+    
+
 
 }

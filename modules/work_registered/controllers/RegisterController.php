@@ -4,7 +4,13 @@ namespace app\modules\work_registered\controllers;
 
 use app\common\helpers\CommonSQL;
 use app\common\helpers\DateHelper;
+use app\models\KpiWorkAssignment;
+use app\models\KpiWorkRegistered;
+use app\models\KpiWorkRegisteredHistory;
+use app\models\KpiWorkRegisteredStatus;
+use app\models\KpiWorkReport;
 use app\modules\staff\models\StaffForm;
+use app\modules\work_assignment\models\KpiWorkAssignmentForm;
 use Yii;
 use app\modules\work_registered\models\KpiWorkRegisteredForm;
 use yii\db\Expression;
@@ -69,7 +75,7 @@ class RegisterController extends Controller
         }
         $models = $query->all();
 
-        // /dd($models);
+        //dd($models);
 
         $events = [];
 
@@ -79,8 +85,12 @@ class RegisterController extends Controller
                 'title' => $m->title,
                 'start' => $m->start_date,
                 'end'   => $m->end_date,
-                'color' => $m->status->color,//'#257e4a',  // tuỳ chỉnh
-                'status' => $m->status->name,
+                'color' => $m->status ? $m->status->color : '#3788d8',
+                'extendedProps' => [    // ✅ Thêm dữ liệu tùy chỉnh ở đây
+                    'staff' => $m->staff ? $m->staff->name : 'Unknown',
+                    'status' => $m->status ? $m->status->name : 'N/A',
+                    'description' => $m->description,
+                ],
             ];
         }
 
@@ -126,10 +136,12 @@ class RegisterController extends Controller
                 $model->start_date = DateHelper::toMySQL($model->start_date);
                 $model->end_date   = DateHelper::toMySQL($model->end_date);
 
-                $model->staff_id = Yii::$app->user->id ?? null;                
-                $model->status_id = 1; // Chưa duyệt
-
-                //dd($model->status_id);
+                $model->staff_id = Yii::$app->user->id ?? null;    
+                //$model->status_id = 1; // Chưa duyệt
+                $status = Yii::$app->request->post('status');
+                $model->status_id = $status;
+                $model->color = $model->status->color;
+                //dd($status);
 
                 $transaction = Yii::$app->db->beginTransaction();
                 try {
@@ -137,23 +149,19 @@ class RegisterController extends Controller
                         throw new \Exception("Không thể lưu công việc!");
                     }
 
-                    // Lưu lịch sử
-                    Yii::$app->db->createCommand()->insert('{{%kpi_work_registered_history}}', [
-                        'work_registered_id' => $model->id,
-                        'title' => $model->title,
-                        'description' => $model->description,
-                        'start_date' => $model->start_date,
-                        'end_date' => $model->end_date,
-                        'action_type' => 'create',
-                        'updated_by' => Yii::$app->user->id ?? null,
-                        'created_at' => new Expression('NOW()'),
-                    ])->execute();
-
+                    // Lưu lịch sử                    
+                    CommonSQL::saveRegisteredHistory(null, $model, 'create');
+                         
                     // Gọi approve tự động nếu muốn
-                    $status = Yii::$app->request->post('status', 2);
+                    //$status = Yii::$app->request->post('status', 2);
                     if($status == 2) {
-                        $this->actionApprove($model->id);
-                    }
+                        // Luu lich chinh thuc tu lich dang ky
+                        CommonSQL::approve($model->id);
+                        
+                        //$modelAssignment = KpiWorkAssignmentForm::findOne($id);
+                        $modelAssignment = KpiWorkAssignmentForm::findOne(['work_registered_id' => $model->id]);
+                        CommonSQL::saveAssignmentHistory(null, $modelAssignment, 'create');   
+                    } 
 
                     $transaction->commit();
                     return [
@@ -186,26 +194,28 @@ class RegisterController extends Controller
             $model->start_date = DateHelper::toMySQL($model->start_date);
             $model->end_date   = DateHelper::toMySQL($model->end_date);
             $model->staff_id = Yii::$app->user->id ?? null;
-            $model->status_id = 1;
+  
+            //$model->status_id = 1; // Chưa duyệt
+            $status = Yii::$app->request->post('status');
+            $model->status_id = $status;
+            $model->color = $model->status->color;
 
             $transaction = Yii::$app->db->beginTransaction();
             try {
                 if ($model->save(false)) {
-                    Yii::$app->db->createCommand()->insert('{{%kpi_work_registered_history}}', [
-                        'work_registered_id' => $model->id,
-                        'title' => $model->title,
-                        'description' => $model->description,
-                        'start_date' => $model->start_date,
-                        'end_date' => $model->end_date,
-                        'action_type' => 'create',
-                        'updated_by' => Yii::$app->user->id ?? null,
-                        'created_at' => new Expression('NOW()'),
-                    ])->execute();
-
-                    if($model->status_id == 2) {
-                        //$this->approve($model->id);
+                    //$this->saveHistory(null, $model, 'create');
+                    CommonSQL::saveAssignmentHistory(null, $model, 'create');
+                         
+                    // Gọi approve tự động nếu muốn
+                    //$status = Yii::$app->request->post('status', 2);
+                    if($status == 2) {
+                        // Luu lich chinh thuc tu lich dang ky
                         CommonSQL::approve($model->id);
-                    }
+                        
+                        //$modelAssignment = KpiWorkAssignmentForm::findOne($id);
+                        $modelAssignment = KpiWorkAssignmentForm::findOne(['work_registered_id' => $model->id]);
+                        CommonSQL::saveAssignmentHistory(null, $modelAssignment, 'create');   
+                    } 
                     
                     $transaction->commit();
 
@@ -235,41 +245,111 @@ class RegisterController extends Controller
 
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
+        // GET AJAX: hiện form update
         if ($request->isGet) {
             return [
                 'title' => "Cập nhật công việc",
                 'content' => $this->renderAjax('update', ['model' => $model]),
-                'footer' => Html::button('Đóng', ['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]) .
+                'footer' => Html::button('Đóng', ['class'=>'btn btn-default','data-bs-dismiss'=>"modal"]) .
                             Html::button('Cập nhật', ['class'=>'btn btn-primary', 'id'=>'btn-update-register'])
             ];
         }
 
-        // POST AJAX
+        // POST AJAX: xử lý update
         if ($model->load($request->post())) {
             $transaction = Yii::$app->db->beginTransaction();
-            try {
-                Yii::$app->db->createCommand()->insert('{{%kpi_work_registered_history}}', [
-                    'work_registered_id' => $model->id,
-                    'title' => $model->title,
-                    'description' => $model->description,
-                    'start_date' => $model->start_date,
-                    'end_date' => $model->end_date,
-                    'action_type' => 'update',
-                    'updated_by' => Yii::$app->user->id ?? null,
-                    'created_at' => new \yii\db\Expression('NOW()'),
-                ])->execute();
+            $status = (int)$request->post('status');
 
-                $model->save(false);
+            try {
+                // Lấy bản sao cũ để lưu lịch sử
+                $oldModel = clone $model;
+
+                // Gán status_id
+                $model->status_id = $status;
+
+                // Lấy màu từ bảng trạng thái hoặc mặc định
+                $statusModel = KpiWorkRegisteredStatus::findOne($model->status_id);
+                $model->color = $statusModel->color ?? '#3788d8';
+
+                // Trường hợp: Chưa duyệt
+                if ($status === 1) {
+                    $model->save(false);
+                    CommonSQL::saveRegisteredHistory($oldModel, $model, 'update');
+                }
+
+                // Trường hợp: Đã duyệt
+                elseif ($status === 2) {
+                    // Nếu đã có báo cáo → không cho sửa
+                    if ($model->hasAnyReport()) {
+                        return [
+                            'success' => false,
+                            'message' => 'Công việc đã có báo cáo, không thể sửa.'
+                        ];
+                    }
+
+                    /* Cách 1: Duyệt lại */
+                   /*  // Chưa có báo cáo → duyệt lại
+                    $model->status_id = 1; // bật lại Chưa duyệt
+                    $model->save(false);
+                    CommonSQL::saveRegisteredHistory($oldModel, $model, 'update');
+
+                    // Xóa phân công cũ nếu có
+                    KpiWorkAssignment::deleteAll(['work_registered_id' => $model->id]);
+
+                    // Tạo phân công mới từ lịch đăng ký
+                    //CommonSQL::approve($model->id);
+                    //$modelAssignment = KpiWorkAssignmentForm::findOne(['work_registered_id' => $model->id]);
+                    //CommonSQL::saveAssignmentHistory(null, $modelAssignment, 'update'); */
+
+                    /* Cách 2: Giữ nguyên chỉ sửa nội dung không duyệt lại */
+                    CommonSQL::saveRegisteredHistory($oldModel, $model, 'update');
+                    // Luu công việc sửa
+                    $model->save(false);
+
+                    // Kiểm tra đã có phân công chưa
+                    $assigned = KpiWorkAssignment::find()
+                        ->where(['work_registered_id' => $model->id])
+                        ->all();
+
+                    // Nếu đã phân công 
+                    if (!empty($assigned)) {
+                        // Cập nhật các phân công hiện có
+                        foreach ($assigned as $assignment) {
+                            $assignment->title = $model->title;
+                            $assignment->description = $model->description;
+                            $assignment->start_date = $model->start_date;
+                            $assignment->end_date = $model->end_date;
+                            $assignment->color = $model->color; // đồng bộ màu
+                            $assignment->save(false);
+
+                            // Lưu lịch sử phân công
+                            CommonSQL::saveAssignmentHistory(null, $assignment, 'update');
+                        }
+                    }
+                    else { //chưa phân công
+                        // Luu lich chinh thuc tu lich dang ky
+                        CommonSQL::approve($model->id);                    
+                        //$modelAssignment = KpiWorkAssignmentForm::findOne($id);
+                        $modelAssignment = KpiWorkAssignmentForm::findOne(['work_registered_id' => $model->id]);
+                        CommonSQL::saveAssignmentHistory(null, $modelAssignment, 'update');
+                    } 
+
+                }
+
+                // Trường hợp: Từ chối
+                else {
+                    $model->status_id = 1; // đặt lại Chưa duyệt
+                    $model->save(false);
+                    CommonSQL::saveRegisteredHistory($oldModel, $model, 'update');
+                }
+
                 $transaction->commit();
 
-               return [
-                    'forceReload' => '#crud-datatable-pjax',  // PJAX container để reload
-                    'title' => "Cập nhật thành công",         // Tiêu đề modal
-                    'content' => '<span class="text-success">Đã cập nhật dữ liệu thành công!</span>', // Nội dung modal
-                    'footer' => Html::button('Đóng', [
-                        'class' => 'btn btn-default',
-                        'data-bs-dismiss' => "modal"  // Thuộc tính Bootstrap 5 để đóng modal
-                    ])
+                return [
+                    'forceReload' => '#crud-datatable-pjax',
+                    'title' => "Cập nhật thành công",
+                    'content' => '<span class="text-success">Đã cập nhật dữ liệu thành công!</span>',
+                    'footer' => Html::button('Đóng', ['class' => 'btn btn-default', 'data-bs-dismiss' => "modal"])
                 ];
 
             } catch (\Throwable $e) {
@@ -288,58 +368,6 @@ class RegisterController extends Controller
             'footer' => Html::button('Đóng', ['class'=>'btn btn-secondary','data-bs-dismiss'=>"modal"])
         ];
     }
-
-    public function approve($id)
-    {
-        $iStatus = 0;
-
-        $registration = KpiWorkRegisteredForm::findOne($id);
-
-        if (!$registration) {
-            throw new NotFoundHttpException("Không tìm thấy công việc đăng ký này.");
-        }
-
-        /* // Chỉ cho lãnh đạo duyệt
-        if (!Yii::$app->user->can('kpi.approve')) {
-            throw new ForbiddenHttpException("Bạn không có quyền duyệt công việc.");
-        } */
-
-        $transaction = Yii::$app->db->beginTransaction();
-
-        try {
-            // 1️⃣ Cập nhật trạng thái công việc đăng ký
-            $registration->status_id = 2; // 2 = Duyệt
-            $registration->updated_at = new \yii\db\Expression('NOW()');
-            $registration->save(false);
-
-            // 2️⃣ Gán KPI vào bảng KPI thực tế (kpi_work_assignment)
-            Yii::$app->db->createCommand()->insert('{{%kpi_work_assignment}}', [
-                'work_registered_id' => $registration->id,
-                'staff_id' => $registration->staff_id,
-                'status_id' => 4, // 4 = Đang thực hiện (theo bảng status)
-                'title' => $registration->title,
-                'start_date' => $registration->start_date,
-                'end_date' => $registration->end_date,
-                'color' => '#3788d8', // fallback màu xanh dương
-                'assigned_at' => new \yii\db\Expression('NOW()'),
-            ])->execute();
-
-            $transaction->commit();
-
-            $iStatus = 1;
-            Yii::$app->session->setFlash('success', 'Duyệt công việc thành công, phân công và lưu lịch vào calendar.');
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-            Yii::$app->session->setFlash('error', 'Duyệt công việc thất bại: ' . $e->getMessage());
-        }
-
-        //return $this->redirect(['index']);
-        return  $iStatus;
-    }
-
-
-
-
 
 
 }

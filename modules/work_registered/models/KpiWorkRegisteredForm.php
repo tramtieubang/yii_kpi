@@ -7,6 +7,7 @@ use app\models\KpiWorkAssignment;
 use app\models\KpiWorkRegistered;
 use app\models\KpiWorkRegisteredHistory;
 use app\models\KpiWorkRegisteredStatus;
+use app\models\KpiWorkReport;
 use app\models\Staff;
 use Yii;
 
@@ -47,14 +48,15 @@ class KpiWorkRegisteredForm extends KpiWorkRegistered
      * {@inheritdoc}
      */
     public function attributeLabels()
-    {
+    {       
         return [
-            'id' => 'ID',
+            'id' => 'Mã',
             'staff_id' => 'Nhân viên',
-            'kpi_id' => 'KPI',
-            'title' => 'Tiêu đề',
+            'kpi_id' => 'Chỉ tiêu KPI',
+            'title' => 'Tiêu đề công việc',
             'description' => 'Mô tả',
             'status_id' => 'Trạng thái',
+            'color' => 'Màu hiển thị',
             'start_date' => 'Ngày bắt đầu',
             'end_date' => 'Ngày kết thúc',
             'created_at' => 'Ngày tạo',
@@ -67,5 +69,12 @@ class KpiWorkRegisteredForm extends KpiWorkRegistered
         return $this->hasMany(KpiWorkRegisteredForm::class, ['staff_id'=>'staff_id']); // chỉ lấy công việc con
     }
 
+    public function hasAnyReport()
+    {
+        return KpiWorkReport::find()
+            ->innerJoin('kpi_work_assignment a', 'a.id = kpi_work_report.work_assignment_id')
+            ->where(['a.work_registered_id' => $this->id])
+            ->exists();
+    }
 
 }

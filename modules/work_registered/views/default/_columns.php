@@ -25,26 +25,9 @@ return [
     ], */
     [
         'class'=>'kartik\grid\ExpandRowColumn',
-        'width'=>'50px',
-        'value'=>function ($model, $key, $index, $column) {
-            return GridView::ROW_COLLAPSED;
-        },
-        'detail'=>function ($model, $key, $index, $column) {
-            // ❗ Đây là nơi gọi Grid con (_jobs_grid.php)
-            // $model là hàng cha hiện tại
-            //$jobs = $model->getJobs()->all(); // relation trong model KpiWorkRegisteredForm
-             
-           /*  $dataProvider = new ArrayDataProvider([
-                'allModels' => $jobs,
-                'pagination' => [
-                    'pageSize' => 10,
-                ],
-                'sort' => [
-                    'attributes' => ['start_date'],
-                    'defaultOrder' => ['start_date' => SORT_DESC], // giảm dần
-                ],
-            ]);  */
-
+        'width'=>'50px',        
+        'value' => fn() => GridView::ROW_COLLAPSED,
+        'detail'=>function ($model) {
             $searchModel = new KpiWorkRegisteredSearch();
             $searchModel->staff_id = $model->staff_id;  // hoặc lấy từ user login
 
@@ -58,9 +41,10 @@ return [
                 //'jobs' => $jobs,
                 'system' => $model, // thêm dòng này
                 'dataProvider' => $dataProvider,
+                'searchModel' => $searchModel,
             ]);
         },
-        'expandOneOnly'=>true,
+        'expandOneOnly'=>true,       
     ],
     [
         'class' => 'kartik\grid\SerialColumn',

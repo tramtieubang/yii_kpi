@@ -6,7 +6,7 @@ use yii\widgets\Pjax;
 /** @var $system app\models\AlSystems */
 
 Pjax::begin([
-    'id' => 'pjax-jobs-grid-' . $system->id,
+    'id' => 'pjax-jobs-grid-'. $system->id,
     'options' => ['class' => 'pjax-jobs-grid'],
     'timeout' => 5000,
 ]);

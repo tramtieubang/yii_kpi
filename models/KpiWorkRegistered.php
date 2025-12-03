@@ -9,10 +9,11 @@ use Yii;
  *
  * @property int $id ID công việc đăng ký
  * @property int $staff_id ID nhân viên
- * @property int $kpi_id ID KPI liên quan
+ * @property int|null $kpi_id ID KPI liên quan
  * @property string $title Tiêu đề công việc
  * @property string|null $description Mô tả công việc
  * @property int $status_id Trạng thái công việc
+ * @property string|null $color Màu lịch
  * @property string $start_date Ngày bắt đầu công việc
  * @property string|null $end_date Ngày kết thúc công việc
  * @property string|null $created_at Ngày tạo
@@ -26,8 +27,7 @@ use Yii;
  */
 class KpiWorkRegistered extends \yii\db\ActiveRecord
 {
-    // Thuộc tính ảo
-    public $isGroupedRow = false;
+
 
     /**
      * {@inheritdoc}
@@ -43,13 +43,15 @@ class KpiWorkRegistered extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['description', 'end_date'], 'default', 'value' => null],
+            [['kpi_id', 'description', 'end_date'], 'default', 'value' => null],
             [['status_id'], 'default', 'value' => 1],
-            [['staff_id', 'kpi_id', 'title', 'start_date'], 'required'],
+            [['color'], 'default', 'value' => '#3788d8'],
+            [['staff_id', 'title', 'start_date'], 'required'],
             [['staff_id', 'kpi_id', 'status_id'], 'integer'],
             [['description'], 'string'],
             [['start_date', 'end_date', 'created_at', 'updated_at'], 'safe'],
             [['title'], 'string', 'max' => 255],
+            [['color'], 'string', 'max' => 20],
             [['kpi_id'], 'exist', 'skipOnError' => true, 'targetClass' => KpiKpi::class, 'targetAttribute' => ['kpi_id' => 'id']],
             [['staff_id'], 'exist', 'skipOnError' => true, 'targetClass' => Staff::class, 'targetAttribute' => ['staff_id' => 'staff_id']],
             [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => KpiWorkRegisteredStatus::class, 'targetAttribute' => ['status_id' => 'id']],
@@ -68,8 +70,9 @@ class KpiWorkRegistered extends \yii\db\ActiveRecord
             'title' => 'Title',
             'description' => 'Description',
             'status_id' => 'Status ID',
-            'start_date' => 'Start date',
-            'end_date' => 'End date',
+            'color' => 'Color',
+            'start_date' => 'Start Date',
+            'end_date' => 'End Date',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];

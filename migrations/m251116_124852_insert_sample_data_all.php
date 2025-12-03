@@ -4,7 +4,7 @@ use yii\db\Migration;
 
 /**
  * m251116_124852_insert_sample_data_all
- * Chèn dữ liệu mẫu test toàn bộ hệ thống KPI, bao gồm positions, business_fields, department, staff, KPI, work, evaluation, report, summary
+ * Chèn dữ liệu mẫu test toàn bộ hệ thống KPI
  */
 class m251116_124852_insert_sample_data_all extends Migration
 {
@@ -77,7 +77,7 @@ class m251116_124852_insert_sample_data_all extends Migration
         }
 
         // -------------------------------
-        // 4️⃣ Chèn KPI và Formula
+        // 4️⃣ Tạo KPI + Formula
         // -------------------------------
         $kpis = ['Doanh số','CSKH','IT Support','Marketing','HR tuyển dụng','Sản xuất','R&D nghiên cứu','Logistics','Tài chính','Hành chính'];
         $kpiIds = [];
@@ -92,11 +92,11 @@ class m251116_124852_insert_sample_data_all extends Migration
                 'created_at' => $now,
                 'updated_at' => $now
             ]);
-            $kpiIds[] = (int)$db->getLastInsertID();
+            $kpiId = (int)$db->getLastInsertID();
+            $kpiIds[] = $kpiId;
 
-            // Formula
             $this->insert('{{%kpi_formula}}', [
-                'kpi_id' => $kpiIds[$index],
+                'kpi_id' => $kpiId,
                 'formula' => 'actual / target * weight',
                 'description' => "Công thức tính KPI $kpi"
             ]);
@@ -106,30 +106,50 @@ class m251116_124852_insert_sample_data_all extends Migration
         // 5️⃣ Work Registered + History
         // -------------------------------
         $workIds = [];
-        for ($i = 1; $i <= 10; $i++) {
-            $staffId = $staffIds[array_rand($staffIds)];
+        foreach ($staffIds as $i => $staffId) {
             $kpiId = $kpiIds[array_rand($kpiIds)];
+            $status = rand(1, 3);
+            $startDate = "2025-12-" . str_pad($i+1,2,'0',STR_PAD_LEFT) . " 08:00:00";
+            $endDate = "2025-12-" . str_pad($i+4,2,'0',STR_PAD_LEFT) . " 17:00:00";
 
             $this->insert('{{%kpi_work_registered}}', [
                 'staff_id' => $staffId,
                 'kpi_id' => $kpiId,
-                'title' => "Công việc đăng ký $i",
-                'description' => "Mô tả công việc $i",
-                'status_id' => rand(1, 3),
-                'start_date' => "2025-11-" . str_pad($i, 2, '0', STR_PAD_LEFT) . " 08:00:00",
-                'end_date' => "2025-11-" . str_pad($i + 3, 2, '0', STR_PAD_LEFT) . " 17:00:00",
+                'title' => "Công việc đăng ký ".($i+1),
+                'description' => "Mô tả công việc ".($i+1),
+                'status_id' => $status,
+                'color' => '#00a65a',
+                'start_date' => $startDate,
+                'end_date' => $endDate,
                 'created_at' => $now,
                 'updated_at' => $now
             ]);
             $workId = (int)$db->getLastInsertID();
             $workIds[] = $workId;
 
+            // -------------------------------
+            // Sửa: thêm staff_id để không vi phạm FK
             $this->insert('{{%kpi_work_registered_history}}', [
                 'work_registered_id' => $workId,
-                'title' => "Công việc đăng ký $i",
-                'description' => "Mô tả công việc $i",
-                'start_date' => "2025-11-" . str_pad($i, 2, '0', STR_PAD_LEFT) . " 08:00:00",
-                'end_date' => "2025-11-" . str_pad($i + 3, 2, '0', STR_PAD_LEFT) . " 17:00:00",
+                'staff_id' => $staffId,
+                'title' => "Công việc đăng ký ".($i+1),
+                'description' => "Mô tả công việc ".($i+1),
+                'color' => '#00a65a',
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'old_status' => null,
+                'new_status' => $status,
+                'old_data' => null,
+                'new_data' => json_encode([
+                    'staff_id' => $staffId,
+                    'kpi_id' => $kpiId,
+                    'title' => "Công việc đăng ký ".($i+1),
+                    'description' => "Mô tả công việc ".($i+1),
+                    'status_id' => $status,
+                    'color' => '#00a65a',
+                    'start_date' => $startDate,
+                    'end_date' => $endDate
+                ]),
                 'action_type' => 'create',
                 'updated_by' => $staffId,
                 'created_at' => $now
@@ -137,85 +157,54 @@ class m251116_124852_insert_sample_data_all extends Migration
         }
 
         // -------------------------------
-        // 6️⃣ Work Assignment + Calendar + Relation + Work Report + Work Result
+        // 6️⃣ Work Assignment + History
         // -------------------------------
-        $assignmentIds = [];
         foreach ($workIds as $i => $workId) {
             $staffId = $staffIds[array_rand($staffIds)];
+            $kpiId = $kpiIds[array_rand($kpiIds)];
+            $status = rand(1,6);
+            $startDate = "2025-12-" . str_pad($i+1,2,'0',STR_PAD_LEFT);
+            $endDate = "2025-12-" . str_pad($i+4,2,'0',STR_PAD_LEFT);
 
-            // Assignment            
             $this->insert('{{%kpi_work_assignment}}', [
                 'work_registered_id' => $workId,
                 'staff_id' => $staffId,
-                'status_id' => rand(1, 6),
+                'status_id' => $status,
                 'assigned_at' => $now,
-
                 'kpi_id' => $kpiId,
-                'title' => "Công việc đăng ký $i",
-                'description' => "Mô tả công việc $i",
-                'start_date' => "2025-11-" . str_pad($i, 2, '0', STR_PAD_LEFT) . " 08:00:00",
-                'end_date' => "2025-11-" . str_pad($i + 3, 2, '0', STR_PAD_LEFT) . " 17:00:00",
+                'title' => "Công việc đăng ký ".($i+1),
+                'description' => "Mô tả công việc ".($i+1),
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'color' => '#3788d8'
             ]);
             $assignmentId = (int)$db->getLastInsertID();
-            $assignmentIds[] = $assignmentId;
 
-            // ➕ INSERT LỊCH SỬ PHÂN CÔNG
+            // Sửa: thêm staff_id để không vi phạm FK
             $this->insert('{{%kpi_work_assignment_history}}', [
-                'assignment_id' => $assignmentId,
+                'work_assignment_id' => $assignmentId,
                 'staff_id' => $staffId,
-                'status_id' => rand(1, 6),
                 'kpi_id' => $kpiId,
-
-                'title' => "Công việc đăng ký $i",
-                'description' => "Mô tả công việc $i",
-
-                'start_date' => "2025-11-" . str_pad($i, 2, '0', STR_PAD_LEFT),
-                'end_date' => "2025-11-" . str_pad($i + 3, 2, '0', STR_PAD_LEFT),
-
+                'title' => "Công việc đăng ký ".($i+1),
+                'description' => "Mô tả công việc ".($i+1),
+                'start_date' => $startDate,
+                'end_date' => $endDate,
                 'color' => '#3788d8',
-                'assigned_at' => $now,
-
+                'old_status' => null,
+                'new_status' => $status,
+                'old_data' => null,
+                'new_data' => json_encode([
+                    'staff_id' => $staffId,
+                    'kpi_id' => $kpiId,
+                    'title' => "Công việc đăng ký ".($i+1),
+                    'description' => "Mô tả công việc ".($i+1),
+                    'status_id' => $status,
+                    'start_date' => $startDate,
+                    'end_date' => $endDate
+                ]),
                 'action_type' => 'create',
-                'updated_by' => null,
-                'created_at' => date('Y-m-d H:i:s'),
-            ]);
-        
-            // Calendar
-           /*  $this->insert('{{%kpi_work_calendar}}', [
-                'assignment_id' => $assignmentId,
-                'title' => "Công việc chính thức " . ($i + 1),
-                'start_time' => "2025-11-" . str_pad($i + 1, 2, '0', STR_PAD_LEFT) . " 08:00:00",
-                'end_time' => "2025-11-" . str_pad($i + 4, 2, '0', STR_PAD_LEFT) . " 17:00:00",
-                'color' => '#00FF00',
-                'is_all_day' => false
-            ]); */
-
-            // Work Relation
-            $this->insert('{{%kpi_work_relation}}', [
-                'kpi_id' => $kpiIds[array_rand($kpiIds)],
-                'assignment_id' => $assignmentId,
-                'weight' => rand(1, 10),
-                'target' => rand(50, 100),
-                'actual' => rand(10, 100)
-            ]);
-
-            // KPI Work Report
-            $this->insert('{{%kpi_work_report}}', [
-                'work_assignment_id' => $assignmentId,
-                'content' => "Nội dung báo cáo công việc " . ($i + 1),
-                'reported_at' => $now
-            ]);
-
-            // KPI Work Result
-            $this->insert('{{%kpi_work_result}}', [
-                'work_assignment_id' => $assignmentId,
-                'kpi_id' => $kpiIds[array_rand($kpiIds)],
-                'actual' => rand(10, 100),
-                'target' => rand(50, 100),
-                'weight' => rand(1, 10),
-                'score' => rand(50, 100),
-                'month' => 11,
-                'year' => 2025,
+                'updated_by' => $staffId,
+                'assigned_at' => $now,
                 'created_at' => $now
             ]);
         }
@@ -223,12 +212,12 @@ class m251116_124852_insert_sample_data_all extends Migration
         // -------------------------------
         // 7️⃣ KPI Evaluation
         // -------------------------------
-        foreach (range(1, 10) as $i) {
+        foreach ($staffIds as $i => $staffId) {
             $this->insert('{{%kpi_kpi_evaluation}}', [
                 'kpi_id' => $kpiIds[array_rand($kpiIds)],
-                'staff_id' => $staffIds[array_rand($staffIds)],
-                'score' => rand(50, 100) / 10,
-                'comment' => "Nhận xét KPI $i",
+                'staff_id' => $staffId,
+                'score' => rand(50,100)/10,
+                'comment' => "Nhận xét KPI ".($i+1),
                 'evaluated_at' => $now
             ]);
         }
@@ -240,10 +229,10 @@ class m251116_124852_insert_sample_data_all extends Migration
             $this->insert('{{%kpi_summary}}', [
                 'staff_id' => $staffId,
                 'year' => 2025,
-                'month' => 11,
-                'total_assignment' => rand(3, 10),
-                'total_completed' => rand(1, 10),
-                'kpi_score' => rand(60, 100),
+                'month' => 12,
+                'total_assignment' => rand(3,10),
+                'total_completed' => rand(1,10),
+                'kpi_score' => rand(60,100),
                 'created_at' => $now
             ]);
         }
@@ -252,11 +241,8 @@ class m251116_124852_insert_sample_data_all extends Migration
     public function safeDown()
     {
         $this->delete('{{%kpi_summary}}');
-        $this->delete('{{%kpi_work_result}}');
-        $this->delete('{{%kpi_work_report}}');
         $this->delete('{{%kpi_kpi_evaluation}}');
-        $this->delete('{{%kpi_work_relation}}');
-        //$this->delete('{{%kpi_work_calendar}}');
+        $this->delete('{{%kpi_work_assignment_history}}');
         $this->delete('{{%kpi_work_assignment}}');
         $this->delete('{{%kpi_work_registered_history}}');
         $this->delete('{{%kpi_work_registered}}');

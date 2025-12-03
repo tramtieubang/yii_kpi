@@ -187,6 +187,14 @@ class DefaultController extends Controller
                 }
 
                 return [
+                    'forceReload' => false,       // ✔ KHÔNG reload toàn bộ grid
+                    //'forceReload'=>'#crud-datatable-pjax', // PJAX Grid cha
+                    'forceReload'=>'#pjax-jobs-grid-'.$model->staff_id,
+                    'system_id' => $model->id,    // ✔ Gửi ID về để mở lại expand row
+                    'forceClose' => true,
+                    'tcontent' => 'Thêm mới thành công!'
+                ];
+               /*  return [
                     'forceReload'=>'#crud-datatable-pjax',
                     'title'=> "Thêm mới",
                     'content'=>'<span class="text-success">Thêm mới thành công</span>',
@@ -194,7 +202,7 @@ class DefaultController extends Controller
                     'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]).
                             Html::a('Tiếp tục thêm',['create'],['class'=>'btn btn-primary','role'=>'modal-remote'])
         
-                ];         
+                ];     */     
             }else{           
                 return [
                     'title'=> "Thêm mới",
@@ -251,20 +259,37 @@ class DefaultController extends Controller
             }else if($model->load($request->post()) && $model->save()){
             	if(Yii::$app->params['showView']){
                     return [
-                        'forceReload'=>'#crud-datatable-pjax',
+                        //'forceReload'=>'#crud-datatable-pjax',
+                        'forceReload' => false,       // ✔ KHÔNG reload toàn bộ grid
                         'title'=> "Cập nhật",
                         'content'=>$this->renderAjax('view', [
                             'model' => $model,
                         ]),
                         'tcontent'=>'Cập nhật thành công!',
+                        'system_id' => $model->id, // đây là key quan trọng
                         'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]).
                                 Html::a('Sửa',['update','id'=>$id],['class'=>'btn btn-primary','role'=>'modal-remote'])
                     ];    
                 }else{
-                	return ['forceClose'=>true,'forceReload'=>'#crud-datatable-pjax','tcontent'=>'Cập nhật thành công!',];
+                    return [
+                        'forceReload' => false,       // ✔ KHÔNG reload toàn bộ grid
+                        //'forceReload'=>'#crud-datatable-pjax', // PJAX Grid cha
+                        'forceReload'=>'#pjax-jobs-grid-'.$model->staff_id,
+                        'system_id' => $model->id,    // ✔ Gửi ID về để mở lại expand row
+                        'forceClose' => true,
+                        'tcontent' => 'Cập nhật thành công!'
+                    ];
+
+                	/* return [
+                        //'forceClose'=>true, 
+                        'forceReload'=>'#crud-datatable-pjax',
+                        'staff_id' => $model->staff_id, // đây là key quan trọng
+                        'tcontent'=>'Cập nhật thành công!',
+                    ]; */
                 }
             }else{
-                 return [
+                 return [                    
+                    'forceReload'=>'#crud-datatable-pjax',
                     'title'=> "Cập nhật",
                     'content'=>$this->renderAjax('update', [
                         'model' => $model,
@@ -307,7 +332,12 @@ class DefaultController extends Controller
             *   Process for ajax request
             */
             Yii::$app->response->format = Response::FORMAT_JSON;
-            return ['forceClose'=>true,'forceReload'=>'#crud-datatable-pjax'];
+            return [
+                'forceClose'=>true,
+                //'forceReload'=>'#crud-datatable-pjax',
+                'forceReload'=>'#pjax-jobs-grid-'.$model->staff_id,
+                'system_id' => $model->id,    // ✔ Gửi ID về để mở lại expand row
+            ];
         }else{
             /*
             *   Process for non-ajax request
@@ -344,9 +374,13 @@ class DefaultController extends Controller
             *   Process for ajax request
             */
             Yii::$app->response->format = Response::FORMAT_JSON;
-            return ['forceClose'=>true,'forceReload'=>'#crud-datatable-pjax',
-            			'tcontent'=>$delOk==true?'Xóa thành công!':('Không thể xóa:'.implode('</br>', $fList)),
-            ];
+            return [
+                'forceClose'=>true,
+                //'forceReload'=>'#crud-datatable-pjax',
+                'forceReload'=>'#pjax-jobs-grid-'.$model->staff_id,
+                'system_id' => $model->id,    // ✔ Gửi ID về để mở lại expand row
+                'tcontent'=>$delOk==true?'Xóa thành công!':('Không thể xóa:'.implode('</br>', $fList)),
+            ];           
         }else{
             /*
             *   Process for non-ajax request
@@ -372,7 +406,7 @@ class DefaultController extends Controller
         }
     }
 
-   public function actionHistoryDelete($id)
+    public function actionHistoryDelete($id)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
@@ -382,9 +416,16 @@ class DefaultController extends Controller
         }
 
         if($model->delete()){
-            return ['success' => true, 'message' => 'Đã xóa lịch sử.'];
+            return [
+                'success' => true, 
+                'message' => 'Đã xóa lịch sử.'
+            ];
+            
         } else {
-            return ['success' => false, 'message' => 'Xóa thất bại.'];
+            return [
+                'success' => false, 
+                'message' => 'Xóa thất bại.'
+            ];
         }
     }
 
