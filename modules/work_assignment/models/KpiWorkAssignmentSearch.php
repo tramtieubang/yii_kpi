@@ -84,6 +84,8 @@ class KpiWorkAssignmentSearch extends KpiWorkAssignmentForm
                 ->andFilterWhere(['like', 'description', $this->description])
                 ->andFilterWhere(['like', 'color', $this->color]);  
 
+            //$query->andFilterWhere(['!=', 'status_id', 2]);    
+
               // GỌI HÀM LỌC NGÀY
             $this->applyDateFilters($query);     
 		}
@@ -135,6 +137,8 @@ class KpiWorkAssignmentSearch extends KpiWorkAssignmentForm
             $query->andFilterWhere(['like', 'title', $this->title])
                 ->andFilterWhere(['like', 'description', $this->description])
                 ->andFilterWhere(['like', 'color', $this->color]);  
+
+            //$query->andFilterWhere(['!=', 'status_id', 2]); 
 
               // GỌI HÀM LỌC NGÀY
             $this->applyDateFilters($query);     

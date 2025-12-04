@@ -382,7 +382,7 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
                     //'type' => 'primary', 
                     //'heading' => '<i class="fas fa fa-list" aria-hidden="true"></i> Danh sách',
                     //'heading' => $this->render('//layouts\menus/gridview_heading'),
-                    'heading' => 'NHẬT KÝ CÔNG VIỆC ĐĂNG KÝ',
+                    'heading' => '<span style="color: #007bff;"><i class="fas fa-file-signature"></i> NHẬT KÝ CÔNG VIỆC ĐĂNG KÝ</span>',
                     'headingOptions' => ['class'=>'card-header'],
                     'before'=>'<em>* '.Html::encode($this->title).'</em>',
                     '<div class="clearfix"></div>',

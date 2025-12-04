@@ -18,7 +18,7 @@ use kartik\daterange\DateRangePicker;
 /* @var $searchModel app\modules\work_registered\models\KpiWorkRegisteredSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Quản lý danh sách';
+$this->title = 'Quản lý danh sách lịch chưa duyệt';
 $this->params['breadcrumbs'][] = $this->title;
 
 // Lấy danh sách nhân viên
@@ -383,7 +383,7 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
                     //'type' => 'primary', 
                     //'heading' => '<i class="fas fa fa-list" aria-hidden="true"></i> Danh sách',
                     //'heading' => $this->render('//layouts\menus/gridview_heading'),
-                    'heading' => '<span style="color: #007bff;"><i class="fas fa-clipboard-list"></i> NHẬT KÝ CÔNG VIỆC</span>',
+                    'heading' => '<span style="color: #f39c12;"><i class="fas fa-clipboard-list"></i> LỊCH CHƯA DUYỆT</span>',
                     'headingOptions' => ['class'=>'card-header'],
                     'before'=>'<em>* '.Html::encode($this->title).'</em>',
                     '<div class="clearfix"></div>',

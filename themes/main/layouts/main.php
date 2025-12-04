@@ -63,6 +63,7 @@ $csrfToken = Yii::$app->request->getCsrfToken();
 <?php $this->endBody() ?>
 
 <script>
+jQuery(function($){
 function checkSession() {
     $.ajax({
         url: <?= json_encode($checkSessionUrl) ?>,
@@ -85,6 +86,8 @@ checkSession();
 
 // Check session mỗi 30 giây
 setInterval(checkSession, 30000);
+
+});
 </script>
 
 </body>

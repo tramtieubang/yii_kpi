@@ -107,11 +107,19 @@ Yii::$app->params['showView'] = false;
 <?php Pjax::end(); ?>
 
 <script>
-$(document).on('hidden.bs.modal', '.modal', function() {
-    if ($('.modal.show').length > 0) {
-        $('body').addClass('modal-open');
-    }
-});
+    /* jQuery(function($){
+        $(document).on('hidden.bs.modal', '.modal', function() {
+            if ($('.modal.show').length > 0) {
+                $('body').addClass('modal-open');
+            }
+        });
+    }); */
+    document.addEventListener('hidden.bs.modal', function (event) {
+        const modals = document.querySelectorAll('.modal.show');
+        if (modals.length > 0) {
+            document.body.classList.add('modal-open');
+        }
+    });
 </script>
 
 <?php Modal::begin([

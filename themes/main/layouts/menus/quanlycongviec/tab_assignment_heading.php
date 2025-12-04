@@ -12,25 +12,25 @@ $menuItems = [
      [
         'label' => 'Lịch chưa duyệt',
         'icon' => 'fa-solid fa-calendar-days',
-        'url' => ['/work-assignment/calendar', 'menu'=>'cv1'],
-        'permission' => '/work-assignment/calendar/index',
-        'controller' => 'calendar',
+        'url' => ['/work-assignment/pending', 'menu'=>'cv4'],
+        'permission' => '/work-assignment/pending/index',
+        'controller' => 'pending',
         'actions' => ['index'],
         'dataMenu' => 'cv-calendar'
     ],
     [
         'label' => 'Lịch đã duyệt',
         'icon' => 'fa-solid fa-calendar-days',
-        'url' => ['/work-assignment/calendar', 'menu'=>'cv1'],
-        'permission' => '/work-assignment/calendar/index',
-        'controller' => 'calendar',
+        'url' => ['/work-assignment/calendar', 'menu'=>'cv4'],
+        'permission' => '/work-assignment/calendar1/index',
+        'controller' => 'calendar1',
         'actions' => ['index'],
-        'dataMenu' => 'cv-calendar'
+        'dataMenu' => 'cv-calendar1'
     ],
     [
         'label' => 'Nhật ký công việc',
         'icon' => 'fa-solid fa-history',
-        'url' => ['/work-assignment/default', 'menu'=>'cv1'],
+        'url' => ['/work-assignment/default', 'menu'=>'cv4'],
         'permission' => '/work-assignment/default/index',
         'controller' => 'default',
         'actions' => ['index'],
