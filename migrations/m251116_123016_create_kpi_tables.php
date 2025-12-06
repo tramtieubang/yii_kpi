@@ -125,6 +125,7 @@ class m251116_123016_create_kpi_tables extends Migration
             'old_data' => $this->text()->comment('Dữ liệu cũ dạng JSON'),
             'new_data' => $this->text()->comment('Dữ liệu mới dạng JSON'),
             'action_type' => $this->string(20)->defaultValue('update')->comment('Loại hành động'),
+            'reject_reason' => $this->text()->comment('Lý do từ chối'),
             'updated_by' => $this->integer()->comment('ID người thực hiện hành động'),
             'created_at' => $this->dateTime()->defaultExpression('CURRENT_TIMESTAMP')->comment('Thời gian tạo bản ghi lịch sử'),
         ], 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');

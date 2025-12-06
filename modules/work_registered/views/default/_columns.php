@@ -58,6 +58,30 @@ return [
         'label' => 'Phòng ban',
         'value' => fn($m) => $m->staff->department ? $m->staff->department->name : 'N/A',        
     ],  
+    [
+        'label' => 'Số lượng',
+        'value' => function ($m) {
+            $searchModel = new KpiWorkRegisteredSearch();
+            $searchModel->staff_id = $m->staff_id;
+
+            $postData = Yii::$app->request->post();
+            // Apply search
+            $dataProvider = $searchModel->searchChild($postData ?: Yii::$app->request->queryParams);
+
+            // Lấy tổng số bản ghi sau khi lọc
+            return $dataProvider->getTotalCount();
+         },
+        'format' => 'raw',
+
+        // ==== thêm width và căn giữa ====
+        'headerOptions' => [
+            'style' => 'width:100px; text-align:center; white-space:nowrap;',
+        ],
+        'contentOptions' => [
+            'style' => 'text-align:center; width:100px; font-weight:bold;',
+        ],
+    ]
+   
    /*  [
         'class' => 'kartik\grid\ActionColumn',
         'template' => '{view} {update} {delete}',

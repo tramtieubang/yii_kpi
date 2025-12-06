@@ -19,7 +19,7 @@ use yii\filters\AccessControl;
 /**
  * DefaultController implements the CRUD actions for KpiWorkAssignmentForm model.
  */
-class PendingController extends Controller
+class ApproveController extends Controller
 {
     /**
      * @inheritdoc
@@ -105,8 +105,7 @@ class PendingController extends Controller
 
             // Lưu thành công → Không đóng form, giữ nguyên form đang mở
             if($model->load($request->post())){
-            		
-                
+            		                
                 $oldModel = clone $model;
 
                 // $model->save()
@@ -116,7 +115,7 @@ class PendingController extends Controller
                 // Lấy màu từ bảng trạng thái hoặc mặc định
                 $statusModel = KpiWorkRegisteredStatus::findOne($model->status_id);
                 $model->color = $statusModel->color ?? '#3788d8';
-                CommonSQL::saveRegisteredHistory($oldModel, $model, 'Pending');
+                CommonSQL::saveRegisteredHistory($oldModel, $model, 'Approve');
 
                 // Luu lich chinh thuc tu lich dang ky
                 CommonSQL::approve($model);
@@ -124,10 +123,10 @@ class PendingController extends Controller
                 
                 //$modelAssignment = KpiWorkAssignmentForm::findOne($id);
                 $modelAssignment = KpiWorkAssignmentForm::findOne(['work_registered_id' => $model->id]);
-                CommonSQL::saveAssignmentHistory(null, $modelAssignment, 'Pending');  
+                CommonSQL::saveAssignmentHistory(null, $modelAssignment, 'Approve');  
 
                 return [
-                    'forceReload' => false,       // ✔ KHÔNG reload toàn bộ grid
+                    //'forceReload' => false,       // ✔ KHÔNG reload toàn bộ grid
                     //'forceReload'=>'#crud-datatable-pjax', // PJAX Grid cha
                     'forceReload'=>'#pjax-jobs-grid-'.$model->staff_id,
                     'system_id' => $model->id,    // ✔ Gửi ID về để mở lại expand row
@@ -136,34 +135,138 @@ class PendingController extends Controller
                 ];               
             }
 
-
         }
+       
+    }
 
-       /*  $model = KpiWorkRegisteredForm::findOne($id);
-        if (!$model) {
-            throw new NotFoundHttpException("Không tìm thấy công việc #$id");
-        }
+	public function actionReject($id)
+	{
+		$request = Yii::$app->request;
+		$model = $this->findModel($id);
 
-        $jobsDataProvider = new ActiveDataProvider([
-            'query' => KpiWorkAssignment::find()->where(['work_registered_id' => $id]),
-            'pagination' => false,
-        ]);
+		if ($request->isAjax) {
 
-        if (Yii::$app->request->isPost) {
-            $selectedJobs = Yii::$app->request->post('selectedJobs', []);
-            // Duyệt các công việc đã chọn
-            if ($selectedJobs) {
-                KpiWorkAssignment::updateAll(['status_id' => KpiWorkAssignmentStatus::APPROVED], ['id' => $selectedJobs]);
-                Yii::$app->session->setFlash('success', 'Duyệt thành công!');
-                return $this->redirect(['index']); // hoặc PJAX reload 
+			Yii::$app->response->format = Response::FORMAT_JSON;
+
+			/** ======================
+			 *  CASE 1: Hiển thị form
+			 *  ====================== */
+			if ($request->isGet) {
+				return [
+					'title'   => 'Từ chối',
+					'content' => $this->renderAjax('reject', [
+						'model' => $model,
+					]),
+					'footer' =>
+						Html::button('Đóng lại', [
+							'class' => 'btn btn-default pull-left',
+							'data-bs-dismiss' => "modal"
+						]) .
+						Html::button('<i class="fas fa-times-circle text-danger"></i> Từ chối', [
+							'class' => 'btn btn-warning',
+							'type'  => "submit"
+						]),
+				];
+			}
+
+			/** ======================
+			 *  CASE 2: Submit form
+			 *  ====================== */
+			if ($request->post()) {
+				//dd($model);
+				$oldModel = clone $model;
+
+				// Lý do từ chối từ textarea
+				$rejectReason = $request->post('reject_reason');
+
+				// Cập nhật trạng thái
+				$model->status_id = 3;
+				$model->save(false);
+
+				// Cập nhật màu trạng thái
+				$statusModel = KpiWorkRegisteredStatus::findOne($model->status_id);
+				$model->color = $statusModel->color ?? '#3788d8';
+
+				// Lưu lịch sử
+				CommonSQL::saveRegisteredHistory($oldModel, $model, 'reject', [
+					'reject_reason' => $rejectReason
+				]);
+
+				// TRẢ VỀ JSON ĐÚNG CHUẨN
+				return [
+					'forceClose' => true,
+					'forceReload' => '#pjax-jobs-grid-' . $model->staff_id,
+					'system_id' => $model->id
+				];
+			}
+
+			/** ======================
+			 *  CASE 3: load() thất bại → render lại form để tránh lỗi ModalRemote
+			 *  ====================== */
+			return [
+				'title'   => 'Từ chối',
+				'content' => $this->renderAjax('reject', [
+					'model' => $model,
+				]),
+				'footer' =>
+					Html::button('Đóng lại', [
+						'class' => 'btn btn-default pull-left',
+						'data-bs-dismiss' => "modal"
+					]) .
+					Html::button('<i class="fas fa-times-circle text-danger"></i> Từ chối', [
+						'class' => 'btn btn-warning',
+						'type'  => "submit"
+					]),
+			];
+		}
+	}
+
+	public function actionCustomApprove($staff_id)
+    {
+        //$request = Yii::$app->request;
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+       // Lấy danh sách ID được chọn
+        $pks = array_filter(explode(',', Yii::$app->request->post('pks', '')), 'strlen');
+
+        //dd($pks);
+        // ✔ Xử lý duyệt
+        foreach ($pks as $pk) {
+            $model = $this->findModel($pk);
+            $old   = clone $model;
+
+            try {
+                $model->status_id = 2;
+                $model->save(false);
+
+                // màu
+                $status = KpiWorkRegisteredStatus::findOne($model->status_id);
+                $model->color = $status->color ?? '#3788d8';
+
+                // lưu lịch sử
+                CommonSQL::saveRegisteredHistory($old, $model, 'Approve');
+                CommonSQL::approve($model);
+
+                // lưu lịch sử phân công
+                $assign = KpiWorkAssignmentForm::findOne(['work_registered_id' => $model->id]);
+                if ($assign) {
+                    CommonSQL::saveAssignmentHistory(null, $assign, 'Approve');
+                }
+
+            } catch (\Throwable $e) {
+                Yii::error($e->getMessage());
+                return [
+                    'forceReload' => '#pjax-jobs-grid-' . $staff_id,
+                    'tcontent'    => '<span class="text-danger">Lỗi xử lý!</span>',
+                ];
             }
         }
 
-        return $this->render('update', [
-            'model' => $model,
-            'jobsDataProvider' => $jobsDataProvider,
-        ]);
-     */
+        return [
+            'forceReload' => '#pjax-jobs-grid-' . $staff_id,
+            'tcontent' => 'Duyệt thành công'
+        ];
+            
     }
 
     protected function findModel($id)
@@ -173,6 +276,26 @@ class PendingController extends Controller
             throw new \yii\web\NotFoundHttpException("Không tìm thấy công việc #$id");
         }
         return $model;
+    }
+
+    public function actionFilter()
+    {
+        $searchModel = new KpiWorkRegisteredSearch();
+
+        // Lấy dữ liệu POST
+        $postData = Yii::$app->request->post();
+
+        // Truyền dữ liệu POST vào search model
+        $dataProvider = $searchModel->search($postData ?: Yii::$app->request->queryParams);
+
+        //dd($dataProvider);
+
+        // Render view cùng searchModel và dataProvider
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            //'sql' => $sql,
+        ]);
     }
 
 

@@ -28,7 +28,7 @@ class DefaultController extends Controller
     			'class' => 'webvimark\modules\UserManagement\components\GhostAccessControl',
         		],
     			'verbs' => [
-    				'class' => VerbFilter::className(),
+    				'class' => VerbFilter::class,
     				'actions' => [
     					'delete' => ['POST'],
                         'history-delete' => ['POST'], // add this

@@ -42,23 +42,64 @@ use yii\web\JqueryAsset;
 
 <!-- CARD: ĐĂNG KÝ CÔNG VIỆC -->
 <div class="card kpi-card shadow-sm">
-    <h4 class="fw-bold mb-3">Đăng ký công việc</h4>
+    <h4 class="fw-bold mb-3">Thông tin công việc</h4>
     <div class="row g-2">
 
         <!-- Nhân viên -->
         <div class="col-md-6 kpi-form-field">
-            <?= $form->field($model, 'staff_id', [
-                'template' => '{label}<div class="input-group">{input}<button class="btn btn-outline-primary btn-add" role="modal-remote-2" data-url="'.Url::to(['/staff/default/create']).'" data-target="#ajaxCrudModal2" data-pjax="0"><i class="fa fa-plus"></i></button></div>{error}'
-            ])->widget(Select2::class, [
-                'data' => ArrayHelper::map(StaffForm::find()->all(), 'staff_id', fn($m) => $m->staff_id.' - '.$m->name),
-                'options' => [
-                    'placeholder' => 'Chọn nhân viên...',
-                ],
-                'pluginOptions' => [
-                    'allowClear' => true,
-                    'dropdownParent' => new JsExpression("$('#ajaxCrudModal .modal-body')")
-                ]
-            ]) ?>
+            <?php
+                // Cach 1: disabled
+               /*  echo $form->field($model, 'staff_id', [
+                    'template' => '{label}<div class="input-group">{input}<button class="btn btn-outline-primary btn-add" role="modal-remote-2" data-url="'.Url::to(['/staff/default/create']).'" data-target="#ajaxCrudModal2" data-pjax="0"><i class="fa fa-plus"></i></button></div>{error}'
+                ])->widget(Select2::class, [
+                    'data' => ArrayHelper::map(StaffForm::find()->all(), 'staff_id', fn($m) => $m->staff_id.' - '.$m->name),
+                    'options' => [
+                        'placeholder' => 'Chọn nhân viên...',
+                        'disabled' => true,
+                    ],
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'dropdownParent' => new JsExpression("$('#ajaxCrudModal .modal-body')")
+                    ]
+                ]); 
+                // 'disabled' => true dung Hidden input để submit vào controller    
+                echo Html::hiddenInput('KpiWorkRegisteredForm[staff_id]', $model->staff_id);  */        
+             
+                // Cach 2: readonly
+                echo $form->field($model, 'staff_id', [
+                    'template' =>
+                        '{label}
+                        <div class="input-group">
+                            {input}
+                            <button class="btn btn-outline-primary btn-add"
+                                role="modal-remote-2"
+                                data-url="' . Url::to(['/staff/default/create']) . '"
+                                data-target="#ajaxCrudModal2"
+                                data-pjax="0">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
+                        {error}',
+                ])->widget(Select2::class, [
+                    'data' => ArrayHelper::map(
+                        StaffForm::find()->all(),
+                        'staff_id',
+                        fn($m) => $m->staff_id . ' - ' . $m->name
+                    ),
+                    'options' => [
+                        'placeholder' => 'Chọn nhân viên...',
+                        'readonly' => true,   // KHÔNG disable
+                    ],
+                    'pluginEvents' => [
+                        // Chặn không cho mở dropdown
+                        "select2:opening" => "function(e){ e.preventDefault(); }",
+                    ],
+                    'pluginOptions' => [
+                        'allowClear' => false,
+                        'dropdownParent' => new JsExpression("$('#ajaxCrudModal .modal-body')")
+                    ]
+                ]);
+            ?>                 
         </div>
 
         <!-- KPI -->
@@ -67,7 +108,9 @@ use yii\web\JqueryAsset;
                 'template' => '{label}<div class="input-group">{input}<button class="btn btn-outline-primary btn-add" role="modal-remote-3" data-url="'.Url::to(['/kpi/default/create']).'" data-target="#ajaxCrudModal3" data-pjax="0"><i class="fa fa-plus"></i></button></div>{error}'
             ])->widget(Select2::class, [
                 'data' => ArrayHelper::map(KpiKpiForm::find()->all(), 'id', fn($m) => $m->id.' - '.$m->name),
-                'options' => ['placeholder' => 'Chọn KPI...'],
+                'options' => [
+                    'placeholder' => 'Chọn KPI...',
+                ],
                 'pluginOptions' => [
                     'allowClear' => true,
                     'dropdownParent' => new JsExpression("$('#ajaxCrudModal .modal-body')")
@@ -116,16 +159,23 @@ use yii\web\JqueryAsset;
                 });
 
                 echo $form->field($model, 'status_id')->widget(Select2::class, [
-                    'options' => ['placeholder' => 'Chọn trạng thái...'],
                     'data' => $data,
+                    'options' => [
+                        'placeholder' => 'Chọn trạng thái...',
+                        'readonly' => true,   // KHÔNG disable
+                    ],   
+                    'pluginEvents' => [
+                        // Chặn không cho mở dropdown
+                        "select2:opening" => "function(e){ e.preventDefault(); }",
+                    ],                                   
                     'pluginOptions' => [
                         'escapeMarkup' => new JsExpression('function(markup) { return markup; }'),
-                        'allowClear' => true,
                         'width' => '100%',
                         'templateResult' => new JsExpression('function(item) { return item.text; }'),
                         'templateSelection' => new JsExpression('function(item) { return item.text; }'),
                         'dropdownParent' => new JsExpression("$('#ajaxCrudModal .modal-body')")
                     ],
+
                 ]);
 
             ?>
@@ -144,7 +194,7 @@ use yii\web\JqueryAsset;
 </div>
 
 <!-- LỊCH SỬ CÔNG VIỆC -->
-<div class="card shadow-sm rounded-3 p-4 mb-3 bg-white">
+<!-- <div class="card shadow-sm rounded-3 p-4 mb-3 bg-white">
     <h4 class="mb-3 fw-semibold">Lịch sử công việc</h4>
     <table class="table table-bordered table-hover align-middle mb-0">
         <thead class="table-light">
@@ -180,7 +230,7 @@ use yii\web\JqueryAsset;
         <?php endforeach; ?>
         </tbody>
     </table>
-</div>
+</div> -->
 
 <?php ActiveForm::end(); ?>
 

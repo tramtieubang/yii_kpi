@@ -11,7 +11,7 @@ JqueryAsset::register($this);
 /** @var $dataProvider yii\data\ActiveDataProvider */
 
 Pjax::begin([
-    'id' => 'pjax-jobs-grid-' . $system->id,
+    'id' => 'pjax-jobs-grid-' . $system->staff_id,
     'timeout' => 5000,
 ]);
 ?>
@@ -47,7 +47,7 @@ Pjax::begin([
         [
             'attribute' => 'start_date',
             'format' => ['datetime', 'php:d/m/Y h:i A'],
-        ],
+        ],         
         [
             'attribute' => 'end_date',
             'format' => ['datetime', 'php:d/m/Y h:i A'],

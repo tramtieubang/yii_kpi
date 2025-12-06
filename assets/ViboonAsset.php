@@ -34,7 +34,7 @@ class ViboonAsset extends AssetBundle
     public $js = [
         'assets/plugins/bootstrap/popper.min.js',
         'assets/plugins/perfect-scrollbar/perfect-scrollbar.min.js',
-        'assets/plugins/perfect-scrollbar/p-scroll-1.js',
+        'assets/plugins/perfect-scrollbar/p-scroll.js',
         'assets/plugins/sidemenu/sidemenu.js',
         'assets/plugins/sidebar/sidebar.js',
         'assets/js/sticky.js',

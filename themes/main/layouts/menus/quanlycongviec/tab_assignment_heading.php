@@ -12,21 +12,12 @@ $menuItems = [
      [
         'label' => 'Lịch chưa duyệt',
         'icon' => 'fa-solid fa-calendar-days',
-        'url' => ['/work-assignment/pending', 'menu'=>'cv4'],
-        'permission' => '/work-assignment/pending/index',
-        'controller' => 'pending',
+        'url' => ['/work-assignment/approve', 'menu'=>'cv4'],
+        'permission' => '/work-assignment/approve/index',
+        'controller' => 'approve',
         'actions' => ['index'],
         'dataMenu' => 'cv-calendar'
-    ],
-    [
-        'label' => 'Lịch đã duyệt',
-        'icon' => 'fa-solid fa-calendar-days',
-        'url' => ['/work-assignment/calendar', 'menu'=>'cv4'],
-        'permission' => '/work-assignment/calendar1/index',
-        'controller' => 'calendar1',
-        'actions' => ['index'],
-        'dataMenu' => 'cv-calendar1'
-    ],
+    ],    
     [
         'label' => 'Nhật ký công việc',
         'icon' => 'fa-solid fa-history',
@@ -93,7 +84,7 @@ $menuItems = [
     <?php if (PermissionHelper::check($item['permission']) == 1): ?>
         <?php 
             // Chỉ active nếu module + controller + action khớp
-            $active = ($currentModule == 'work-registered' 
+            $active = ($currentModule == 'work-assignment' 
                        && $currentController == $item['controller'] 
                        && in_array($currentAction, $item['actions'] ?? ['index']))
                       ? ' active' 

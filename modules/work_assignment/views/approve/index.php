@@ -424,7 +424,7 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
         }
     });    
 
-    jQuery(function ($) {
+jQuery(function ($) {
 
     $(document).on('ajaxComplete', function (event, xhr) {
         let response;

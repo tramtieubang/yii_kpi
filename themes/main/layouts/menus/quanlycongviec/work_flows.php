@@ -25,9 +25,9 @@ use yii\helpers\Html;
                                         <?= Html::a('<i class="fe fe-clipboard"></i> Đăng ký công việc', ['/work-registered/register', 'menu'=>'cv1'], ['class' => 'slide-item', 'data-menu' => 'cv1']) ?>
                                     </li>
                                 <?php endif; ?>                               
-                                <?php if (PermissionHelper::check('work-assignment/default')): ?>
+                                <?php if (PermissionHelper::check('work-assignment/approve')): ?>
                                     <li>
-                                        <?= Html::a('<i class="fe fe-thumbs-up"></i> Phê duyệt và phân công việc', ['/work-assignment/default', 'menu'=>'cv4'], ['class' => 'slide-item', 'data-menu' => 'cv4']) ?>
+                                        <?= Html::a('<i class="fe fe-thumbs-up"></i> Phê duyệt và phân công việc', ['/work-assignment/approve', 'menu'=>'cv4'], ['class' => 'slide-item', 'data-menu' => 'cv4']) ?>
                                     </li>
                                 <?php endif; ?>                                
                                  <?php if (PermissionHelper::check('kpi/default')): ?>

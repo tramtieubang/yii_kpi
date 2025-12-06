@@ -16,34 +16,50 @@ class CommonSQL
      * @param string $action  Loại hành động: create/update/delete
      * @return bool
      */
-    public static function saveRegisteredHistory($oldModel, $newModel, $action = 'update')
+    public static function saveRegisteredHistory($oldModel, $newModel, $action = 'update', $extra = [])
     {
         $history = new KpiWorkRegisteredHistory();
 
+        // ====== Thông tin cơ bản ======
         $history->work_registered_id = $newModel->id;
         $history->staff_id = $newModel->staff_id;
         $history->kpi_id = $newModel->kpi_id;
 
-        // Snapshot từ bản mới
+        // ====== Snapshot dữ liệu ======
         $history->title = $newModel->title;
         $history->description = $newModel->description;
         $history->start_date = $newModel->start_date;
-        $history->end_date = $newModel->end_date;  
+        $history->end_date = $newModel->end_date;
+        $history->color = $newModel->color ?? ($newModel->status->color ?? '#3788d8');
 
-        $history->color = $newModel->status->color;
-        
-         // Trạng thái cũ / mới
+        // ====== Old / New status ======
         $history->old_status = $oldModel ? $oldModel->status_id : null;
         $history->new_status = $newModel->status_id;
 
-        // JSON dữ liệu cũ và mới
-        $history->old_data = $oldModel ? json_encode($oldModel->getAttributes(), JSON_UNESCAPED_UNICODE) : null;
-        $history->new_data = json_encode($newModel->getAttributes(), JSON_UNESCAPED_UNICODE);   
+        // ====== JSON dữ liệu cũ ======
+        $history->old_data = $oldModel
+            ? json_encode($oldModel->getAttributes(), JSON_UNESCAPED_UNICODE)
+            : null;
 
-        // Loại hành động
+        // ====== JSON dữ liệu mới ======
+        $newData = $newModel->getAttributes();
+
+        // Gộp thêm dữ liệu bổ sung vào JSON nếu có
+        if (!empty($extra) && is_array($extra)) {
+            $newData = array_merge($newData, $extra);
+        }
+
+        $history->new_data = json_encode($newData, JSON_UNESCAPED_UNICODE);
+
+        // ====== Gán reject_reason nếu có ======
+        if (isset($extra['reject_reason'])) {
+            $history->reject_reason = $extra['reject_reason'];
+        }
+
+        // ====== Action ======
         $history->action_type = $action;
 
-        // Người thao tác
+        // ====== User thao tác ======
         $history->updated_by = Yii::$app->user->id ?? null;
 
         return $history->save(false);
@@ -85,13 +101,17 @@ class CommonSQL
         return $history->save(false);
     }
    
-    public static function approve($id)
+    public static function approve($registration)
     {
         $iStatus = 0;
 
-        $registration = KpiWorkRegisteredForm::findOne($id);
+        // Nếu truyền vào là ID → lấy model
+        if (is_numeric($registration)) {
+            $registration = KpiWorkRegisteredForm::findOne($registration);
+        }
 
-        if (!$registration) {
+        // Kiểm tra model hợp lệ
+        if (!$registration instanceof KpiWorkRegisteredForm) {
             throw new NotFoundHttpException("Không tìm thấy công việc đăng ký này.");
         }
 

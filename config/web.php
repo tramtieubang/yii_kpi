@@ -48,6 +48,19 @@ $config = [
     ],
 
     'components' => [
+        /* ======================
+         * FORMATTER — QUAN TRỌNG CHIN NGAY HGIO
+         * ====================== */
+        'formatter' => [
+            'class' => 'yii\i18n\Formatter',
+            'defaultTimeZone' => 'Asia/Ho_Chi_Minh',
+            'timeZone' => 'Asia/Ho_Chi_Minh',
+            'locale' => 'vi-VN',
+            'dateFormat' => 'php:d/m/Y',
+            'datetimeFormat' => 'php:d/m/Y H:i',
+            'timeFormat' => 'php:H:i',
+        ],
+
         'i18n' => [
             'translations' => [
                 'user-management*' => [
