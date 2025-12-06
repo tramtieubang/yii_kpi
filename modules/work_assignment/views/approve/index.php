@@ -468,55 +468,6 @@ jQuery(function ($) {
 });
 
 
-
-
-
-
-
-// Khi modal đóng
-/* $(document).on('hidden.bs.modal', '.modal', function () {
-    if ($('.modal.show').length > 0) {
-        $('body').addClass('modal-open'); // giữ scroll
-    }
-}); */
-
-/* jQuery(function($) {
-    // ✅ Lắng nghe mọi AJAX phản hồi (khi thêm/sửa/xóa)
-    $(document).on('ajaxComplete', function (event, xhr) {
-        let response;
-        try {
-            response = JSON.parse(xhr.responseText);
-        } catch (e) {
-            return; // Không phải JSON, bỏ qua
-        }
-
-        // ✅ Nếu có systemId → chỉ reload ExpandRow tương ứng
-        if (response.system_id) {
-            const $row = $('tr[data-key="' + response.system_id + '"]');
-
-            // Nếu hàng đang expand thì reload nội dung con
-            if ($row.hasClass('kv-state-expanded')) {
-                const $expandCell = $row.next('.kv-expand-detail-row');
-                const $expandContainer = $expandCell.find('.kv-detail-content');
-
-                if ($expandContainer.length) {
-                    $.pjax.reload({
-                        container: $expandContainer.find('.pjax-jobs-grid').attr('id'),
-                        async: false
-                    });
-                } else {
-                    // Nếu không có PJAX con, fallback: đóng mở lại
-                    const expandBtn = $row.find('.kv-expand-icon');
-                    expandBtn.click();
-                    setTimeout(() => expandBtn.click(), 600);
-                }
-            }
-        }
-
-    });
-}); */
-
-
 </script>
 
 <?php Modal::begin([

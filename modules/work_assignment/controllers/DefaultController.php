@@ -40,6 +40,9 @@ class DefaultController extends Controller
      */
     public function actionIndex()
     {    
+        // Cap nhat tre han
+        $this->actionUpdateOverdue();
+
         $searchModel = new KpiWorkAssignmentSearch();
   		if(isset($_POST['search']) && $_POST['search'] != null){
             $dataProvider = $searchModel->search(Yii::$app->request->post(), $_POST['search']);
@@ -336,4 +339,25 @@ class DefaultController extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+
+    /**
+     * Cập nhật trạng thái công việc trễ hạn
+    */
+    public function actionUpdateOverdue()
+    {
+        $now = date('Y-m-d H:i:s');
+
+        $overdueJobs = KpiWorkAssignmentForm::find()
+            ->where(['status_id' => 1]) // 1 = Chưa hoàn thành
+            ->andWhere(['<', 'end_date', $now])
+            ->all();
+
+        foreach ($overdueJobs as $job) {
+            $job->status_id = 3; // 3 = Trễ hạn
+            $job->save(false); // không validate
+        }
+
+        //echo count($overdueJobs) . " công việc được đánh dấu trễ hạn.\n";
+    }
+
 }

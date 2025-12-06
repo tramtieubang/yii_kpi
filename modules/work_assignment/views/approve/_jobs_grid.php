@@ -11,19 +11,11 @@ use yii\widgets\Pjax;
 
 Pjax::begin([
     'id' => 'pjax-jobs-grid-' . $system->staff_id,
+    'options' => ['class' => 'pjax-jobs-grid'],
     'timeout' => 5000,
 ]);
 ?>
-    <?php $form = ActiveForm::begin([
-        'id'=>'form_jobs_grid'. $system->staff_id,
-        'method'=>'post',
-        'action'=>['filter'],
-        'options'=>[
-            'class'=>'inline-filter',
-            'id'=>'filterForm'
-        ],
-    ]); ?>   
-
+ 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h6 class="text-primary mb-0">
         <i class="fas fa-user"></i> Nhân viên: <?= Html::encode($system->staff->name) ?>
@@ -82,7 +74,7 @@ Pjax::begin([
             'template' => '{view} {approve} {reject}',
             'width' => '110px',
             'buttons' => [
-                'view' => fn($url, $model) => Html::a('<i class="fas fa-eye"></i>', ['/work-assignment/approve/view', 'id' => $model->id], [
+                /* 'view' => fn($url, $model) => Html::a('<i class="fas fa-eye"></i>', ['/work-assignment/approve/view', 'id' => $model->id], [
                     'class' => 'btn btn-primary btn-sm', 'role' => 'modal-remote', 'title' => 'Xem chi tiết'
                 ]),
                 'approve' => fn($url, $model) => Html::a('<i class="fas fa-edit"></i>', ['/work-assignment/approve/update', 'id' => $model->id], [
@@ -91,6 +83,27 @@ Pjax::begin([
                 'reject' => fn($url, $model) => Html::a('<i class="fas fa-times-circle"></i>', ['/work-assignment/approve/reject', 'id' => $model->id], [
                     'class' => 'btn btn-sm btn-outline-warning', 'role' => 'modal-remote', 'title' => 'Từ chối'
                 ]),
+ */
+                'view' => function($url, $model, $key) {
+                    return Html::a('<i class="fas fa-eye"></i>', ['/work-assignment/approve/view', 'id' => $model->id], [
+                        'class' => 'btn btn-primary btn-sm',
+                        'role' => 'modal-remote',
+                        'title' => 'Xem chi tiết',
+                        'data-bs-toggle' => 'tooltip',
+                        'data-bs-placement' => 'top',
+                    ]);
+                },
+                'approve' => fn($url, $model) => Html::a('<i class="fas fa-edit"></i>', ['/work-assignment/approve/update', 'id' => $model->id], [
+                    'class' => 'btn btn-sm btn-outline-success',
+                    'role' => 'modal-remote',
+                    'title' => 'Duyệt',
+                ]),
+                'reject' => fn($url, $model) => Html::a('<i class="fas fa-times-circle"></i>', ['/work-assignment/approve/reject', 'id' => $model->id], [
+                    'class' => 'btn btn-sm btn-outline-warning',
+                    'role' => 'modal-remote',
+                    'title' => 'Từ chối',
+                ]),
+
             ],
             'contentOptions' => ['class' => 'text-center'],
         ],
@@ -105,8 +118,6 @@ Pjax::begin([
     'striped' => false,
     'hover' => true,
 ]) ?>
-
-<?php ActiveForm::end(); ?>
 
 <?php Pjax::end(); ?>
 
@@ -129,7 +140,8 @@ jQuery(function($){
     });
 
     // NÚT DUYỆT TÙY CHỌN    
-    $(document).off('click').on('click', '#btn-custom-approve', function(e){
+    //$(document).off('click').on('click', '#btn-custom-approve', function(e){
+    $(document).off('click', '#btn-custom-approve').on('click', '#btn-custom-approve', function(e){    
          e.preventDefault();
 
         let url = $(this).data('url');
@@ -142,7 +154,7 @@ jQuery(function($){
                 icon: 'warning',
                 title: 'Chưa chọn công việc!',
                 text: 'Vui lòng chọn ít nhất một công việc.',
-                timer: 3000,
+                timer: 2000,
                 showConfirmButton: false
             });
             return;
@@ -158,7 +170,7 @@ jQuery(function($){
                         icon: 'success',
                         title: 'Thành công!',
                         text: response.tcontent, // nếu muốn hiện thêm nội dung từ server
-                        timer: 3000,
+                        timer: 2000,
                         showConfirmButton: false
                     });
                 }
@@ -168,7 +180,13 @@ jQuery(function($){
                 }
             },
             error: function(){
-                alert('Lỗi khi gửi dữ liệu!');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi!',
+                    text: 'Gửi dữ liệu thất bại.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
             }
         });
     });

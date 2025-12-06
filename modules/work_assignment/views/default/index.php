@@ -501,6 +501,23 @@ jQuery(function($) {
 });
 ");
 
+// Thong bao cong viec tre han
+/* $this->registerJs(<<<JS
+    $(document).on('pjax:success', function(){
+        $.get('/work-assignment/check-overdue', function(response){
+            if(response.count > 0){
+                Swal.fire({
+                    icon: 'warning',
+                    title: response.count + ' công việc trễ hạn!',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            }
+        }, 'json');
+    });
+JS
+); */
+
 ?>
 
 <?php 
