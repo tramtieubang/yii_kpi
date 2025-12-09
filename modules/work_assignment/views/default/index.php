@@ -255,7 +255,7 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
                         ';
                     }
 
-                    echo $form->field($searchModel, 'staff_id')->label(false)->widget(Select2::classname(), [
+                    echo $form->field($searchModel, 'staff_id')->label(false)->widget(Select2::class, [
                         'options' => ['placeholder' => 'Chọn nhân viên....'],
                         'data' => $data,
                         'pluginOptions' => [
@@ -313,7 +313,7 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
                         return $markup;
                     });
 
-                    echo $form->field($searchModel, 'status_id')->label(false)->widget(Select2::classname(), [
+                    echo $form->field($searchModel, 'status_id')->label(false)->widget(Select2::class, [
                         'options' => ['placeholder' => 'Chọn trạng thái...'],
                         'data' => $data,
                         'pluginOptions' => [
