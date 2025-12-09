@@ -2,7 +2,9 @@
 
 namespace app\modules\work_assignment\controllers;
 
-use Yii;
+use app\common\helpers\CommonSQL;
+use app\models\KpiWorkRegistered;
+use app\models\KpiWorkRegisteredHistory;
 use app\modules\work_assignment\models\KpiWorkAssignmentForm;
 use app\modules\work_assignment\models\KpiWorkAssignmentSearch;
 use yii\web\Controller;
@@ -11,6 +13,7 @@ use yii\filters\VerbFilter;
 use \yii\web\Response;
 use yii\helpers\Html;
 use yii\filters\AccessControl;
+use Yii;
 
 /**
  * DefaultController implements the CRUD actions for KpiWorkAssignmentForm model.
@@ -26,7 +29,7 @@ class DefaultController extends Controller
     			'class' => 'webvimark\modules\UserManagement\components\GhostAccessControl',
         		],
     			'verbs' => [
-    				'class' => VerbFilter::className(),
+    				'class' => VerbFilter::class,
     				'actions' => [
     					'delete' => ['POST'],
     				],
@@ -43,6 +46,8 @@ class DefaultController extends Controller
         // Cap nhat tre han
         $this->actionUpdateOverdue();
 
+        //dd(date('Y-m-d H:i:s'));
+
         $searchModel = new KpiWorkAssignmentSearch();
   		if(isset($_POST['search']) && $_POST['search'] != null){
             $dataProvider = $searchModel->search(Yii::$app->request->post(), $_POST['search']);
@@ -58,7 +63,6 @@ class DefaultController extends Controller
         ]);
     }
 
-
     /**
      * Displays a single KpiWorkAssignmentForm model.
      * @param integer $id
@@ -70,12 +74,12 @@ class DefaultController extends Controller
         if($request->isAjax){
             Yii::$app->response->format = Response::FORMAT_JSON;
             return [
-                    'title'=> "KpiWorkAssignmentForm",
+                    'title'=> "Xem",
                     'content'=>$this->renderAjax('view', [
                         'model' => $this->findModel($id),
                     ]),
                     'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]).
-                            Html::a('Sửa',['update','id'=>$id],['class'=>'btn btn-primary','role'=>'modal-remote'])
+                            Html::a('Sửa',['update', 'id'=>$id, 'fromView'=>1],['class'=>'btn btn-primary','role'=>'modal-remote'])
                 ];    
         }else{
             return $this->render('view', [
@@ -131,36 +135,61 @@ class DefaultController extends Controller
      * and for non-ajax request if creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($staff_id = null)
     {
         $request = Yii::$app->request;
         $model = new KpiWorkAssignmentForm();  
+
+        // Nếu tạo mới thì gán staff_id từ tham số
+        if ($staff_id !== null) {
+            $model->staff_id = $staff_id;
+        }
+
 
         if($request->isAjax){
             /*
             *   Process for ajax request
             */
             Yii::$app->response->format = Response::FORMAT_JSON;
-            if($request->isGet){
+            
+            // ------------ HIỂN THỊ FORM TẠO -------------
+            if ($request->isGet) {
                 return [
-                    'title'=> "Thêm mới",
-                    'content'=>$this->renderAjax('create', [
+                    'title' => 'Phân công việc',
+                    'content' => $this->renderAjax('create', [
                         'model' => $model,
+                        'isUpdate' => false,
                     ]),
-                    'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]).
-                                Html::button('Lưu lại',['class'=>'btn btn-primary','type'=>"submit"])
-        
-                ];         
-            }else if($model->load($request->post()) && $model->save()){
+                    'footer' =>
+                        Html::button('Đóng', ['class' => 'btn btn-default pull-left', 'data-bs-dismiss' => 'modal']) .
+                        Html::button('Lưu lại', ['class' => 'btn btn-primary', 'type' => 'submit'])
+                ];
+            }
+            // ------------- LƯU DỮ LIỆU ---------------
+            else if($model->load($request->post()) && $model->save()){
+
+                // lấy bản ghi đã lưu chính xác
+                 $saved = KpiWorkAssignmentForm::findOne(['id' => $model->id]);
+
+                // Lưu lịch sử
+                CommonSQL::saveAssignmentHistory(null, $saved, 'create');
+    
+                // Đếm lại số dòng grid con
+                $searchModel = new KpiWorkAssignmentSearch();
+                $searchModel->staff_id = $staff_id;
+                $dataProvider = $searchModel->searchChild(Yii::$app->request->queryParams);
+                $count = $dataProvider->getTotalCount();
+
                 return [
-                    'forceReload'=>'#crud-datatable-pjax',
-                    'title'=> "Thêm mới",
-                    'content'=>'<span class="text-success">Thêm mới thành công</span>',
-                    'tcontent'=>'Thêm mới thành công!',
-                    'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]).
-                            Html::a('Tiếp tục thêm',['create'],['class'=>'btn btn-primary','role'=>'modal-remote'])
-        
-                ];         
+                    //'forceReload' => false,       // ✔ KHÔNG reload toàn bộ grid
+                    'forceReload'=>'#pjax-jobs-grid-'.$staff_id,
+                    'newCount' => $count,
+                    'staff_id'  => $staff_id,
+                    'system_id' => $model->id,    // ✔ Gửi ID về để mở lại expand row
+                    'forceClose' => true,
+                    'tcontent'=>'Phân công việc thành công!',
+                ];
+         
             }else{           
                 return [
                     'title'=> "Thêm mới",
@@ -200,6 +229,8 @@ class DefaultController extends Controller
         $request = Yii::$app->request;
         $model = $this->findModel($id);       
 
+        $fromView = $request->get('fromView', 0);
+
         if($request->isAjax){
             /*
             *   Process for ajax request
@@ -215,19 +246,28 @@ class DefaultController extends Controller
                                 Html::button('Lưu lại',['class'=>'btn btn-primary','type'=>"submit"])
                 ];         
             }else if($model->load($request->post()) && $model->save()){
-            	if(Yii::$app->params['showView']){
+            	if ($fromView == 1) {
+                    // ⭐ Trường hợp vào từ form VIEW                     
                     return [
-                        'forceReload'=>'#crud-datatable-pjax',
-                        'title'=> "Cập nhật",
-                        'content'=>$this->renderAjax('view', [
+                        'forceReload'=>'#pjax-jobs-grid-'.$model->staff_id,  
+                        'system_id'   => $model->staff_id,              // ⭐ ID để mở lại expand row
+                        'title'       => "Cập nhật",
+                        'content'     => $this->renderAjax('view', [
                             'model' => $model,
                         ]),
-                        'tcontent'=>'Cập nhật thành công!',
-                        'footer'=> Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]).
-                                Html::a('Sửa',['update','id'=>$id],['class'=>'btn btn-primary','role'=>'modal-remote'])
-                    ];    
+                        'tcontent'    => 'Cập nhật thành công!',
+                        'footer'      => Html::button('Đóng lại',['class'=>'btn btn-default pull-left','data-bs-dismiss'=>"modal"]) .
+                                        Html::a('Sửa',['update','id'=>$id, 'fromView'=>1],['class'=>'btn btn-primary','role'=>'modal-remote'])
+                    ];  
                 }else{
-                	return ['forceClose'=>true,'forceReload'=>'#crud-datatable-pjax','tcontent'=>'Cập nhật thành công!',];
+                	return [
+                       
+                        'forceReload' => false,       // ✔ KHÔNG reload toàn bộ grid
+                        'forceReload'=>'#pjax-jobs-grid-'.$model->staff_id,
+                        'system_id' => $model->staff_id,    // ✔ Gửi ID về để mở lại expand row
+                        'forceClose' => true,
+                        'tcontent'=>'Cập nhật công việc phân công việc thành công!',
+                    ];                    
                 }
             }else{
                  return [
@@ -264,24 +304,95 @@ class DefaultController extends Controller
     public function actionDelete($id)
     {
         $request = Yii::$app->request;
-        $model = $this->findModel($id);
 
+        // ==============================
+        // 1. Lấy model phân công (ActiveRecord)
+        // ==============================
+        $model = $this->findModel($id); // KpiWorkAssignment
+        $staff_id = $model->staff_id;
+        $registeredId = $model->work_registered_id; // có thể null nếu phân công độc lập
+
+        // ==============================
+        // 2. Lưu snapshot phân công trước khi xóa (dùng để ghi lịch sử)
+        // ==============================
+        $oldRegistered = KpiWorkRegistered::findOne($registeredId);
+
+        // ==============================
+        // 3. XÓA PHÂN CÔNG
+        // ==============================
         $model->delete();
 
-        if($request->isAjax){
-            /*
-            *   Process for ajax request
-            */
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            return ['forceClose'=>true,'forceReload'=>'#crud-datatable-pjax'];
-        }else{
-            /*
-            *   Process for non-ajax request
-            */
-            return $this->redirect(['index']);
+        // ==============================
+        // 4. Nếu phân công liên kết với đăng ký -> khôi phục trạng thái + lưu lịch sử
+        // ==============================
+        if ($registeredId) {
+
+            // 4a. Lấy model đăng ký
+            $registered = KpiWorkRegistered::findOne($registeredId);
+
+            if ($registered) {
+                // 4b. Khôi phục trạng thái đăng ký từ lịch sử
+                $newregistered = $this->restoreRegisteredStatus($registeredId);
+
+                // 4c. Ghi lịch sử đăng ký với action_type = 'unassign'
+                CommonSQL::saveRegisteredHistory($oldRegistered, $newregistered, 'unassign');
+            } else {
+                // Không tìm thấy đăng ký, chỉ log warning
+                Yii::warning("Phân công #{$id} liên kết với đăng ký #{$registeredId} nhưng không tìm thấy bản ghi đăng ký.");
+            }
         }
 
+        // ==============================
+        // 5. Trả kết quả về giao diện
+        // ==============================
+        if ($request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
 
+            $searchModel = new KpiWorkAssignmentSearch();
+            $searchModel->staff_id = $staff_id;
+            $count = $searchModel->searchChild(Yii::$app->request->queryParams)->getTotalCount();
+
+            return [
+                'forceClose' => true,
+                'forceReload' => '#pjax-jobs-grid-' . $staff_id,
+                'newCount' => $count,
+                'staff_id' => $staff_id,
+                'tcontent' => 'Hủy phân công việc thành công!',
+            ];
+        }
+
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * Khôi phục trạng thái đăng ký công việc dựa trên lịch sử gần nhất trước khi phân công
+     *
+     * @param int $registeredId ID của công việc đăng ký
+     * @return KpiWorkRegistered|null Trả về model đăng ký sau khi restore, hoặc null nếu không tìm thấy
+    */
+    protected function restoreRegisteredStatus($registeredId)
+    {
+        // 1. Tìm bản ghi lịch sử gần nhất trước khi trạng thái được phân công (assigned)
+        $lastHistory = KpiWorkRegisteredHistory::find()
+            ->where(['work_registered_id' => $registeredId])
+            ->andWhere(['action_type' => 'assign']) // hoặc action_type phù hợp nếu bạn dùng assign/unassign
+            ->orderBy(['id' => SORT_DESC])
+            ->one();
+
+        // 2. Nếu có lịch sử, khôi phục trạng thái cũ
+        if ($lastHistory) {
+            $registered = KpiWorkRegistered::findOne($registeredId);
+            if ($registered) {
+                $registered->status_id = $lastHistory->old_status;
+                $registered->save(false);
+
+                return $registered;
+            }
+        }
+
+        // 3. Nếu không có lịch sử hoặc không tìm thấy bản ghi đăng ký
+        Yii::warning("Không thể restore trạng thái cho đăng ký #{$registeredId}. Lịch sử phân công không tìm thấy.");
+        return null;
     }
 
      /**
@@ -345,8 +456,27 @@ class DefaultController extends Controller
     */
     public function actionUpdateOverdue()
     {
+     
+        // khong duyet for
         $now = date('Y-m-d H:i:s');
 
+        $count = KpiWorkAssignmentForm::updateAll(
+            ['status_id' => 3],
+            [
+                'and',
+                ['or',
+                    ['status_id' => 1],
+                    ['status_id' => 4]
+                ],
+                new \yii\db\Expression("DATE(end_date) < :now", ['now' => $now])
+            ]
+        );
+
+        return $count;
+
+       // echo $count . " công việc được đánh dấu trễ hạn.";
+
+        /* 
         $overdueJobs = KpiWorkAssignmentForm::find()
             ->where(['status_id' => 1]) // 1 = Chưa hoàn thành
             ->andWhere(['<', 'end_date', $now])
@@ -355,8 +485,7 @@ class DefaultController extends Controller
         foreach ($overdueJobs as $job) {
             $job->status_id = 3; // 3 = Trễ hạn
             $job->save(false); // không validate
-        }
-
+        } */
         //echo count($overdueJobs) . " công việc được đánh dấu trễ hạn.\n";
     }
 

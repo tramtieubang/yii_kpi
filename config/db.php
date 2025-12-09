@@ -11,4 +11,9 @@ return [
     //'enableSchemaCache' => true,
     //'schemaCacheDuration' => 60,
     //'schemaCache' => 'cache',
+
+    'attributes' => [
+        PDO::MYSQL_ATTR_INIT_COMMAND => "SET time_zone = '+07:00'",
+    ],
+
 ];

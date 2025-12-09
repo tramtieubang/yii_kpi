@@ -121,12 +121,13 @@ class KpiWorkRegisteredSearch extends KpiWorkRegisteredForm
 
         $this->load($params);
 
+        // Nếu không truyền gì hoặc params rỗng → trả về toàn bộ data
+
         if (!$this->validate()) {
             return $dataProvider;
         }
         
         if ($customSearch != null) {
-
             $query->andFilterWhere([
                 'OR',
                 ['like', 'title', $customSearch],

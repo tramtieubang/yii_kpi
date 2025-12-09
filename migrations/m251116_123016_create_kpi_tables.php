@@ -142,7 +142,7 @@ class m251116_123016_create_kpi_tables extends Migration
         // -------------------------------
         $this->createTable('{{%kpi_work_assignment}}', [
             'id' => $this->primaryKey()->comment('ID phân công'),
-            'work_registered_id' => $this->integer()->notNull()->comment('ID công việc đăng ký'),
+            'work_registered_id' => $this->integer()->comment('ID công việc đăng ký'),
             'staff_id' => $this->integer()->notNull()->comment('ID nhân viên được phân công'),
             'status_id' => $this->integer()->notNull()->defaultValue(1)->comment('Trạng thái phân công'),
             'kpi_id' => $this->integer()->comment('ID KPI liên quan'),
@@ -156,7 +156,16 @@ class m251116_123016_create_kpi_tables extends Migration
             'updated_at' => $this->dateTime()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')->comment('Ngày cập nhật'),
         ], 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
 
-        $this->addForeignKey('fk_assignment_registered','{{%kpi_work_assignment}}','work_registered_id','{{%kpi_work_registered}}','id','CASCADE');
+        $this->addForeignKey(
+            'fk_work_assign_registered',
+            '{{%kpi_work_assignment}}',
+            'work_registered_id',
+            '{{%kpi_work_registered}}',
+            'id',
+            'SET NULL',  // nếu bản đăng ký bị xóa -> phân công không bị lỗi
+            'CASCADE'
+        );
+
         $this->addForeignKey('fk_assignment_staff','{{%kpi_work_assignment}}','staff_id','{{%staff}}','staff_id','CASCADE');
         $this->addForeignKey('fk_assignment_status','{{%kpi_work_assignment}}','status_id','{{%kpi_work_assignment_status}}','id','CASCADE');
         $this->addForeignKey('fk_assignment_kpi','{{%kpi_work_assignment}}','kpi_id','{{%kpi_kpi}}','id','SET NULL');

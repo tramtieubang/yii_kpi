@@ -33,7 +33,7 @@ $menuItems = [
         'url' => ['/work-registered/default', 'menu'=>'cv1'],
         'permission' => '/work-registered/default/index',
         'controller' => 'default',
-        'actions' => ['index'],
+        'actions' => ['index', 'filter'],
         'dataMenu' => 'cv-default'
     ],
 ];
@@ -95,7 +95,7 @@ $menuItems = [
             // Chỉ active nếu module + controller + action khớp
             $active = ($currentModule == 'work-registered' 
                        && $currentController == $item['controller'] 
-                       && in_array($currentAction, $item['actions'] ?? ['index']))
+                       && in_array($currentAction, $item['actions'] ?? ['index', 'filter']))
                       ? ' active' 
                       : '';
         ?>

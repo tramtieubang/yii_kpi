@@ -30,18 +30,23 @@ return [
         'detail'=>function ($model) {
             $searchModel = new KpiWorkRegisteredSearch();
             $searchModel->staff_id = $model->staff_id;  // hoặc lấy từ user login
-
+           
+           /* $searchModel = KpiWorkRegisteredSearch::find()
+                    ->where(['staff_id' => $model->staff_id])
+                    ->one(); 
+ */
             // Lấy dữ liệu POST
             $postData = Yii::$app->request->post();
 
             // Truyền dữ liệu POST vào search model
             $dataProvider = $searchModel->searchChild($postData ?: Yii::$app->request->queryParams); 
 
+            //dd($dataProvider);
             return $this->render('_jobs_grid', [
                 //'jobs' => $jobs,
                 'system' => $model, // thêm dòng này
                 'dataProvider' => $dataProvider,
-                'searchModel' => $searchModel,
+                //'searchModel' => $searchModel,
             ]);
         },
         'expandOneOnly'=>true,       
@@ -59,18 +64,28 @@ return [
         'value' => fn($m) => $m->staff->department ? $m->staff->department->name : 'N/A',        
     ],  
     [
-        'label' => 'Số lượng',
+        'label' => 'Số công việc',
         'value' => function ($m) {
             $searchModel = new KpiWorkRegisteredSearch();
             $searchModel->staff_id = $m->staff_id;
-
-            $postData = Yii::$app->request->post();
+            
+            /* $searchModel = KpiWorkRegisteredSearch::find()
+                    ->where(['staff_id' => $m->staff_id])
+                    ->one();
+  */
+             $postData = Yii::$app->request->post();
             // Apply search
             $dataProvider = $searchModel->searchChild($postData ?: Yii::$app->request->queryParams);
 
             // Lấy tổng số bản ghi sau khi lọc
-            return $dataProvider->getTotalCount();
-         },
+            //return $dataProvider->getTotalCount();
+            $count = $dataProvider->getTotalCount();
+
+            // GÁN ID CHO Ô
+            return "<span id='soluong_{$m->staff_id}' class='soluong-cell'>{$count}</span>";
+    
+        },
+
         'format' => 'raw',
 
         // ==== thêm width và căn giữa ====

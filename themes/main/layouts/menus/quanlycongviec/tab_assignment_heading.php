@@ -15,7 +15,7 @@ $menuItems = [
         'url' => ['/work-assignment/approve', 'menu'=>'cv4'],
         'permission' => '/work-assignment/approve/index',
         'controller' => 'approve',
-        'actions' => ['index'],
+        'actions' => ['index', 'filter'],
         'dataMenu' => 'cv-calendar'
     ],    
     [
@@ -24,7 +24,7 @@ $menuItems = [
         'url' => ['/work-assignment/default', 'menu'=>'cv4'],
         'permission' => '/work-assignment/default/index',
         'controller' => 'default',
-        'actions' => ['index'],
+        'actions' => ['index', 'filter'],
         'dataMenu' => 'cv-default'
     ],
 ];
@@ -86,7 +86,7 @@ $menuItems = [
             // Chỉ active nếu module + controller + action khớp
             $active = ($currentModule == 'work-assignment' 
                        && $currentController == $item['controller'] 
-                       && in_array($currentAction, $item['actions'] ?? ['index']))
+                       && in_array($currentAction, $item['actions'] ?? ['index', 'filter']))
                       ? ' active' 
                       : '';
         ?>

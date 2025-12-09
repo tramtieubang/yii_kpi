@@ -44,16 +44,15 @@ class KpiWorkAssignment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['kpi_id', 'description'], 'default', 'value' => null],
+            [['work_registered_id','kpi_id', 'description'], 'default', 'value' => null],
             [['status_id'], 'default', 'value' => 1],
             [['color'], 'default', 'value' => '#3788d8'],
-            [['work_registered_id', 'staff_id', 'start_date', 'end_date', 'title'], 'required'],
+            [['staff_id', 'start_date', 'end_date', 'title'], 'required'],
             [['work_registered_id', 'staff_id', 'status_id', 'kpi_id'], 'integer'],
             [['start_date', 'end_date', 'assigned_at'], 'safe'],
             [['description'], 'string'],
             [['title'], 'string', 'max' => 255],
             [['color'], 'string', 'max' => 20],
-            [['work_registered_id'], 'exist', 'skipOnError' => true, 'targetClass' => KpiWorkRegistered::class, 'targetAttribute' => ['work_registered_id' => 'id']],
             [['staff_id'], 'exist', 'skipOnError' => true, 'targetClass' => Staff::class, 'targetAttribute' => ['staff_id' => 'staff_id']],
             [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => KpiWorkAssignmentStatus::class, 'targetAttribute' => ['status_id' => 'id']],
         ];
@@ -79,6 +78,11 @@ class KpiWorkAssignment extends \yii\db\ActiveRecord
         ];
     }
 
+    public function getKpi()
+    {
+        return $this->hasOne(KpiKpi::class, ['id' => 'kpi_id']);
+    }
+    
     /**
      * Gets query for [[KpiWorkRelations]].
      *

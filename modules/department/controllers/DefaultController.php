@@ -189,7 +189,7 @@ class DefaultController extends Controller
                 ];         
             }
             
-             // Lưu thành công → Không đóng form, giữ nguyên form đang mở
+            // Lưu thành công → Không đóng form, giữ nguyên form đang mở
             if($model->load($request->post()) && $model->save()){
             	if(Yii::$app->params['showView']){
                     return [

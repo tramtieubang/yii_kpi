@@ -56,6 +56,12 @@ class KpiWorkRegisteredSearch extends KpiWorkRegisteredForm
             ],
         ]);
 
+        // 1️⃣ Nếu có yêu cầu trả data rỗng
+        /* if (isset($params['empty']) && $params['empty'] === true) {
+            $query->where('0=1'); // trả về 0 bản ghi
+            return $dataProvider;
+        } */
+
         $this->load($params);
 
         if (!$this->validate()) {

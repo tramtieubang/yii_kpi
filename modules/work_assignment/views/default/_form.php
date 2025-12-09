@@ -42,10 +42,36 @@ use yii\web\JqueryAsset;
 
 <!-- CARD: ĐĂNG KÝ CÔNG VIỆC -->
 <div class="card kpi-card shadow-sm">
-    <h4 class="fw-bold mb-3">Đăng ký công việc</h4>
+    <h4 class="fw-bold mb-3">
+        <?php if ($model->isNewRecord): ?>
+            <h4>Phân công công việc mới</h4>
+        <?php else: ?>
+            <h4>Cập nhật công việc</h4>
+        <?php endif; ?>
+    </h4>
+    
     <div class="row g-2">
 
         <!-- Nhân viên -->
+       <!--  <div class="col-md-6 kpi-form-field">
+            <?= $form->field($model, 'staff_id', [
+                'template' => '{label}<div class="input-group">{input}<button class="btn btn-outline-primary btn-add" role="modal-remote-2" data-url="'.Url::to(['/staff/default/create']).'" data-target="#ajaxCrudModal2" data-pjax="0"><i class="fa fa-plus"></i></button></div>{error}'
+            ])->widget(Select2::class, [
+                'data' => ArrayHelper::map(StaffForm::find()->all(), 'staff_id', fn($m) => $m->staff_id.' - '.$m->name),
+                'options' => [
+                    'placeholder' => 'Chọn nhân viên...',
+                ],
+                'pluginOptions' => [
+                    'allowClear' => true,
+                    'dropdownParent' => new JsExpression("$('#ajaxCrudModal .modal-body')")
+                ]
+            ]) ?>
+        </div> -->
+
+        <?php 
+            $isCreate = $model->isNewRecord;   // true nếu đang CREATE
+        ?>
+
         <div class="col-md-6 kpi-form-field">
             <?= $form->field($model, 'staff_id', [
                 'template' => '{label}<div class="input-group">{input}<button class="btn btn-outline-primary btn-add" role="modal-remote-2" data-url="'.Url::to(['/staff/default/create']).'" data-target="#ajaxCrudModal2" data-pjax="0"><i class="fa fa-plus"></i></button></div>{error}'
@@ -53,6 +79,9 @@ use yii\web\JqueryAsset;
                 'data' => ArrayHelper::map(StaffForm::find()->all(), 'staff_id', fn($m) => $m->staff_id.' - '.$m->name),
                 'options' => [
                     'placeholder' => 'Chọn nhân viên...',
+                    'value' => $isCreate ? $model->staff_id : $model->staff_id,  
+                    // CREATE = gán staff_id truyền vào
+                    // UPDATE = dùng staff_id từ DB
                 ],
                 'pluginOptions' => [
                     'allowClear' => true,
@@ -115,6 +144,7 @@ use yii\web\JqueryAsset;
 </div>
 
 <!-- LỊCH SỬ CÔNG VIỆC -->
+<?php if (!$model->isNewRecord): ?>
 <div class="card shadow-sm rounded-3 p-4 mb-3 bg-white">
     <h4 class="mb-3 fw-semibold">Lịch sử công việc</h4>
     <table class="table table-bordered table-hover align-middle mb-0">
@@ -152,6 +182,7 @@ use yii\web\JqueryAsset;
         </tbody>
     </table>
 </div>
+<?php endif; ?>
 
 <?php ActiveForm::end(); ?>
 

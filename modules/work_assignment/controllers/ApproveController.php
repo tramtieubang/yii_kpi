@@ -4,11 +4,10 @@ namespace app\modules\work_assignment\controllers;
 
 use app\common\helpers\CommonSQL;
 use app\models\KpiWorkRegisteredStatus;
-use app\models\KpiWorkRegistered;
 use app\modules\work_assignment\models\KpiWorkAssignmentForm;
-use Yii;
 use app\modules\work_assignment\models\KpiWorkRegisteredSearch;
 use app\modules\work_registered\models\KpiWorkRegisteredForm;
+use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -115,7 +114,7 @@ class ApproveController extends Controller
                 // Lấy màu từ bảng trạng thái hoặc mặc định
                 $statusModel = KpiWorkRegisteredStatus::findOne($model->status_id);
                 $model->color = $statusModel->color ?? '#3788d8';
-                CommonSQL::saveRegisteredHistory($oldModel, $model, 'Approve');
+                CommonSQL::saveRegisteredHistory($oldModel, $model, 'assign');
 
                 // Luu lich chinh thuc tu lich dang ky
                 CommonSQL::approve($model);
@@ -123,18 +122,24 @@ class ApproveController extends Controller
                 
                 //$modelAssignment = KpiWorkAssignmentForm::findOne($id);
                 $modelAssignment = KpiWorkAssignmentForm::findOne(['work_registered_id' => $model->id]);
-                CommonSQL::saveAssignmentHistory(null, $modelAssignment, 'Approve');  
+                CommonSQL::saveAssignmentHistory(null, $modelAssignment, 'assign');  
+                
+                // Đếm lại số dòng grid con
+                $searchModel = new KpiWorkRegisteredSearch();
+                $searchModel->staff_id = $model->staff_id;
+                $dataProvider = $searchModel->searchChild(Yii::$app->request->queryParams);
+                $count = $dataProvider->getTotalCount();
 
                 return [
                     //'forceReload' => false,       // ✔ KHÔNG reload toàn bộ grid
-                    //'forceReload'=>'#crud-datatable-pjax', // PJAX Grid cha
                     'forceReload'=>'#pjax-jobs-grid-'.$model->staff_id,
+                    'newCount' => $count,
+                    'staff_id'  => $model->staff_id,
                     'system_id' => $model->id,    // ✔ Gửi ID về để mở lại expand row
                     'forceClose' => true,
-                    'tcontent' => 'Duyệt thành công!' 
-                ];               
+                    'tcontent' => 'Duyệt thành công!',
+                ];
             }
-
         }
        
     }
@@ -244,13 +249,13 @@ class ApproveController extends Controller
                 $model->color = $status->color ?? '#3788d8';
 
                 // lưu lịch sử
-                CommonSQL::saveRegisteredHistory($old, $model, 'Approve');
+                CommonSQL::saveRegisteredHistory($old, $model, 'assign');
                 CommonSQL::approve($model);
 
                 // lưu lịch sử phân công
                 $assign = KpiWorkAssignmentForm::findOne(['work_registered_id' => $model->id]);
                 if ($assign) {
-                    CommonSQL::saveAssignmentHistory(null, $assign, 'Approve');
+                    CommonSQL::saveAssignmentHistory(null, $assign, 'assign');
                 }
 
             } catch (\Throwable $e) {
@@ -262,11 +267,24 @@ class ApproveController extends Controller
             }
         }
 
+
+
+         // Đếm lại số dòng grid con
+        $searchModel = new KpiWorkRegisteredSearch();
+        $searchModel->staff_id = $model->staff_id;
+        $dataProvider = $searchModel->searchChild(Yii::$app->request->queryParams);
+        $count = $dataProvider->getTotalCount();
+        /* return [                    
+            'system_id' => $model->id,    // ✔ Gửi ID về để mở lại expand row
+            'forceClose' => true,
+        ]; */
+
         return [
             'forceReload' => '#pjax-jobs-grid-' . $staff_id,
+            'newCount' => $count,
+            'staff_id'  => $staff_id,                    
             'tcontent' => 'Duyệt thành công'
-        ];
-            
+        ];            
     }
 
     protected function findModel($id)
@@ -279,24 +297,32 @@ class ApproveController extends Controller
     }
 
     public function actionFilter()
-    {
-        $searchModel = new KpiWorkRegisteredSearch();
+{
+    $searchModel = new KpiWorkRegisteredSearch();
 
-        // Lấy dữ liệu POST
-        $postData = Yii::$app->request->post();
+    // Lấy dữ liệu POST
+    $postData = Yii::$app->request->post();
 
-        // Truyền dữ liệu POST vào search model
-        $dataProvider = $searchModel->search($postData ?: Yii::$app->request->queryParams);
+    // Nếu POST rỗng → không làm gì hết, chỉ render view mặc định
+    if (empty($postData)) {
+        // Lấy data mặc định theo query hoặc không lọc gì
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        //dd($dataProvider);
-
-        // Render view cùng searchModel và dataProvider
         return $this->render('index', [
-            'searchModel' => $searchModel,
+            'searchModel'  => $searchModel,
             'dataProvider' => $dataProvider,
-            //'sql' => $sql,
         ]);
     }
+
+    // Nếu có POST → thực hiện filter
+    $dataProvider = $searchModel->search($postData);
+
+    return $this->render('index', [
+        'searchModel'  => $searchModel,
+        'dataProvider' => $dataProvider,
+    ]);
+}
+
 
 
 } // end class

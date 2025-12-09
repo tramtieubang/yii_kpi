@@ -5,9 +5,9 @@ namespace app\modules\work_registered\controllers;
 use app\common\helpers\CommonSQL;
 use app\models\KpiWorkRegisteredHistory;
 use app\models\KpiWorkRegisteredStatus;
-use Yii;
-use app\modules\work_registered\models\KpiWorkRegisteredForm;
 use app\modules\work_registered\models\KpiWorkRegisteredSearch;
+use app\modules\work_registered\models\KpiWorkRegisteredForm;
+use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -106,13 +106,36 @@ class DefaultController extends Controller
 
     public function actionFilter()
     {
+        // Tạo search model
         $searchModel = new KpiWorkRegisteredSearch();
+
+        // Lấy toàn bộ params (POST ưu tiên, nếu rỗng thì dùng GET)
+        $params = Yii::$app->request->post();
+        if (empty($params)) {
+            $params = Yii::$app->request->queryParams;
+        }
+
+        // Xử lý tìm kiếm
+        $dataProvider = $searchModel->search($params);
+
+        return $this->render('index', [
+            'searchModel'  => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+    
+    public function actionFilter1()
+    {
+        $searchModel = new KpiWorkRegisteredSearch();
+        //$searchModel = new KpiWorkRegisteredSearch(['staff_id' => $model->staff_id]);
 
         // Lấy dữ liệu POST
         $postData = Yii::$app->request->post();
 
         // Truyền dữ liệu POST vào search model
         $dataProvider = $searchModel->search($postData ?: Yii::$app->request->queryParams);
+
+        dd($dataProvider);
 
         /* @var \yii\db\ActiveQuery $query */ // giúp IDE nhận dạng
     /*  $query = $dataProvider->query;
@@ -125,8 +148,8 @@ class DefaultController extends Controller
         echo "SQL= ".$query->createCommand()->getRawSql(); // SQL thực thi
         echo "</pre>";
 
-        Yii::info(print_r($dataProvider->getModels(), true), __METHOD__); */
-
+        Yii::info(print_r($dataProvider->getModels(), true), __METHOD__); 
+*/
         // ========================
         
         // Nếu muốn debug dữ liệu thực tế:
@@ -138,7 +161,7 @@ class DefaultController extends Controller
         // exit;
 
         // Render view cùng searchModel và dataProvider
-        return $this->render('index', [
+        return $this->render('index', [            
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             //'sql' => $sql,
@@ -186,10 +209,18 @@ class DefaultController extends Controller
                     CommonSQL::approve($model->id);
                 }
 
+                 // Đếm lại số dòng grid con
+                $searchModel = new KpiWorkRegisteredSearch();
+                $searchModel->staff_id = $staff_id;
+                $dataProvider = $searchModel->searchChild(Yii::$app->request->queryParams);
+                $count = $dataProvider->getTotalCount();
+
                 return [
-                    'forceReload' => false,       // ✔ KHÔNG reload toàn bộ grid
+                    //'forceReload' => false,       // ✔ KHÔNG reload toàn bộ grid
                     //'forceReload'=>'#crud-datatable-pjax', // PJAX Grid cha
                     'forceReload'=>'#pjax-jobs-grid-'.$model->staff_id,
+                    'newCount' => $count,
+                    'staff_id'  => $staff_id,
                     'system_id' => $model->id,    // ✔ Gửi ID về để mở lại expand row
                     'forceClose' => true,
                     'tcontent' => 'Thêm mới thành công!'
@@ -324,7 +355,8 @@ class DefaultController extends Controller
     {
         $request = Yii::$app->request;
         $model = $this->findModel($id);
-
+        $staff_id = $model->staff_id;
+        
         $model->delete();
 
         if($request->isAjax){
@@ -332,12 +364,30 @@ class DefaultController extends Controller
             *   Process for ajax request
             */
             Yii::$app->response->format = Response::FORMAT_JSON;
+
+             // Đếm lại số dòng grid con
+            $searchModel = new KpiWorkRegisteredSearch();
+            $searchModel->staff_id = $staff_id;
+            $dataProvider = $searchModel->searchChild(Yii::$app->request->queryParams);
+            $count = $dataProvider->getTotalCount();
+
             return [
+                //'forceReload' => false,       // ✔ KHÔNG reload toàn bộ grid
+                //'forceReload'=>'#crud-datatable-pjax', // PJAX Grid cha
+                'forceReload'=>'#pjax-jobs-grid-'.$model->staff_id,
+                'newCount' => $count,
+                'staff_id'  => $staff_id,
+                'system_id' => $model->id,    // ✔ Gửi ID về để mở lại expand row
+                'forceClose' => true,
+                'tcontent' => 'Xóa công việc thành công!'
+            ];
+
+           /*  return [
                 'forceClose'=>true,
                 //'forceReload'=>'#crud-datatable-pjax',
                 'forceReload'=>'#pjax-jobs-grid-'.$model->staff_id,
                 'system_id' => $model->id,    // ✔ Gửi ID về để mở lại expand row
-            ];
+            ]; */
         }else{
             /*
             *   Process for non-ajax request
@@ -415,7 +465,27 @@ class DefaultController extends Controller
             return ['success' => false, 'message' => 'Không tìm thấy dữ liệu.'];
         }
 
+        $staff_id = $model->staff_id;
+
         if($model->delete()){
+
+            Yii::$app->response->format = Response::FORMAT_JSON;
+
+            // Đếm lại số dòng grid con
+            $searchModel = new KpiWorkRegisteredSearch();
+            $searchModel->staff_id = $staff_id;
+            $dataProvider = $searchModel->searchChild(Yii::$app->request->queryParams);
+            $count = $dataProvider->getTotalCount();
+
+            /* return [
+                'forceClose' => true,
+                'forceReload' => '#pjax-jobs-grid-'.$staff_id,    
+                'newCount' => $count,
+                'staff_id'  => $staff_id,
+                'tcontent' => 'Hủy phân công việc thành công!',
+            ]; */
+
+
             return [
                 'success' => true, 
                 'message' => 'Đã xóa lịch sử.'

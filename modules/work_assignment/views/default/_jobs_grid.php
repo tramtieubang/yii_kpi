@@ -7,7 +7,7 @@ use yii\widgets\Pjax;
 /** @var $system app\models\AlSystems */
 
 Pjax::begin([
-    'id' => 'pjax-jobs-grid-' . $system->id,
+    'id' => 'pjax-jobs-grid-' . $system->staff_id,
     'options' => ['class' => 'pjax-jobs-grid'],
     'timeout' => 5000,
 ]);
@@ -16,14 +16,18 @@ Pjax::begin([
     <h6 class="text-primary mb-0">
         <i class="fas fa-user"></i> Nhân viên: <?= Html::encode($system->staff->name) ?>
     </h6>
-    <?= Html::a('<i class="fas fa-plus"></i> Thêm mới', ['/work-assignment/default/create', 'staff_id' => $system->staff->staff_id], [
+    <?= Html::a('<i class="fas fa-plus"></i> Phân công việc mới', ['/work-assignment/default/create', 'staff_id' => $system->staff->staff_id], [
         'class' => 'btn btn-sm btn-outline-primary',
         'role' => 'modal-remote',
-        'title' => 'Thêm mới',
+        'title' => 'Phân công việc mới',
+        'data-bs-toggle' => 'tooltip',
+        'data-bs-placement' => 'top',
     ]) ?>
 </div>
 <?= GridView::widget([
     'dataProvider' => $dataProvider,
+    'pjax' => false,
+    'id' => 'grid-jobs-' . $system->staff_id,
     'columns' => [
         ['class' => 'kartik\grid\SerialColumn'],
         [
@@ -77,7 +81,7 @@ Pjax::begin([
                 ]),
                 'delete' => fn($url, $model) => Html::a('<i class="fas fa-trash"></i>', ['/work-assignment/default/delete', 'id' => $model->id], [
                     'class' => 'btn btn-sm btn-outline-danger',
-                    'role' => 'modal-remote',
+                    'role' => 'modal-remote-3',
                     'data-request-method' => 'post',
                     'data-confirm-title' => 'Xác nhận xóa?',
                     'data-confirm-message' => 'Bạn có chắc muốn xóa công việc này?',
@@ -130,4 +134,22 @@ $this->registerCss("
         border-color: #e5e7eb !important;
     }
 ");
+?>
+
+<?php
+
+$js = <<<JS
+
+    $(document).on('ajaxComplete', function (e, xhr) {
+        let res = xhr.responseJSON;
+        if (res && res.newCount !== undefined) {
+            //alert(res.newCount);
+            // Cập nhật lại số lượng trong grid cha
+            $('#soluong_' + res.staff_id).text(res.newCount);
+        }
+    });
+
+JS;
+$this->registerJs($js);
+
 ?>

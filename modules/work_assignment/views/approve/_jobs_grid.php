@@ -191,6 +191,15 @@ jQuery(function($){
         });
     });
 
+    $(document).on('ajaxComplete', function (e, xhr) {
+        let res = xhr.responseJSON;
+        if (res && res.newCount !== undefined) {
+            //alert(res.newCount);
+            // Cập nhật lại số lượng trong grid cha
+            $('#soluong_' + res.staff_id).text(res.newCount);
+        }
+    });
+
 });
 
 JS

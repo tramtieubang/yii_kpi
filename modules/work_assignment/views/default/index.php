@@ -1,7 +1,6 @@
 <?php
 
 use app\models\KpiWorkAssignmentStatus;
-use app\models\KpiWorkRegisteredStatus;
 use app\modules\staff\models\StaffForm;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -15,7 +14,7 @@ use yii\web\JsExpression;
 use kartik\daterange\DateRangePicker;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\modules\work_registered\models\KpiWorkRegisteredSearch */
+/* @var $searchModel app\modules\work_assignment\models\KpiWorkAssignmentSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Quản lý danh sách';
@@ -354,7 +353,7 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
         <!-- GridView -->
         <div id="ajaxCrudDatatable">
             <?= GridView::widget([
-                'id' => 'work-registered-grid',
+                'id' => 'work-assignment-grid',
                 'dataProvider' => $dataProvider,
                 'pjax' => false,
                 'panel' => false,
@@ -366,8 +365,14 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
                 'columns' => require(__DIR__.'/_columns.php'),
                 'toolbar'=> [
                     ['content'=>
-                        Html::a('<i class="fas fa fa-sync" aria-hidden="true"></i> Tải lại', [''],
-                        ['data-pjax'=>1, 'class'=>'btn btn-outline-primary', 'title'=>'Tải lại']).
+                        Html::a('<i class="fas fa-file-pdf" aria-hidden="true"></i> Xuất PDF', [''],
+                        ['data-pjax'=>1, 'class'=>'btn btn-outline-danger', 'title'=>'Xuất PDF']).
+                        Html::a('<i class="fas fa-file-word" aria-hidden="true"></i> Xuất Word', [''],
+                        ['data-pjax'=>1, 'class'=>'btn btn-outline-primary', 'title'=>'Xuất Word']).
+                        Html::a('<i class="fas fa-file-excel" aria-hidden="true"></i> Xuất Excel', [''],
+                        ['data-pjax'=>1, 'class'=>'btn btn-outline-success', 'title'=>'Xuất Excel']).
+                       Html::a('<i class="fas fa fa-sync" aria-hidden="true"></i> Tải lại', [''],
+                        ['data-pjax'=>1, 'class'=>'btn btn-outline-secondary', 'title'=>'Tải lại']).
                       
                         //'{toggleData}'.
                         '{export}'
@@ -534,7 +539,7 @@ Modal::begin(['options'=>['id'=>'ajaxCrudModal3','tabindex'=>false],'dialogOptio
    ],
    'dialogOptions'=>['class'=>'modal-lg'],
    'closeButton'=>['label'=>'<span aria-hidden=\'true\'>×</span>'],
-   'id'=>'ajaxCrudModal',
+   //'id'=>'ajaxCrudModal',
     'footer'=>'',// always need it for jquery plugin
 ])?>
 
@@ -547,8 +552,8 @@ Modal::begin(['options'=>['id'=>'ajaxCrudModal3','tabindex'=>false],'dialogOptio
    ],
    'dialogOptions'=>['class'=>'modal-xl'],
    'closeButton'=>['label'=>'<span aria-hidden=\'true\'>×</span>'],
-   'id'=>'ajaxCrudModal2',
-    'footer'=>'',// always need it for jquery plugin
+   //'id'=>'ajaxCrudModal2',
+   'footer'=>'',// always need it for jquery plugin
 ])?>
 
 <?php Modal::end(); ?>
@@ -560,7 +565,7 @@ Modal::begin(['options'=>['id'=>'ajaxCrudModal3','tabindex'=>false],'dialogOptio
    ],
    'dialogOptions'=>['class'=>'modal-lg'],
    'closeButton'=>['label'=>'<span aria-hidden=\'true\'>×</span>'],
-   'id'=>'ajaxCrudModal3',
+   //'id'=>'ajaxCrudModal3',
     'footer'=>'',// always need it for jquery plugin
 ])?>
 
