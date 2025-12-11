@@ -4,7 +4,6 @@ namespace app\modules\work_registered\controllers;
 
 use app\common\helpers\CommonSQL;
 use app\models\KpiWorkRegisteredHistory;
-use app\models\KpiWorkRegisteredStatus;
 use app\modules\work_registered\models\KpiWorkRegisteredSearch;
 use app\modules\work_registered\models\KpiWorkRegisteredForm;
 use Yii;

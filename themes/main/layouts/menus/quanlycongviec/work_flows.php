@@ -6,7 +6,7 @@ use yii\helpers\Html;
 
 <?php if (
 	PermissionHelper::check('work-registered/register/index') ||
-	PermissionHelper::check('work-assignment/register/index') ||
+	PermissionHelper::check('work-assignment/approve/index') ||
 	PermissionHelper::check('kpi/default/index') 
 ): ?>
     <li class="slide">

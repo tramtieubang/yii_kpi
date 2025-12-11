@@ -2,6 +2,7 @@
 
 namespace app\modules\work_registered\controllers;
 
+use app\custom\PermissionHelper;
 use app\models\KpiWorkAssignment;
 use app\models\KpiWorkReport;
 use app\modules\staff\models\StaffForm;
@@ -69,9 +70,14 @@ class CalendarController extends Controller
         // Giả sử role superadmin lưu trong Yii::$app->user->identity->role
         // Hoặc dùng RBAC: Yii::$app->user->can('superadmin')        
         $query = KpiWorkAssignment::find()
-            ->where(['>=', 'start_date', $start]);
-            //->andWhere(['<=', 'end_date', $end]);
-       if (!Yii::$app->user->isSuperadmin){
+            ->where(['>=', 'start_date', $start])
+            ->andWhere(['<=', 'start_date', $end]);
+
+        // ---- Kiểm tra quyền duyệt theo controller ----
+        $canApprove = PermissionHelper::check('work-assignment/approve/index');  
+        
+       if (!Yii::$app->user->isSuperadmin && !$canApprove){   
+       //if (!Yii::$app->user->isSuperadmin){
             $query->andWhere(['staff_id' => Yii::$app->user->id]);
         }
         $models = $query->all();    

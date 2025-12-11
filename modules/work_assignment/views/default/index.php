@@ -12,6 +12,7 @@ use yii\bootstrap5\Modal;
 use yii\helpers\ArrayHelper;
 use yii\web\JsExpression;
 use kartik\daterange\DateRangePicker;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\modules\work_assignment\models\KpiWorkAssignmentSearch */
@@ -365,13 +366,31 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
                 'columns' => require(__DIR__.'/_columns.php'),
                 'toolbar'=> [
                     ['content'=>
-                        Html::a('<i class="fas fa-file-pdf" aria-hidden="true"></i> Xuất PDF', [''],
-                        ['data-pjax'=>1, 'class'=>'btn btn-outline-danger', 'title'=>'Xuất PDF']).
-                        Html::a('<i class="fas fa-file-word" aria-hidden="true"></i> Xuất Word', [''],
-                        ['data-pjax'=>1, 'class'=>'btn btn-outline-primary', 'title'=>'Xuất Word']).
-                        Html::a('<i class="fas fa-file-excel" aria-hidden="true"></i> Xuất Excel', [''],
-                        ['data-pjax'=>1, 'class'=>'btn btn-outline-success', 'title'=>'Xuất Excel']).
-                       Html::a('<i class="fas fa fa-sync" aria-hidden="true"></i> Tải lại', [''],
+                        
+                        Html::button('<i class="fas fa-file-pdf"></i> Xuất PDF', [
+                            'class' => 'btn btn-outline-danger btn-md',
+                            'id' => 'btn-export-pdf',
+                            'title' => 'Xuất PDF',
+                            'data-pjax' => 0,
+                        ]).
+                       
+                        Html::button('<i class="fas fa-file-word"></i> Xuất Word', [
+                                'class' => 'btn btn-outline-primary btn-md',
+                                'id' => 'btn-export-word',
+                                'title' => 'Xuất Word',
+                                'data-pjax' => 0,       // KHÔNG dùng PJAX
+                            ]
+                        ).
+
+                        Html::button('<i class="fas fa-file-excel"></i> Xuất Excel', [
+                                'class' => 'btn btn-outline-success btn-md',
+                                'id' => 'btn-export-excel',
+                                'title' => 'Xuất Excel',
+                                'data-pjax' => 0,       // KHÔNG dùng PJAX
+                            ]
+                        ).
+
+                        Html::a('<i class="fas fa fa-sync" aria-hidden="true"></i> Tải lại', [''],
                         ['data-pjax'=>1, 'class'=>'btn btn-outline-secondary', 'title'=>'Tải lại']).
                       
                         //'{toggleData}'.
@@ -430,51 +449,7 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
         }
     });    
 
-
-// Khi modal đóng
-/* $(document).on('hidden.bs.modal', '.modal', function () {
-    if ($('.modal.show').length > 0) {
-        $('body').addClass('modal-open'); // giữ scroll
-    }
-}); */
-
-/* jQuery(function($) {
-    // ✅ Lắng nghe mọi AJAX phản hồi (khi thêm/sửa/xóa)
-    $(document).on('ajaxComplete', function (event, xhr) {
-        let response;
-        try {
-            response = JSON.parse(xhr.responseText);
-        } catch (e) {
-            return; // Không phải JSON, bỏ qua
-        }
-
-        // ✅ Nếu có systemId → chỉ reload ExpandRow tương ứng
-        if (response.system_id) {
-            const $row = $('tr[data-key="' + response.system_id + '"]');
-
-            // Nếu hàng đang expand thì reload nội dung con
-            if ($row.hasClass('kv-state-expanded')) {
-                const $expandCell = $row.next('.kv-expand-detail-row');
-                const $expandContainer = $expandCell.find('.kv-detail-content');
-
-                if ($expandContainer.length) {
-                    $.pjax.reload({
-                        container: $expandContainer.find('.pjax-jobs-grid').attr('id'),
-                        async: false
-                    });
-                } else {
-                    // Nếu không có PJAX con, fallback: đóng mở lại
-                    const expandBtn = $row.find('.kv-expand-icon');
-                    expandBtn.click();
-                    setTimeout(() => expandBtn.click(), 600);
-                }
-            }
-        }
-
-    });
-}); */
-
-
+    
 </script>
 
 <?php
@@ -507,21 +482,152 @@ jQuery(function($) {
 ");
 
 // Thong bao cong viec tre han
-/* $this->registerJs(<<<JS
-    $(document).on('pjax:success', function(){
-        $.get('/work-assignment/check-overdue', function(response){
-            if(response.count > 0){
-                Swal.fire({
-                    icon: 'warning',
-                    title: response.count + ' công việc trễ hạn!',
-                    timer: 3000,
-                    showConfirmButton: false
-                });
+// --------------------------
+// SCRIPT XUẤT PDF
+// --------------------------
+
+
+$this->registerJs(<<<JS
+
+    /* $('#btn-export-pdf').on('click', function (e) {
+        e.preventDefault();
+
+        let form = $('#filterForm');   // form chứa dữ liệu filter
+
+        $.ajax({
+            url: '/work-assignment/report/pdf-tuan',
+            type: 'POST',
+            data: form.serialize(),
+            xhrFields: {
+                responseType: 'blob'      // rất quan trọng để nhận file PDF
+            },
+            success: function (data, status, xhr) {
+
+                let blob = new Blob([data], { type: 'application/pdf' });
+
+                // Lấy filename từ header (nếu có)
+                let filename = "bao_cao_lich_cong_tac.pdf";
+                let disposition = xhr.getResponseHeader('Content-Disposition');
+                if (disposition && disposition.indexOf('filename=') !== -1) {
+                    let match = disposition.match(/filename="?([^"]+)"?/);
+                    if (match.length > 1) filename = match[1];
+                }
+
+                // Tạo link tải
+                let link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            },
+            error: function (xhr) {
+                alert("Xuất PDF thất bại!");
             }
-        }, 'json');
+        });
+
+    }); */
+
+    $('#btn-export-pdf').on('click', function (e) {
+        e.preventDefault();
+
+        let form = $('#filterForm');   // form chứa dữ liệu filter
+
+        $.ajax({
+            url: '/work-assignment/report-export/pdf-tuan',
+            type: 'POST',
+            data: form.serialize(),
+            xhrFields: {
+                responseType: 'blob'      // quan trọng
+            },
+            success: function (data, status, xhr) {
+
+                let blob = new Blob([data], { type: 'application/pdf' });
+
+                // Lấy filename từ header (nếu có)
+                let filename = "bao_cao_lich_cong_tac.pdf";
+                let disposition = xhr.getResponseHeader('Content-Disposition');
+                if (disposition && disposition.indexOf('filename=') !== -1) {
+                    let match = disposition.match(/filename="?([^"]+)"?/);
+                    if (match.length > 1) filename = match[1];
+                }
+
+                // Tạo link tải
+                let link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            },
+            error: function (xhr) {
+                alert("Xuất PDF thất bại!");
+            }
+        });
+
     });
-JS
-); */
+
+    /* Word */
+    $('#btn-export-word').on('click', function (e) {
+        e.preventDefault();
+        let form = $('#filterForm');
+        $.ajax({
+            url: '/work-assignment/report-export/word-tuan',
+            type: 'POST',
+            data: form.serialize(),
+            xhrFields: { responseType: 'blob' },
+            success: function (data, status, xhr) {
+                let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+                let filename = "bao_cao_lich_cong_tac.docx";
+                let disposition = xhr.getResponseHeader('Content-Disposition');
+                if (disposition && disposition.indexOf('filename=') !== -1) {
+                    let match = disposition.match(/filename="?([^"]+)"?/);
+                    if (match.length > 1) filename = match[1];
+                }
+                let link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            },
+            error: function () {
+                alert("Xuất Word thất bại!");
+            }
+        });
+    });
+
+    /* Excel */
+    $('#btn-export-excel').on('click', function (e) {
+        e.preventDefault();
+        let form = $('#filterForm');
+        $.ajax({
+            url: '/work-assignment/report-export/excel-tuan',
+            type: 'POST',
+            data: form.serialize(),
+            xhrFields: { responseType: 'blob' },
+            success: function (data, status, xhr) {
+                let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+                let filename = "bao_cao_lich_cong_tac.docx";
+                let disposition = xhr.getResponseHeader('Content-Disposition');
+                if (disposition && disposition.indexOf('filename=') !== -1) {
+                    let match = disposition.match(/filename="?([^"]+)"?/);
+                    if (match.length > 1) filename = match[1];
+                }
+                let link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            },
+            error: function () {
+                alert("Xuất Word thất bại!");
+            }
+        });
+    });
+
+JS);
 
 ?>
 

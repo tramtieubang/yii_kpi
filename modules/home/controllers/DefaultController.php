@@ -2,6 +2,8 @@
 
 namespace app\modules\home\controllers;
 
+use app\custom\PermissionHelper;
+use app\modules\user_management\user\models\User;
 use webvimark\modules\UserManagement\components\GhostAccessControl;
 use Yii;
 use yii\filters\VerbFilter;
@@ -35,7 +37,11 @@ class DefaultController extends Controller
 	
     public function actionIndex()
     {
-		
+		//$canRegister = PermissionHelper::check('work-registered/register/index'); 		
+        //dd($canRegister);
+       //dd(Yii::$app->user->can('/work-registered/register/index'));
+	   //dd(PermissionHelper::check('work-registered/register'));
+
         return $this->render('index');
     }
 }

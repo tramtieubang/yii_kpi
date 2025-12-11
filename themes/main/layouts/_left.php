@@ -23,7 +23,7 @@ use yii\helpers\Html;
 			<ul class="side-menu">
 				<li class="side-item side-item-category" style="background-color:var(--primary-bg-color);padding:15px 20px;color:white;margin-top:-15px"><i class="fa fa-unlock-alt"></i>&nbsp;Xin chào, <?php echo User::getCurrentUser()->username; ?></li>
 				<li>
-					<a class="side-menu__item" data-bs-toggle="slide" href="<?= Yii::getAlias('@web/') ?>">
+					<a class="side-menu__item" href="<?= Yii::getAlias('@web/') ?>">
 						<span class="side-menu__icon"><i class="bi bi-house-door side_menu_img"></i></span>
 						<span class="side-menu__label">Trang chủ</span>
 					</a>
