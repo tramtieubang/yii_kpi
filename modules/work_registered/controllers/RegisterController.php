@@ -14,6 +14,7 @@ use app\modules\staff\models\StaffForm;
 use app\modules\work_assignment\models\KpiWorkAssignmentForm;
 use Yii;
 use app\modules\work_registered\models\KpiWorkRegisteredForm;
+use app\modules\work_registered\models\KpiWorkRegisteredSearch;
 use yii\db\Expression;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -374,6 +375,6 @@ class RegisterController extends Controller
             'footer' => Html::button('Đóng', ['class'=>'btn btn-secondary','data-bs-dismiss'=>"modal"])
         ];
     }
-
+    
 
 }

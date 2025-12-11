@@ -94,10 +94,54 @@ document.addEventListener('DOMContentLoaded', function() {
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay,refreshBtn'
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,printBtn,refreshBtn'
         },
 
         customButtons: {
+            /* printBtn: {
+                text: 'In lịch',
+                click: function() {
+                    // Gọi action export PDF
+                    window.open('/work-registered/register/print', '_blank');
+                }
+            }, */
+            
+           printBtn: {
+                text: "🖨️ In lịch",
+                click: function () {
+
+                    let view = window.calendarInstance.view;
+                    let start = view.activeStart.toISOString().slice(0, 10);
+                    let end   = view.activeEnd.toISOString().slice(0, 10)
+
+                    $.ajax({
+                        url: "/work-registered/report-export/print-register",
+                        type: "GET",
+                        data: { start: start, end: end },
+                        xhrFields: { responseType: 'blob' },
+                        success: function (data, status, xhr) {
+                            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+                            let filename = "bao_cao_lich_cong_tac.docx";
+                            let disposition = xhr.getResponseHeader('Content-Disposition');
+                            if (disposition && disposition.indexOf('filename=') !== -1) {
+                                let match = disposition.match(/filename="?([^"]+)"?/);
+                                if (match.length > 1) filename = match[1];
+                            }
+                            let link = document.createElement('a');
+                            link.href = window.URL.createObjectURL(blob);
+                            link.download = filename;
+                            document.body.appendChild(link);
+                            link.click();
+                            link.remove();
+                        },
+                        error: function () {
+                            alert("Xuất Word thất bại!");
+                        }
+                    });
+
+                }
+            },
+
             refreshBtn: {
                 text: '🔄 Làm mới',
                 click: function() {

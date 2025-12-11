@@ -1,6 +1,9 @@
 <?php
 namespace app\modules\work_registered\controllers;
 
+use app\custom\PermissionHelper;
+use app\modules\work_assignment\models\KpiWorkAssignmentForm;
+use app\modules\work_registered\models\KpiWorkRegisteredForm;
 use app\modules\work_registered\models\KpiWorkRegisteredSearch;
 use Yii;
 use yii\web\Controller;
@@ -542,4 +545,205 @@ class ReportExportController extends Controller
         $writer->save('php://output');
         exit;
     }
-}
+
+    // Register
+    public function actionPrintRegister($start = null, $end = null)
+    {
+        // Chuẩn hóa ngày
+        if ($start) $start = date('Y-m-d 00:00:00', strtotime($start));
+        if ($end)   $end   = date('Y-m-d 23:59:59', strtotime($end));
+
+        $query = KpiWorkRegisteredForm::find()
+            ->andFilterWhere(['>=', 'start_date', $start])
+            ->andFilterWhere(['<=', 'start_date', $end]);
+
+        // ----- Kiểm tra quyền duyệt -----
+        $canApprove = PermissionHelper::check('work-assignment/approve/index');
+
+        if (!Yii::$app->user->isSuperadmin && !$canApprove) {
+            $query->andWhere(['staff_id' => Yii::$app->user->id]);
+        }
+
+        // --- ActiveDataProvider ---
+        $dataProvider = new \yii\data\ActiveDataProvider([
+            'query' => $query,
+            'pagination' => false,
+            'sort' => [
+                'defaultOrder' => ['start_date' => SORT_ASC],
+            ],
+        ]);
+
+        $models = $dataProvider->getModels();
+
+        // -------- Gom nhóm theo ngày --------
+        $rowsByDate = [];
+        $dates = [];
+
+        foreach ($models as $row) {
+            if (!$row) continue;
+
+            $dateKey = Yii::$app->formatter->asDate($row->start_date, 'php:Y-m-d');
+
+            $rowsByDate[$dateKey][] = $row;
+            $dates[] = $row->start_date;
+        }
+
+        // -------- Tạo HTML bảng --------
+        $data = '';
+        $stt = 1;
+
+        foreach ($rowsByDate as $dateKey => $items) {
+            $displayDate = Yii::$app->formatter->asDate($dateKey, 'php:d/m/Y');
+            $rowspan = count($items);
+            $first = true;
+
+            foreach ($items as $detail) {
+                $data .= "<tr>";
+
+                if ($first) {
+                    $data .= "<td rowspan='{$rowspan}'>{$stt}</td>";
+                    $data .= "<td rowspan='{$rowspan}'>{$displayDate}</td>";
+                    $first = false;
+                    $stt++;
+                }
+
+                $data .= "
+                    <td>{$detail->description}</td>
+                    <td>{$detail->staff->name}</td>
+                    <td>{$detail->status->name}</td>
+                    <td></td>
+                ";
+
+                $data .= "</tr>";
+            }
+        }
+
+        // Tính từ ngày - đến ngày
+        if (!empty($dates)) {
+            sort($dates);
+            $tu_ngay  = Yii::$app->formatter->asDate($dates[0], 'php:d/m/Y');
+            $den_ngay = Yii::$app->formatter->asDate(end($dates), 'php:d/m/Y');
+        } else {
+            $tu_ngay = $den_ngay = '';
+        }
+
+        // Render template HTML
+        $html = file_get_contents(Yii::getAlias('@app/modules/work_registered/views/report/register/pdf-tuan.php'));
+        $html = strtr($html, [
+            '${data}' => $data,
+            '${tu_ngay}' => $tu_ngay,
+            '${den_ngay}' => $den_ngay,
+        ]);
+
+        // ----- Tạo PDF -----
+        $mpdf = new \Mpdf\Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'default_font' => 'DejaVu Sans',
+        ]);
+
+        $mpdf->WriteHTML($html);
+        return $mpdf->Output("bao_cao_lich_dang_ky.pdf", "I"); // Mở tab PDF
+    }
+
+    // Calendar
+    public function actionPrintCalendar($start = null, $end = null)
+    {
+        // Chuẩn hóa ngày
+        if ($start) $start = date('Y-m-d 00:00:00', strtotime($start));
+        if ($end)   $end   = date('Y-m-d 23:59:59', strtotime($end));
+
+        $query = KpiWorkAssignmentForm::find()
+            ->andFilterWhere(['>=', 'start_date', $start])
+            ->andFilterWhere(['<=', 'start_date', $end]);
+
+        // ----- Kiểm tra quyền duyệt -----
+        $canApprove = PermissionHelper::check('work-assignment/approve/index');
+
+        if (!Yii::$app->user->isSuperadmin && !$canApprove) {
+            $query->andWhere(['staff_id' => Yii::$app->user->id]);
+        }
+
+        // --- ActiveDataProvider ---
+        $dataProvider = new \yii\data\ActiveDataProvider([
+            'query' => $query,
+            'pagination' => false,
+            'sort' => [
+                'defaultOrder' => ['start_date' => SORT_ASC],
+            ],
+        ]);
+
+        $models = $dataProvider->getModels();
+
+        // -------- Gom nhóm theo ngày --------
+        $rowsByDate = [];
+        $dates = [];
+
+        foreach ($models as $row) {
+            if (!$row) continue;
+
+            $dateKey = Yii::$app->formatter->asDate($row->start_date, 'php:Y-m-d');
+
+            $rowsByDate[$dateKey][] = $row;
+            $dates[] = $row->start_date;
+        }
+
+        // -------- Tạo HTML bảng --------
+        $data = '';
+        $stt = 1;
+
+        foreach ($rowsByDate as $dateKey => $items) {
+            $displayDate = Yii::$app->formatter->asDate($dateKey, 'php:d/m/Y');
+            $rowspan = count($items);
+            $first = true;
+
+            foreach ($items as $detail) {
+                $data .= "<tr>";
+
+                if ($first) {
+                    $data .= "<td rowspan='{$rowspan}'>{$stt}</td>";
+                    $data .= "<td rowspan='{$rowspan}'>{$displayDate}</td>";
+                    $first = false;
+                    $stt++;
+                }
+
+                $data .= "
+                    <td>{$detail->description}</td>
+                    <td>{$detail->staff->name}</td>
+                    <td>{$detail->status->name}</td>
+                    <td></td>
+                ";
+
+                $data .= "</tr>";
+            }
+        }
+
+        // Tính từ ngày - đến ngày
+        if (!empty($dates)) {
+            sort($dates);
+            $tu_ngay  = Yii::$app->formatter->asDate($dates[0], 'php:d/m/Y');
+            $den_ngay = Yii::$app->formatter->asDate(end($dates), 'php:d/m/Y');
+        } else {
+            $tu_ngay = $den_ngay = '';
+        }
+
+        // Render template HTML
+        $html = file_get_contents(Yii::getAlias('@app/modules/work_registered/views/report/calendar/pdf-tuan.php'));
+        $html = strtr($html, [
+            '${data}' => $data,
+            '${tu_ngay}' => $tu_ngay,
+            '${den_ngay}' => $den_ngay,
+        ]);
+
+        // ----- Tạo PDF -----
+        $mpdf = new \Mpdf\Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'default_font' => 'DejaVu Sans',
+        ]);
+
+        $mpdf->WriteHTML($html);
+        return $mpdf->Output("bao_cao_lich_cong_tac.pdf", "I"); // Mở tab PDF
+    }
+
+} // end class
