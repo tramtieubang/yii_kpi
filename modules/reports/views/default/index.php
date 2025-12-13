@@ -17,7 +17,7 @@ use kartik\daterange\DateRangePicker;
 /* @var $searchModel app\modules\work_registered\models\KpiWorkRegisteredSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Quản lý danh sách lịch chưa duyệt';
+$this->title = 'Quản lý danh sách';
 $this->params['breadcrumbs'][] = $this->title;
 
 // Lấy danh sách nhân viên
@@ -184,11 +184,6 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
 
 ?>
 <!-- ===== Form Filter ===== -->
-<div>
-    <?= 
-        $this->render('//layouts/menus/quanlycongviec/tab_assignment_heading')
-    ?>
-</div>
 
 <div class="card kpi-card shadow-sm mb-3">
      <div class="card-header kpi-card-header">
@@ -255,7 +250,7 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
                         ';
                     }
 
-                    echo $form->field($searchModel, 'staff_id')->label(false)->widget(Select2::class, [
+                    echo $form->field($searchModel, 'staff_id')->label(false)->widget(Select2::classname(), [
                         'options' => ['placeholder' => 'Chọn nhân viên....'],
                         'data' => $data,
                         'pluginOptions' => [
@@ -313,7 +308,7 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
                         return $markup;
                     });
 
-                    echo $form->field($searchModel, 'status_id')->label(false)->widget(Select2::class, [
+                    echo $form->field($searchModel, 'status_id')->label(false)->widget(Select2::classname(), [
                         'options' => ['placeholder' => 'Chọn trạng thái...'],
                         'data' => $data,
                         'pluginOptions' => [
@@ -338,101 +333,6 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
     <?php ActiveForm::end(); ?>
 </div>
 
-
-<!-- ===== PJAX Grid ===== -->
-
- <?php Pjax::begin([
-        'id' => 'crud-datatable-pjax',
-        'timeout' => 10000,
-        'formSelector' => '.myFilterForm'
-    ]); ?>
-    
-
-    <div class="card-white">
-       
-        <!-- GridView -->
-        <div id="ajaxCrudDatatable">
-            <?= GridView::widget([
-                'id' => 'work-registered-grid',
-                'dataProvider' => $dataProvider,
-                'pjax' => false,                
-                'columns' => require(__DIR__.'/_columns.php'),
-                'toolbar'=> [                    
-                    ['content'=>
-                        Html::button('<i class="fas fa-file-pdf"></i> Xuất PDF', [
-                            'class' => 'btn btn-outline-danger btn-md',
-                            'id' => 'btn-export-pdf',
-                            'title' => 'Xuất PDF',
-                            'data-pjax' => 0,
-                        ]).
-                       
-                        Html::button('<i class="fas fa-file-word"></i> Xuất Word', [
-                                'class' => 'btn btn-outline-primary btn-md',
-                                'id' => 'btn-export-word',
-                                'title' => 'Xuất Word',
-                                'data-pjax' => 0,       // KHÔNG dùng PJAX
-                            ]
-                        ).
-
-                        Html::button('<i class="fas fa-file-excel"></i> Xuất Excel', [
-                                'class' => 'btn btn-outline-success btn-md',
-                                'id' => 'btn-export-excel',
-                                'title' => 'Xuất Excel',
-                                'data-pjax' => 0,       // KHÔNG dùng PJAX
-                            ]
-                        ).
-
-                        Html::a('<i class="fas fa fa-sync" aria-hidden="true"></i> Tải lại', [''],
-                        ['data-pjax'=>1, 'class'=>'btn btn-outline-primary', 'title'=>'Tải lại']).
-                      
-                        //'{toggleData}'.
-                        '{export}'
-                    ],
-                ],    
-                //'panel' => false,
-                //'summary' => false,
-                'responsive' => true,
-                'striped' => false,
-                'condensed' => true,
-                'hover' => true,
-                'panelHeadingTemplate'=>'{title}',
-                //'panelFooterTemplate'=>'{summary}',
-                //'summary'=>'Hiển thị dữ liệu {count}/{totalCount}, Trang {page}/{pageCount}',
-                'panelFooterTemplate'=>'<div style="width:100%;"><div class="float-start">{summary}</div><div class="float-end">{pager}</div></div>',
-                'summary'=>'Tổng: {totalCount} dòng dữ liệu',
-                // 🔹 Vị trí hiển thị nút trang
-                'layout' => "{items}\n{pager}",
-                'panel' => [
-                    //'type' => 'primary', 
-                    //'heading' => '<i class="fas fa fa-list" aria-hidden="true"></i> Danh sách',
-                    'headingOptions' => [
-                        'class' => 'gv-heading-mini'
-                    ],
-                    'before' => '<div style="
-                                    color:#f39c12;
-                                    border:0px solid black;
-                                    height:35px;
-                                    display:flex;
-                                    align-items:center;      /* canh giữa theo chiều cao */
-                                    /*justify-content:center;  /* canh giữa ngang */
-                                    font-weight:600;
-                                ">
-                                    <i class="fas fa-clipboard-list" style="margin-right:6px;"></i>
-                                    LỊCH CHƯA DUYỆT
-                                </div>
-                                ',
-                    '<div class="clearfix"></div>',
-                ],  
-                
-            ]); ?>
-        </div>       
-
-       
-    </div>
-
-    <?php Pjax::end(); ?>
-
-    <!-- ===== JS ===== -->
 <script>
     // Toggle filter
     const btnScrollFilter = document.getElementById('btnScrollFilter');
@@ -467,210 +367,8 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
 
         isCollapsed = !isCollapsed;
     });
+  
 
-    // Reset filter
-    document.getElementById('btnResetFilter').addEventListener('click', function(e){
-        e.preventDefault();
-        const form = this.closest('form');
-        form.reset();
-        $(form).find('select').val(null).trigger('change');
-        $(form).find('input.kv-date').each(function(){ $(this).datepicker('update',''); });
-    });
-
-    document.addEventListener('hidden.bs.modal', function (event) {
-        const modals = document.querySelectorAll('.modal.show');
-        if (modals.length > 0) {
-            document.body.classList.add('modal-open');
-        }
-    });    
-
-jQuery(function ($) {
-
-    $(document).on('ajaxComplete', function (event, xhr) {
-        let response;
-        try {
-            response = JSON.parse(xhr.responseText);
-        } catch (e) {
-            return; // Không phải JSON
-        }
-
-        if (!response.system_id) return;
-
-        const $row = $('tr[data-key="' + response.system_id + '"]');
-        if (!$row.length) return;
-
-        // ===== Đây là hàm reload Grid con =====
-        const reloadChildGrid = function () {
-            const $pjaxChild = $row.next('.kv-expand-detail-row').find('.pjax-jobs-grid');
-            if ($pjaxChild.length) {
-                $.pjax.reload({
-                    container: '#' + $pjaxChild.attr('id'),
-                    timeout: 3000,
-                    scrollTo: false, // giữ scroll hiện tại
-                    replace: false
-                });
-            }
-        };
-        // ===== end reloadChildGrid =====
-
-        // Nếu row đang đóng → mở trước rồi reload
-        if ($row.hasClass('kv-state-collapsed')) {
-            $row.find('.kv-expand-icon').click(); // mở expand
-            $(document).one('kvexprow.afterExpand', function () {
-                reloadChildGrid();
-            });
-        } else {
-            reloadChildGrid(); // đang mở → reload ngay
-        }
-    });
-        
- });
+    
 
 </script>
-
-<?php
-
-$this->registerJs(<<<JS
-
-    $('#btn-export-pdf').on('click', function (e) {
-        e.preventDefault();
-//alert("dfasd");
-        let form = $('#filterForm');   // form chứa dữ liệu filter
-
-        $.ajax({
-            url: '/work-assignment/report-approve/pdf-tuan',
-            type: 'POST',
-            data: form.serialize(),
-            xhrFields: {
-                responseType: 'blob'      // quan trọng
-            },
-            success: function (data, status, xhr) {
-
-                let blob = new Blob([data], { type: 'application/pdf' });
-
-                // Lấy filename từ header (nếu có)
-                let filename = "bao_cao_lich_cong_tac.pdf";
-                let disposition = xhr.getResponseHeader('Content-Disposition');
-                if (disposition && disposition.indexOf('filename=') !== -1) {
-                    let match = disposition.match(/filename="?([^"]+)"?/);
-                    if (match.length > 1) filename = match[1];
-                }
-
-                // Tạo link tải
-                let link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-            },
-            error: function (xhr) {
-                alert("Xuất PDF thất bại!");
-            }
-        });
-
-    });
-
-    /* Word */
-    $('#btn-export-word').on('click', function (e) {
-        e.preventDefault();
-        let form = $('#filterForm');
-        $.ajax({
-            url: '/work-assignment/report-approve/word-tuan',
-            type: 'POST',
-            data: form.serialize(),
-            xhrFields: { responseType: 'blob' },
-            success: function (data, status, xhr) {
-                let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-                let filename = "bao_cao_lich_cong_tac.docx";
-                let disposition = xhr.getResponseHeader('Content-Disposition');
-                if (disposition && disposition.indexOf('filename=') !== -1) {
-                    let match = disposition.match(/filename="?([^"]+)"?/);
-                    if (match.length > 1) filename = match[1];
-                }
-                let link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-            },
-            error: function () {
-                alert("Xuất Word thất bại!");
-            }
-        });
-    });
-
-    /* Excel */
-    $('#btn-export-excel').on('click', function (e) {
-        e.preventDefault();
-        let form = $('#filterForm');
-        $.ajax({
-            url: '/work-assignment/report-approve/excel-tuan',
-            type: 'POST',
-            data: form.serialize(),
-            xhrFields: { responseType: 'blob' },
-            success: function (data, status, xhr) {
-                let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-                let filename = "bao_cao_lich_cong_tac.docx";
-                let disposition = xhr.getResponseHeader('Content-Disposition');
-                if (disposition && disposition.indexOf('filename=') !== -1) {
-                    let match = disposition.match(/filename="?([^"]+)"?/);
-                    if (match.length > 1) filename = match[1];
-                }
-                let link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-            },
-            error: function () {
-                alert("Xuất Word thất bại!");
-            }
-        });
-    });
-
-JS);
-
-?>
-
-<?php Modal::begin([
-   'options' => [
-        'id'=>'ajaxCrudModal',
-        'tabindex' => false // important for Select2 to work properly
-   ],
-   'dialogOptions'=>['class'=>'modal-lg'],
-   'closeButton'=>['label'=>'<span aria-hidden=\'true\'>×</span>'],
-   'id'=>'ajaxCrudModal',
-    'footer'=>'',// always need it for jquery plugin
-])?>
-
-<?php Modal::end(); ?>
-
-<?php Modal::begin([
-   'options' => [
-        'id'=>'ajaxCrudModal2',
-        'tabindex' => false // important for Select2 to work properly
-   ],
-   'dialogOptions'=>['class'=>'modal-xl'],
-   'closeButton'=>['label'=>'<span aria-hidden=\'true\'>×</span>'],
-   'id'=>'ajaxCrudModal2',
-    'footer'=>'',// always need it for jquery plugin
-])?>
-
-<?php Modal::end(); ?>
-
-<?php Modal::begin([
-   'options' => [
-        'id'=>'ajaxCrudModal3',
-        'tabindex' => false // important for Select2 to work properly
-   ],
-   'dialogOptions'=>['class'=>'modal-lg'],
-   'closeButton'=>['label'=>'<span aria-hidden=\'true\'>×</span>'],
-   'id'=>'ajaxCrudModal3',
-    'footer'=>'',// always need it for jquery plugin
-])?>
-
-<?php Modal::end(); ?>
-

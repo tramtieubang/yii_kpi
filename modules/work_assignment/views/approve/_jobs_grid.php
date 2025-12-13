@@ -108,11 +108,18 @@ Pjax::begin([
             'contentOptions' => ['class' => 'text-center'],
         ],
     ],
-    'layout' => "{items}\n<div class='d-flex justify-content-between align-items-center grid-footer-bar mt-2 pt-2 border-top'>
+    /* 'layout' => "{items}\n<div class='d-flex justify-content-between align-items-center grid-footer-bar mt-2 pt-2 border-top'>
         <div>{pager}</div>
         <div class='small text-muted'>{summary}</div>
     </div>",
-    'summary' => 'Hiển thị {count}/{totalCount} bản ghi',
+    'summary' => 'Hiển thị {count}/{totalCount} bản ghi', */
+    'layout' => "{items}
+                <div class='d-flex justify-content-between align-items-center grid-footer-bar mt-2 pt-2 border-top'>
+                    <div class='small text-muted'>{summary}</div>
+                    <div>{pager}</div>
+                </div>",
+    'summary' => 'Tổng: {totalCount} dòng dữ liệu',
+
     'responsive' => true,
     'condensed' => true,
     'striped' => false,

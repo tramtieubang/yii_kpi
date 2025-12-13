@@ -56,6 +56,12 @@ class KpiWorkRegisteredSearch extends KpiWorkRegisteredForm
             ],
         ]);
 
+        $pageSize = Yii::$app->request->get('per-page', 20);
+        $dataProvider->pagination = [
+            'pageSize' => $pageSize,
+            'pageSizeLimit' => [10, 100],
+        ];
+
         // 1️⃣ Nếu có yêu cầu trả data rỗng
         /* if (isset($params['empty']) && $params['empty'] === true) {
             $query->where('0=1'); // trả về 0 bản ghi
@@ -119,6 +125,12 @@ class KpiWorkRegisteredSearch extends KpiWorkRegisteredForm
                 ],
             ],
         ]);
+
+        $pageSize = Yii::$app->request->get('per-page', 20);
+        $dataProvider->pagination = [
+            'pageSize' => $pageSize,
+            'pageSizeLimit' => [10, 100],
+        ];
 
         $this->load($params);
 

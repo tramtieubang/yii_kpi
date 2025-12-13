@@ -59,6 +59,12 @@ class KpiWorkRegisteredSearch extends KpiWorkRegisteredForm
             ],
         ]);
 
+        $pageSize = Yii::$app->request->get('per-page', 20);
+        $dataProvider->pagination = [
+            'pageSize' => $pageSize,
+            'pageSizeLimit' => [10, 100],
+        ];
+
         $this->load($params);
 
         if (!$this->validate()) {
@@ -118,6 +124,12 @@ class KpiWorkRegisteredSearch extends KpiWorkRegisteredForm
                 ],
             ],
         ]);
+
+        $pageSize = Yii::$app->request->get('per-page', 20);
+        $dataProvider->pagination = [
+            'pageSize' => $pageSize,
+            'pageSizeLimit' => [10, 100],
+        ];
 
         $this->load($params);
 

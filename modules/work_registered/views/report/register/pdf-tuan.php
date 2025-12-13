@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <style>
     body {
-        font-family: DejaVu Sans, sans-serif;
-        font-size: 12px;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 13px;
         color: #333;
     }
 
@@ -82,7 +82,7 @@
         /* letter-spacing: 3px; */ 
         display: block;
         margin-top: 20px;
-        font-family: DejaVu Sans, sans-serif;
+        font-family: 'Times New Roman', Times, serif;
     }
 
     .footer .signature-line {

@@ -22,27 +22,27 @@ use yii\helpers\Html;
                     <div class="tab-content">
                         <div class="tab-pane active" id="side7">
                             <ul class="sidemenu-list">
-                                <?php if (PermissionHelper::check('positions/default')): ?>
+                                <?php if (PermissionHelper::check('positions/default/')): ?>
                                     <li>
                                         <?= Html::a('<i class="fe fe-users"></i> Chức vụ', ['/positions/default', 'menu'=>'dm1'], ['class' => 'slide-item', 'data-menu' => 'dm1']) ?>
                                     </li>
                                 <?php endif; ?>
-                                <?php if (PermissionHelper::check('business-fields/default')): ?>
+                                <?php if (PermissionHelper::check('business-fields/default/')): ?>
                                     <li>
                                         <?= Html::a('<i class="fe fe-briefcase"></i> Lĩnh vực kinh doanh', ['/business-fields/default', 'menu'=>'dm2'], ['class' => 'slide-item', 'data-menu' => 'dm2']) ?>
                                     </li>
                                 <?php endif; ?>
-                                <?php if (PermissionHelper::check('department/default')): ?>
+                                <?php if (PermissionHelper::check('department/default/')): ?>
                                     <li>
                                         <?= Html::a('<i class="fe fe-grid"></i> Phòng ban', ['/department/default', 'menu'=>'dm3'], ['class' => 'slide-item', 'data-menu' => 'dm3']) ?>
                                     </li>
                                 <?php endif; ?>                               
-                                <?php if (PermissionHelper::check('staff/default')): ?>
+                                <?php if (PermissionHelper::check('staff/default/')): ?>
                                     <li>
                                         <?= Html::a('<i class="fe fe-users"></i> Nhân viên', ['/staff/default', 'menu'=>'dm6'], ['class' => 'slide-item', 'data-menu' => 'dm6']) ?>
                                     </li>
                                 <?php endif; ?>
-                                <?php if (PermissionHelper::check('kpi/default')): ?>
+                                <?php if (PermissionHelper::check('kpi/default/')): ?>
                                     <li>
                                         <?= Html::a('<i class="fe fe-bar-chart-2"></i> Danh mục KPI', ['/kpi/default', 'menu'=>'dm7'], ['class' => 'slide-item', 'data-menu' => 'dm7']) ?>
                                     </li>

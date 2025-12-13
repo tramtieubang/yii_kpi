@@ -6,8 +6,7 @@ use yii\helpers\Html;
 
 <?php if (
 	PermissionHelper::check('work-registered/register/index') ||
-	PermissionHelper::check('work-assignment/approve/index') ||
-	PermissionHelper::check('kpi/default/index') 
+	PermissionHelper::check('work-assignment/approve/index') 
 ): ?>
     <li class="slide">
         <a class="side-menu__item" data-bs-toggle="slide" href="javascript:void(0);">
@@ -20,21 +19,16 @@ use yii\helpers\Html;
                     <div class="tab-content">
                         <div class="tab-pane active" id="side7">
                             <ul class="sidemenu-list">
-                                <?php if (PermissionHelper::check('work-registered/register')): ?>
+                                <?php if (PermissionHelper::check('work-registered/register/')): ?>
                                     <li>
                                         <?= Html::a('<i class="fe fe-clipboard"></i> Đăng ký công việc', ['/work-registered/register', 'menu'=>'cv1'], ['class' => 'slide-item', 'data-menu' => 'cv1']) ?>
                                     </li>
                                 <?php endif; ?>                               
-                                <?php if (PermissionHelper::check('work-assignment/approve')): ?>
+                                <?php if (PermissionHelper::check('work-assignment/approve/')): ?>
                                     <li>
                                         <?= Html::a('<i class="fe fe-thumbs-up"></i> Phê duyệt và phân công việc', ['/work-assignment/approve', 'menu'=>'cv4'], ['class' => 'slide-item', 'data-menu' => 'cv4']) ?>
                                     </li>
                                 <?php endif; ?>                                
-                                 <?php if (PermissionHelper::check('kpi/default')): ?>
-                                    <li>
-                                        <?= Html::a('<i class="fe fe-bar-chart"></i> Báo cáo công việc', ['/kpi/default', 'menu'=>'cv6'], ['class' => 'slide-item', 'data-menu' => 'cv6']) ?>
-                                    </li>
-                                <?php endif; ?>
                                 
                             </ul>
                             <div class="menutabs-content px-0">

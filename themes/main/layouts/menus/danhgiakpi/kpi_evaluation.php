@@ -20,17 +20,17 @@ use yii\helpers\Html;
                     <div class="tab-content">
                         <div class="tab-pane active" id="side7">
                             <ul class="sidemenu-list">
-                                <?php if (PermissionHelper::check('deparments/default')): ?>
+                                <?php if (PermissionHelper::check('deparments/default/')): ?>
                                     <li>
                                         <?= Html::a('<i class="fe fe-edit"></i> Chấm điểm KPI ', ['/deparments/default', 'menu'=>'dg1'], ['class' => 'slide-item', 'data-menu' => 'dg1']) ?>
                                     </li>
                                 <?php endif; ?>
-                                <?php if (PermissionHelper::check('employees/default')): ?>
+                                <?php if (PermissionHelper::check('employees/default/')): ?>
                                     <li>
                                         <?= Html::a('<i class="fe fe-user-check"></i> Đánh giá hiệu suất cá nhân ', ['/employees/default', 'menu'=>'dg2'], ['class' => 'slide-item', 'data-menu' => 'dg2']) ?>
                                     </li>
                                 <?php endif; ?>
-                                <?php if (PermissionHelper::check('kpi/default')): ?>
+                                <?php if (PermissionHelper::check('kpi/default/')): ?>
                                     <li>
                                         <?= Html::a('<i class="fe fe-users"></i> Đánh giá theo phòng ban ', ['/kpi/default', 'menu'=>'dg3'], ['class' => 'slide-item', 'data-menu' => 'dg3']) ?>
                                     </li>

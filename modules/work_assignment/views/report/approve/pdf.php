@@ -1,6 +1,6 @@
 <style>
     body {
-        font-family: DejaVu Sans, sans-serif;
+        font-family: 'Times New Roman', Times, serif;
         font-size: 13px;
         margin: 0;
         padding: 0;

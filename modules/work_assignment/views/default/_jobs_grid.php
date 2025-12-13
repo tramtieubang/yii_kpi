@@ -93,16 +93,22 @@ Pjax::begin([
     ],
 
     /** ✅ Layout giữ phân trang & summary ở cuối **/
+    'layout' => "{items}
+                <div class='d-flex justify-content-between align-items-center grid-footer-bar mt-2 pt-2 border-top'>
+                    <div class='small text-muted'>{summary}</div>
+                    <div>{pager}</div>
+                </div>",
+    'summary' => 'Tổng: {totalCount} dòng dữ liệu',
+
+/* 
     'layout' => "{items}\n<div class='d-flex justify-content-between align-items-center grid-footer-bar mt-2 pt-2 border-top'>
         <div>{pager}</div>
         <div class='small text-muted'>{summary}</div>
-    </div>",
-
-    'summary' => 'Hiển thị {count}/{totalCount} bản ghi',
-    'responsive' => true,
-    'condensed' => true,
-    'striped' => false,
-    'hover' => true,
+    </div>", 
+  
+    //'summary' => 'Hiển thị {count}/{totalCount} bản ghi',
+ */   
+    
 ]) ?>
 
 <?php Pjax::end(); ?>

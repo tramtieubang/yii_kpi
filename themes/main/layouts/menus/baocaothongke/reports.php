@@ -5,7 +5,7 @@ use yii\helpers\Html;
 ?>
 
 <?php if (
-	PermissionHelper::check('deparments/default/index') ||
+	PermissionHelper::check('reports/default/index') ||
 	PermissionHelper::check('employees/default/index') ||
 	PermissionHelper::check('kpi/default/index') 
 ): ?>
@@ -20,9 +20,9 @@ use yii\helpers\Html;
                     <div class="tab-content">
                         <div class="tab-pane active" id="side7">
                             <ul class="sidemenu-list">
-                                <?php if (PermissionHelper::check('deparments/default')): ?>
+                                <?php if (PermissionHelper::check('reports/default/')): ?>
                                     <li>
-                                        <?= Html::a('<i class="fe fe-bar-chart-2"></i> Báo cáo tổng hợp KPI ', ['/deparments/default', 'menu'=>'bc1'], ['class' => 'slide-item', 'data-menu' => 'bc2']) ?>
+                                        <?= Html::a('<i class="fe fe-bar-chart-2"></i> Báo cáo ', ['/reports/default', 'menu'=>'bc1'], ['class' => 'slide-item', 'data-menu' => 'bc1']) ?>
                                     </li>
                                 <?php endif; ?>
                                 <?php if (PermissionHelper::check('employees/default')): ?>

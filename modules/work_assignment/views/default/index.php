@@ -357,12 +357,6 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
                 'id' => 'work-assignment-grid',
                 'dataProvider' => $dataProvider,
                 'pjax' => false,
-                'panel' => false,
-                'summary' => false,
-                'responsive' => true,
-                'striped' => false,
-                'condensed' => true,
-                'hover' => true,
                 'columns' => require(__DIR__.'/_columns.php'),
                 'toolbar'=> [
                     ['content'=>
@@ -397,21 +391,41 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
                         '{export}'
                     ],
                 ],    
+
+                //'panel' => false,
+                //'summary' => false,
+                'responsive' => true,
                 'striped' => false,
                 'condensed' => true,
-                'responsive' => true,   
+                'hover' => true,
                 'panelHeadingTemplate'=>'{title}',
-                'panelFooterTemplate'=>'{summary}',
-                'summary'=>'Hiển thị dữ liệu {count}/{totalCount}, Trang {page}/{pageCount}',
+                //'panelFooterTemplate'=>'{summary}',
+                //'summary'=>'Hiển thị dữ liệu {count}/{totalCount}, Trang {page}/{pageCount}',
+                'panelFooterTemplate'=>'<div style="width:100%;"><div class="float-start">{summary}</div><div class="float-end">{pager}</div></div>',
+                'summary'=>'Tổng: {totalCount} dòng dữ liệu',
+                // 🔹 Vị trí hiển thị nút trang
+                'layout' => "{items}\n{pager}",
                 'panel' => [
                     //'type' => 'primary', 
                     //'heading' => '<i class="fas fa fa-list" aria-hidden="true"></i> Danh sách',
-                    //'heading' => $this->render('//layouts\menus/gridview_heading'),
-                    'heading' => '<span style="color: #007bff;"><i class="fas fa-clipboard-list"></i> NHẬT KÝ CÔNG VIỆC</span>',
-                    'headingOptions' => ['class'=>'card-header'],
-                    'before'=>'<em>* '.Html::encode($this->title).'</em>',
+                    'headingOptions' => [
+                        'class' => 'gv-heading-mini'
+                    ],
+                    'before' => '<div style="
+                                    color:#007bff;
+                                    border:0px solid black;
+                                    height:35px;
+                                    display:flex;
+                                    align-items:center;      /* canh giữa theo chiều cao */
+                                    /*justify-content:center;  /* canh giữa ngang */
+                                    font-weight:600;
+                                ">
+                                    <i class="fas fa-clipboard-list" style="margin-right:6px;"></i>
+                                    NHẬT KÝ CÔNG VIỆC
+                                </div>
+                                ',
                     '<div class="clearfix"></div>',
-                ],  
+                ],
 
             ]); ?>
         </div>       
@@ -426,11 +440,35 @@ $staffList = ArrayHelper::map($staff, 'id', 'name');
     // Toggle filter
     const btnScrollFilter = document.getElementById('btnScrollFilter');
     const filterBody = document.getElementById('filterFormBody');
+
+    let isCollapsed = false;
+
     btnScrollFilter.addEventListener('click', () => {
         const icon = btnScrollFilter.querySelector('i');
-        filterBody.classList.toggle('collapsed');
+
+        if (!isCollapsed) {
+            // Đóng
+            filterBody.style.height = filterBody.scrollHeight + 'px';
+            requestAnimationFrame(() => {
+                filterBody.style.height = '0px';
+                filterBody.classList.add('is-collapsed');
+            });
+        } else {
+            // Mở
+            filterBody.classList.remove('is-collapsed');
+            filterBody.style.height = filterBody.scrollHeight + 'px';
+
+            filterBody.addEventListener('transitionend', function handler() {
+                filterBody.style.height = 'auto';
+                filterBody.removeEventListener('transitionend', handler);
+            });
+        }
+
+        btnScrollFilter.classList.toggle('is-collapsed');
         icon.classList.toggle('fe-chevron-up');
         icon.classList.toggle('fe-chevron-down');
+
+        isCollapsed = !isCollapsed;
     });
 
     // Reset filter

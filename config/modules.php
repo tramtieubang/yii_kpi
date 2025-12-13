@@ -41,6 +41,10 @@ return [
     'home' => [ 
         'class' => 'app\modules\home\Module', 
     ],
+
+    'reports' => [ 
+        'class' => 'app\modules\reports\Module', 
+    ],
      
     // phan quyen
     /* 'user' => [ 

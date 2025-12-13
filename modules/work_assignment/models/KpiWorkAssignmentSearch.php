@@ -56,6 +56,12 @@ class KpiWorkAssignmentSearch extends KpiWorkAssignmentForm
             ],
         ]);
 
+        $pageSize = Yii::$app->request->get('per-page', 20);
+        $dataProvider->pagination = [
+            'pageSize' => $pageSize,
+            'pageSizeLimit' => [10, 100],
+        ];
+
         $this->load($params);
 
         if (!$this->validate()) {
@@ -109,6 +115,12 @@ class KpiWorkAssignmentSearch extends KpiWorkAssignmentForm
                 ],
             ],
         ]);
+
+        $pageSize = Yii::$app->request->get('per-page', 20);
+        $dataProvider->pagination = [
+            'pageSize' => $pageSize,
+            'pageSizeLimit' => [10, 100],
+        ];
 
         $this->load($params);
 
