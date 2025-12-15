@@ -61,7 +61,7 @@ class ViboonAsset extends AssetBundle
 
         'assets/js/sweetalert2.all.min.js',
 
-        'js/bootbox.js',
+        //'js/bootbox.js',
        
         //'assets/plugins/tabs/jquery.multipurpose_tabcontent.js',
         //'assets/plugins/tabs/tab-content.js'
